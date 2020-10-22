@@ -1,0 +1,199 @@
+<app-menu [title]="title"></app-menu>
+
+<ion-content>
+
+  <div class="create">
+    <div class="step1" *ngIf="step1"   [@enterAnimation]>
+
+
+      <form action="">
+
+        <div class="form">
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">Your client name</ion-label>
+            <ion-input placeholder="Type name here" autofocus="true"></ion-input>
+          </ion-item>
+
+
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">Client phone number</ion-label>
+            <ion-input placeholder="Type phone number here" autofocus="true"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">SHipping address</ion-label>
+            <ion-input placeholder="Type client shipping address here" autofocus="true"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">total collectible price</ion-label>
+            <ion-input placeholder="Type order price here" autofocus="true"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">total collectible price</ion-label>
+            <ion-textarea autoGrow="true" rows="4" placeholder="Type your order details here...">
+            </ion-textarea>
+
+          </ion-item>
+          <div class="images">
+            <div class="image" *ngIf="image">
+              <ion-thumbnail height="65" width="65">
+                <img [src]="image">
+              </ion-thumbnail>
+            </div>
+            <div class="image-upload">
+              <ion-button (click)="openCamera()">
+                <ion-icon name="camera-sharp"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+
+          <ion-button color="primary" (click)="next()" expand="block">Proceed</ion-button>
+
+        </div>
+
+
+
+
+
+      </form>
+    </div>
+    <div class="step2" *ngIf="step2"   [@enterAnimation]    >
+
+
+      <div class="top">
+        <div class="searchBar">
+          <ion-searchbar animated placeholder="Search"></ion-searchbar>
+
+        </div>
+        <ion-text>
+          Choose a item
+        </ion-text>
+      </div>
+
+
+
+      <div class="items">
+
+
+
+        <!-- List of Input Items -->
+        <ion-list lines="full">
+
+          <ion-radio-group value="pilot">
+
+            <div class="item">
+
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>Ricky Mclaughlin</h4>
+                  <h6 class="available">Available</h6>
+                </ion-label>
+                <ion-radio slot="end" value="1"></ion-radio>
+
+
+              </ion-item>
+            </div>
+
+            <div class="item">
+              <div class="overlay"></div>
+
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>Ricky Mclaughlin</h4>
+                  <h6 class="delivery">Available</h6>
+                </ion-label>
+
+                <ion-radio slot="end" value="1"></ion-radio>
+
+              </ion-item>
+            </div>
+          </ion-radio-group>
+
+        </ion-list>
+      </div>
+
+      <div class="assignVehicle">
+        <ion-button expand="block" (click)="next()" color="success">Assign A Vehicle</ion-button>
+
+      </div>
+
+    </div>
+
+
+    <div class="step3" *ngIf="step3"   [@enterAnimation]
+    >
+      <div class="top">
+        <div class="searchBar">
+          <ion-searchbar animated placeholder="Search"></ion-searchbar>
+
+        </div>
+        <ion-text>
+          Choose a Vehicle
+        </ion-text>
+      </div>
+
+
+
+      <div class="items">
+
+
+
+        <!-- List of Input Items -->
+        <ion-list lines="full">
+          <ion-radio-group value="vehicle">
+
+            <div class="item">
+
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>Ricky Mclaughlin</h4>
+                  <h6 class="available">Available</h6>
+                </ion-label>
+
+                <ion-radio slot="end" value="1"></ion-radio>
+
+              </ion-item>
+            </div>
+
+            <div class="item">
+              <div class="overlay"></div>
+
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>Ricky Mclaughlin</h4>
+                  <h6 class="delivery">Available</h6>
+                </ion-label>
+
+                <ion-radio slot="end" value="1"></ion-radio>
+
+              </ion-item>
+            </div>
+          </ion-radio-group>
+
+
+        </ion-list>
+      </div>
+
+      <div class="assignVehicle">
+        <ion-button expand="block" (click)="send()" color="success">Send</ion-button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+</ion-content>

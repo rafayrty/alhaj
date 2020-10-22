@@ -1,0 +1,54 @@
+<app-menu title="Home"></app-menu>
+
+
+
+<ion-content>
+    <div class="home">
+
+    <ion-grid>
+
+    <ion-row class="ion-align-items-center ion-justify-content-center" >
+        <ion-col size="12">
+
+            <div class="orderButton" (click)="orderBTN($event,'orders/create')" >
+<div class="orderButtonCard">
+              <img src="/assets/images/new.svg" alt="">
+                    
+                    <ion-text>
+                        <h3 color="dark"> New Order</h3>
+                    </ion-text>
+                </div>
+
+            </div>
+       
+
+
+
+            </ion-col>
+        <ion-col>
+<div class="orderButton" (click)="orderBTN($event,'orders/manage')">
+    <div class="orderButtonCard">
+
+        <img src="/assets/images/manage.svg" alt="">
+
+                
+        <ion-text>
+            <h3 color="dark"> Manage orders</h3>
+        </ion-text>
+    </div>
+        
+</div>
+
+
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+</div>
+<div class="logoutbtn">
+    <ion-button color="danger" expand="block"><ion-icon name="log-out-outline"></ion-icon>Logout</ion-button>
+</div>
+
+
+</ion-content>
+
