@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Animation, AnimationController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { StorageService } from '../services/storage.service';
 
 import {
   Plugins,
@@ -16,7 +17,7 @@ const { Haptics } = Plugins;
 })
 export class HomePage implements OnInit {
 
-  constructor(private route:Router,private animationCtrl: AnimationController) { }
+  constructor(private store:StorageService,private route:Router,private animationCtrl: AnimationController) { }
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
     // Native StatusBar available
 if (Capacitor.getPlatform() != 'web') {
@@ -30,6 +31,10 @@ if (Capacitor.getPlatform() != 'web') {
     this.hapticsImpact(HapticsImpactStyle.Light);
   }
   ngOnInit() {
+  }
+  logOut(){
+     this.store.logout();
+    //  this.route.navigateByUrl('/login');
   }
   async orderBTN(e,route){
     const animation: Animation = this.animationCtrl.create()
@@ -47,5 +52,7 @@ if (Capacitor.getPlatform() != 'web') {
     });
 
   }
+
+
 
 }

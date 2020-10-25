@@ -1,0 +1,30 @@
+@function rem($size) {
+    @return $size / 16px * 1rem;
+  }
+.swipe{
+   text-align:center; 
+   color:var(--ion-color-medium);
+   font-size:rem(13px);
+   h6{
+    font-weight:400;
+    margin-top:.6rem;
+   }
+
+}
+ion-thumbnail{
+    img{
+        border-radius:40px;
+    }
+}
+
+ion-list{
+    ion-item{
+        --padding-top:.5rem;
+        --padding-bottom:.5rem;
+    }
+}
+ion-footer{
+    max-width:92%;
+    margin:0 auto;
+    margin-bottom:1rem;
+}

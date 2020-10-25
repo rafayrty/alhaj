@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
@@ -7,9 +7,12 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class MenuComponent implements OnInit {
 @Input() title: string;
-  constructor() { }
+  constructor(private route:Router) { }
 
   ngOnInit() {
   }
 
+  settings(){
+    this.route.navigate(['/settings']);
+  }
 }

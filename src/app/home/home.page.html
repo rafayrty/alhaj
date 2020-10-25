@@ -1,5 +1,13 @@
-<app-menu title="Home"></app-menu>
-
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Home</ion-title>
+      <ion-buttons slot="end">
+        <ion-button routerLink="/settings">Settings</ion-button>
+      </ion-buttons>
+  
+    </ion-toolbar>
+  </ion-header>
+  
 
 
 <ion-content>
@@ -10,7 +18,7 @@
     <ion-row class="ion-align-items-center ion-justify-content-center" >
         <ion-col size="12">
 
-            <div class="orderButton" (click)="orderBTN($event,'orders/create')" >
+            <div class="orderButton"  (click)="orderBTN($event,'orders/create')" >
 <div class="orderButtonCard">
               <img src="/assets/images/new.svg" alt="">
                     
@@ -46,7 +54,7 @@
 
 </div>
 <div class="logoutbtn">
-    <ion-button color="danger" expand="block"><ion-icon name="log-out-outline"></ion-icon>Logout</ion-button>
+    <ion-button color="danger" expand="block" (click)="logOut()"><ion-icon name="log-out-outline"></ion-icon>Logout</ion-button>
 </div>
 
 

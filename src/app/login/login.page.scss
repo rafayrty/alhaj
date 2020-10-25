@@ -6,7 +6,7 @@
    animation: svgAnimation 1s ease-in-out;
    animation-fill-mode: forwards;  
   //  animation-delay: 2s;
-   transform: scale(1) translateY(50%);
+   transform: scale(1) translateY(0%);
 
 }
 @keyframes svgAnimation{
@@ -14,18 +14,26 @@
   transform: scale(1) translateY(50%);
   }
   to{
-    transform: scale(.5) translateY(30%);
+    transform: scale(.5) translateY(0%);
 
   }
   
 }
-
+ion-segment{
+  max-width: 40%;
+  margin: 0 auto;
+  margin-top:3rem;
+  opacity: 0;
+  animation: fadeIn .3s ease-in;
+  animation-fill-mode: forwards;
+  animation-delay: 1s;
+}
 .login-form{
   opacity: 0;
   animation: fadeIn .3s ease-in;
   animation-fill-mode: forwards;
   animation-delay: .8s;
-  padding-top:5%;
+  padding-top:0%;
   ion-text{
     text-transform: uppercase;
 
@@ -35,7 +43,7 @@
     }
   }
   form{
-    padding-top:5%;
+    padding-top:0%;
    ion-item{
      border-top:1px solid var(--ion-color-light-shade);
      border-top-color: var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-250, #c8c7cc)));
@@ -99,4 +107,10 @@
 
 #container a {
   text-decoration: none;
+}
+.error{
+  color:var(--ion-color-danger);
+  font-weight:500;
+  margin:.5rem 0;
+  font-size:.87rem;
 }

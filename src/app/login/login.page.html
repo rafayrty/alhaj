@@ -4,10 +4,20 @@
       Blank
     </ion-title>
   </ion-toolbar>
+        // "launchShowDuration": 0
+
 </ion-header> -->
 
-<ion-content [fullscreen]="true">
+<ion-content >
 <div class="login-page">
+  <ion-segment dir="ltr" (ionChange)="changeLang()" [(ngModel)]="selectedLang">
+    <ion-segment-button value="en">
+      <ion-label>EN</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="ar">
+      <ion-label>AR</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 <div id="svg">
   
 <svg  viewBox="0 0 214 260" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -149,14 +159,19 @@
 <form action="">
 
   <ion-item>
-    <ion-label position="fixed">Login ID</ion-label>
-    <ion-input placeholder="Type your login ID"></ion-input>
+    <ion-label position="fixed">{{'LOGIN.loginId' | translate}}</ion-label>
+    <ion-input [(ngModel)]="loginId" name="loginId" placeholder="Type your login ID"></ion-input>
+    <span class="error" *ngIf="errors.length!=0">{{errors.login_id[0]}}</span>
+    <span class="error" *ngIf="message">{{message}}</span>
+
   </ion-item>
+
   <div class="submit-btn">
     <ion-button 
+   (click)="login($event)"
     color="primary" 
     expand="block" 
-    (click)="loginForm()">Login</ion-button>
+   >Login</ion-button>
   
   </div>
 

@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Edit Vehicle</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="edit()">Done</ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<div class="create">
+<ion-text color="medium">
+  <h6>Vehicle Photo</h6>
+</ion-text>
+<div class="photo">
+<div class="image" *ngIf="!vehicle.image" (click)="openCamera()">
+
+
+  <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="160" rx="80" fill="#F2F2F2"/>
+    <path d="M68.2757 93H91.7243C94.5702 93 96 91.5821 96 88.7735V74.4987C96 71.6901 94.5702 70.2858 91.7243 70.2858H88.5515C87.4894 70.2858 87.1489 70.0676 86.5498 69.3859L85.4468 68.1589C84.766 67.409 84.0715 67 82.6689 67H77.2357C75.8332 67 75.1387 67.409 74.4579 68.1589L73.3685 69.3859C72.7694 70.054 72.4289 70.2858 71.3668 70.2858H68.2757C65.4298 70.2858 64 71.6901 64 74.4987V88.7735C64 91.5821 65.4298 93 68.2757 93ZM80 88.6371C75.8877 88.6371 72.5787 85.3241 72.5787 81.1793C72.5787 77.0346 75.8877 73.7216 80 73.7216C84.126 73.7216 87.4349 77.0346 87.4349 81.1793C87.4349 85.3241 84.126 88.6371 80 88.6371ZM89.7906 77.8526C88.8647 77.8526 88.1021 77.1028 88.1021 76.1757C88.1021 75.2349 88.8647 74.4851 89.7906 74.4851C90.7166 74.4851 91.4791 75.2349 91.4791 76.1757C91.4791 77.1028 90.7166 77.8526 89.7906 77.8526ZM80 86.5648C82.9685 86.5648 85.3787 84.1652 85.3787 81.1793C85.3787 78.1935 82.9685 75.7939 80 75.7939C77.0315 75.7939 74.6349 78.1935 74.6349 81.1793C74.6349 84.1652 77.0451 86.5648 80 86.5648Z" fill="#BDBDBD"/>
+    </svg>
+    
+
+</div>
+<div class="image" style="text-align: center;" *ngIf="vehicle.image" >
+<img style="width:160px;display:inline-block;height:160px;object-fit: cover;border-radius: 100px;" [src]="vehicle.image">
+
+</div>
+</div>
+
+<div class="buttons">
+<ion-button color="primary" expand="block" (click)="openCamera()" fill="solid">Upload Photo</ion-button>
+<!-- <ion-button color="danger" expand="block"  fill="outline">Delete Photo</ion-button> -->
+
+</div>
+
+
+
+  
+</div>
+<div class="form">
+  <ion-item lines="none">
+    <ion-label color="medium"  position="stacked">Vehicle Name</ion-label>
+    <ion-input placeholder="Type name here" autofocus="true" [(ngModel)]="vehicle.name" name="name"></ion-input>
+    <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
+
+  </ion-item>
+
+
+ 
+
+
+
+
+</div>
+
+
+</ion-content>
+

@@ -1,0 +1,122 @@
+{
+    "wait":"Please wait...",
+     "search":"Search",
+     "back":"Back",
+     "settings":"Settings",
+     "logout":"Logout",
+     "call":"Call",
+     "edit":"Edit",
+     "delete":"Delete",
+     "done":"Done!",
+
+    "LOGIN":{
+        "loginId":"Login ID",
+        "welcome":"welcome back!",
+        "placeholder":"Type your login ID",
+        "btn":"Login"
+    },
+    "HOME":{
+        "title":"Home",
+        "logout":"Logout",
+        "new":"New order",
+        "manage":"Manage orders"
+    },
+    "CREATE":{
+        "title":"Create An Order",
+        "name":"Your client name",
+        "name_placeholder":"Your client name",
+        "phone":"Client phone number",
+        "phone_placeholder":"Client phone number",
+        "address":"SHipping address",
+        "address_placeholder":"Type client shipping address here",
+        "price":"total collectible price",
+        "price_placeholder":"Type order price here",
+        "order":"Type your order",
+        "order_placeholder":"Type your order",
+        "proceed":"Proceed",
+
+        "PILOT":{
+            "title":"Assign a pilot",
+            "choose":"Choose a pilot"
+        },"VEHICLE":{
+            "title":"Assign a vehicle",
+            "choose":"Choose a vehicle",
+            "send":"Send"
+        },
+        "ASSIGN":{
+            "title":"Assign the order",
+            "done":"Done!",
+            "order":"Your order was sent",
+            "notified":"You’ll be notified when the pilot is delivering, And when he’s available again",
+            "new":"Create new order"
+
+        }
+    },
+    "manage":{
+        "title":"Manage orders",
+        "status":"Status",
+        "total":"Total bill:",
+        "client":"Client: ",
+        "created":"Created on:",
+        "assigned":"Assigned to:"
+        
+    },
+    "SETTINGS":{
+        "title":"Settings",
+        "pilots":"Manage Pilots",
+        "vehicles":"Manage Vehicles",
+
+        "PILOTS":{
+            "title":"Manage pilots",
+            "swipe":"Swipe items left for options",
+            "new":"Add new pilot",
+
+
+            "INPUTS":{
+                "photo":"Pilot Photo",
+                "upload":"Upload Photo",
+                "name":"Pilot Name",
+                "name_placeholder":"Type name here",
+                "phone":"Pilot phone number",
+                "phone_placeholder":"Type phone number here",
+                "loginId":"Login ID",
+                "loginId_placeholder":"Make it short and unique..."
+            
+            }
+        },
+        "VEHICLES":{
+            "title":"Manage vehicles",
+            "swipe":"Swipe items left for options",
+
+            "INPUTS":{
+                "photo":"Vehicle Photo",
+                "upload":"Upload Photo",
+                "name":"vehicle title",
+                "phone_placeholder":"Type name here"
+
+
+            }
+        }
+    },
+    "ALERTS":{
+        "title":"Confirmation",
+        "pilots":"Are You Sure You Want To Delete This <strong>Pilot</strong>!",
+        "vehicles":"Are You Sure You Want To Delete This <strong>Vehicle</strong>!",
+        "cancel":"Cancel",
+        "confirm":"Confirm",
+        "shipped":"Are you sure you want to mark this order as shipped?",
+        "delivered":"Are you sure you want to mark this order as delivered?"
+    },
+    "ORDER":{
+        "call":"Call Client",
+        "collectible":"Total collectible",
+        "details":"Order Details",
+        "shipped":"Mark as shipped",
+        "delivered":"Mark as Delivered",
+
+        "DONE":{
+            "all":"All is done",
+            "notification":"You’ll get a nootification when you receive a new order to deliver"
+        }
+    }
+}

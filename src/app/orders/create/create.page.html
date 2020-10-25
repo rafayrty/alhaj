@@ -11,30 +11,38 @@
         <div class="form">
           <ion-item lines="none">
             <ion-label color="medium" position="stacked">Your client name</ion-label>
-            <ion-input placeholder="Type name here" autofocus="true"></ion-input>
+            <ion-input placeholder="Type name here" [(ngModel)]="form.name"  name="name" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
+
           </ion-item>
 
 
           <ion-item lines="none">
             <ion-label color="medium" position="stacked">Client phone number</ion-label>
-            <ion-input placeholder="Type phone number here" autofocus="true"></ion-input>
+            <ion-input placeholder="Type phone number here" [(ngModel)]="form.phone" name="phone" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.phone">{{errors.phone[0]}}</span>
+
           </ion-item>
           <ion-item lines="none">
             <ion-label color="medium" position="stacked">SHipping address</ion-label>
-            <ion-input placeholder="Type client shipping address here" autofocus="true"></ion-input>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-label color="medium" position="stacked">total collectible price</ion-label>
-            <ion-input placeholder="Type order price here" autofocus="true"></ion-input>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-label color="medium" position="stacked">total collectible price</ion-label>
-            <ion-textarea autoGrow="true" rows="4" placeholder="Type your order details here...">
-            </ion-textarea>
+            <ion-input placeholder="Type client shipping address here"  [(ngModel)]="form.address" name="address" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.address">{{errors.address[0]}}</span>
 
           </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">total collectible price</ion-label>
+            <ion-input placeholder="Type order price here"  [(ngModel)]="form.price" name="price" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.price">{{errors.price[0]}}</span>
+
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">Type your order</ion-label>
+            <ion-textarea autoGrow="true" rows="4" [(ngModel)]="form.order" name="order" placeholder="Type your order details here..."> </ion-textarea>
+            <span class="error" *ngIf="errors.length!=0 && errors.order">{{errors.order[0]}}</span>
+            <span class="error" *ngIf="errors.length!=0 && errors.image">{{errors.image[0]}}</span>
+          </ion-item>
           <div class="images">
-            <div class="image" *ngIf="image">
+            <div class="image" *ngIf="image" >
               <ion-thumbnail height="65" width="65">
                 <img [src]="image">
               </ion-thumbnail>
@@ -47,7 +55,6 @@
           </div>
 
 
-          <ion-button color="primary" (click)="next()" expand="block">Proceed</ion-button>
 
         </div>
 
@@ -62,7 +69,8 @@
 
       <div class="top">
         <div class="searchBar">
-          <ion-searchbar animated placeholder="Search"></ion-searchbar>
+          <ion-searchbar animated  [(ngModel)]="searchPilots"
+          (ionChange)="filterPilots()" placeholder="Search" name="searchPilots"></ion-searchbar>
 
         </div>
         <ion-text>
@@ -79,25 +87,29 @@
         <!-- List of Input Items -->
         <ion-list lines="full">
 
-          <ion-radio-group value="pilot">
+          <ion-radio-group value="pilot"  name="pilot" [(ngModel)]="form.pilot" mode="md">
 
-            <div class="item">
+            <div class="item" *ngFor="let pilot of pilots; let i = index">
+              <div class="overlay" *ngIf="pilot.status == 'Out For Delivery' || pilot.status == 'Logged Out'"></div>
 
-              <ion-item>
+              <ion-item >
                 <ion-thumbnail slot="start">
-                  <img src="/assets/images/ricky.png">
+                  <img  src="{{pilot.image}}">
                 </ion-thumbnail>
                 <ion-label>
-                  <h4>Ricky Mclaughlin</h4>
-                  <h6 class="available">Available</h6>
+                  <h4>{{pilot.name}}</h4>
+                  <h6 class="warning" *ngIf="pilot.status == 'Out For Delivery'">Out For Delivery</h6>
+                  <h6 class="available" *ngIf="pilot.status == 'Available'">Out For Delivery</h6>
+                  <h6 class="danger" *ngIf="pilot.status == 'Logged Out'">Logged Out</h6>
+
                 </ion-label>
-                <ion-radio slot="end" value="1"></ion-radio>
+                <ion-radio slot="end" value="{{pilot.id}}"></ion-radio>
 
 
               </ion-item>
             </div>
 
-            <div class="item">
+            <!-- <div class="item">
               <div class="overlay"></div>
 
               <ion-item>
@@ -112,25 +124,25 @@
                 <ion-radio slot="end" value="1"></ion-radio>
 
               </ion-item>
-            </div>
+            </div> -->
           </ion-radio-group>
 
         </ion-list>
       </div>
 
-      <div class="assignVehicle">
+      <!-- <div class="assignVehicle">
         <ion-button expand="block" (click)="next()" color="success">Assign A Vehicle</ion-button>
 
-      </div>
+      </div> -->
 
     </div>
 
 
-    <div class="step3" *ngIf="step3"   [@enterAnimation]
-    >
+    <div class="step3" *ngIf="step3"   [@enterAnimation]>
       <div class="top">
         <div class="searchBar">
-          <ion-searchbar animated placeholder="Search"></ion-searchbar>
+          <ion-searchbar animated placeholder="Search" [(ngModel)]="searchVehicles"
+          (ionChange)="filterVehicles()" name="searchVehicles"></ion-searchbar>
 
         </div>
         <ion-text>
@@ -146,24 +158,25 @@
 
         <!-- List of Input Items -->
         <ion-list lines="full">
-          <ion-radio-group value="vehicle">
+          <ion-radio-group value="vehicle" name="vehicle" [(ngModel)]="form.vehicle" [(ngModel)]="form.vehicle" mode="md">
 
-            <div class="item">
+            <div class="item" *ngFor="let vehicle of vehicles; let i = index">
+              <div class="overlay" *ngIf="vehicle.status == 'Out For Delivery'"></div>
 
-              <ion-item>
+              <ion-item >
                 <ion-thumbnail slot="start">
-                  <img src="/assets/images/ricky.png">
+                  <img src="{{vehicle.image}}">
                 </ion-thumbnail>
                 <ion-label>
-                  <h4>Ricky Mclaughlin</h4>
-                  <h6 class="available">Available</h6>
+                  <h4>{{vehicle.name}}</h4>
+                  <h6 class="available">{{vehicle.status}}</h6>
                 </ion-label>
 
-                <ion-radio slot="end" value="1"></ion-radio>
+                <ion-radio slot="end" value="{{vehicle.id}}"></ion-radio>
 
               </ion-item>
             </div>
-
+<!-- 
             <div class="item">
               <div class="overlay"></div>
 
@@ -179,17 +192,17 @@
                 <ion-radio slot="end" value="1"></ion-radio>
 
               </ion-item>
-            </div>
+            </div> -->
           </ion-radio-group>
 
 
         </ion-list>
       </div>
 
-      <div class="assignVehicle">
+      <!-- <div class="assignVehicle">
         <ion-button expand="block" (click)="send()" color="success">Send</ion-button>
 
-      </div>
+      </div> -->
 
     </div>
 
@@ -197,3 +210,19 @@
 
 
 </ion-content>
+
+
+
+<ion-footer *ngIf="step1">
+  <ion-button color="primary" (click)="next($event,'proceed')" expand="block">Proceed</ion-button>
+</ion-footer>
+
+
+<ion-footer *ngIf="step2">
+  <ion-button expand="block" (click)="next($event,'pilot')" color="success">Assign A Vehicle</ion-button>
+</ion-footer>
+
+<ion-footer *ngIf="step3">
+  <ion-button expand="block" (click)="send($event)" color="success">Send</ion-button>
+
+</ion-footer>

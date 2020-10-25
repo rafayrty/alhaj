@@ -1,9 +1,179 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>manage</ion-title>
-  </ion-toolbar>
-</ion-header>
-
+<app-menu title="Manage Orders"></app-menu>
 <ion-content>
+
+  <div class="manage-page">
+    <div class="searchBar">
+      <ion-searchbar animated placeholder="Search" [(ngModel)]="searchOrders"
+      (ionChange)="filterOrders()" name="searchOrders"></ion-searchbar>
+
+    </div>
+
+
+    <div class="orders-list">
+
+      <ion-list lines="none">
+        <ion-item *ngFor="let order of orders; let i = index">
+          <div class="order">
+            <div class="status warning" [ngClass]="{'medium': order.status === 'Pending', 'warning':order.status === 'Shipped', 'success':order.status === 'Delivered' }"            >
+              <div class="status-text">
+                <h3>Status: <span>{{order.status}}</span></h3>
+              </div>
+              <div class="status-total">
+                <h3>Total Bill: <span>$ {{order.price}}</span></h3>
+              </div>
+            </div>
+
+            <div class="client">
+              <div class="details">
+                <h2>Client: <span>{{order.client}}</span></h2>
+                <p>Created on: {{date(order.created_at)}}</p>
+              </div>
+              <ion-button color="success" (click)="call(order.phone)">Call</ion-button>
+
+            </div>
+
+            <div class="assigned">
+              <ion-text color="medium">
+                <p>Assigned to:</p>
+              </ion-text>
+              <div class="pilot">
+                <div class="left">
+                  <ion-thumbnail slot="start">
+                    <img src="{{order.user.image}}">
+                  </ion-thumbnail>
+                  <p>{{order.user.name}}</p>
+                </div>
+
+                <div class="right">
+                  <ion-button color="primary" (click)="call(order.user.phone)" fill="outline">Call</ion-button>
+
+                </div>
+
+              </div>
+              <div class="vehicle">
+                <ion-thumbnail slot="start">
+                  <img src="{{order.vehicle.image}}">
+                </ion-thumbnail>
+                <p>{{order.vehicle.name}}</p>
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </ion-item>
+
+        <!-- <ion-item>
+          <div class="order">
+            <div class="status success">
+              <div class="status-text">
+                <h3>Status: <span>Delivered</span></h3>
+              </div>
+              <div class="status-total">
+                <h3>Total Bill: <span>$ 568</span></h3>
+              </div>
+            </div>
+
+            <div class="client">
+              <div class="details">
+                <h2>Client: <span>John Doe</span></h2>
+                <p>Created on: Oct. 20, 14:25</p>
+              </div>
+              <ion-button color="success">Call</ion-button>
+
+            </div>
+
+            <div class="assigned">
+              <ion-text color="medium">
+                <p>Assigned to:</p>
+              </ion-text>
+              <div class="pilot">
+                <div class="left">
+                  <ion-thumbnail slot="start">
+                    <img src="/assets/images/ricky.png">
+                  </ion-thumbnail>
+                  <p>Ricky Mclaughlin</p>
+                </div>
+
+                <div class="right">
+                  <ion-button color="primary" fill="outline">Call</ion-button>
+
+                </div>
+
+              </div>
+              <div class="vehicle">
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <p>Ricky Mclaughlin</p>
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </ion-item>
+
+        <ion-item>
+          <div class="order">
+            <div class="status medium">
+              <div class="status-text">
+                <h3>Status: <span>Delivered</span></h3>
+              </div>
+              <div class="status-total">
+                <h3>Total Bill: <span>$ 568</span></h3>
+              </div>
+            </div>
+
+            <div class="client">
+              <div class="details">
+                <h2>Client: <span>John Doe</span></h2>
+                <p>Created on: Oct. 20, 14:25</p>
+              </div>
+              <ion-button color="success">Call</ion-button>
+
+            </div>
+
+            <div class="assigned">
+              <ion-text color="medium">
+                <p>Assigned to:</p>
+              </ion-text>
+              <div class="pilot">
+                <div class="left">
+                  <ion-thumbnail slot="start">
+                    <img src="/assets/images/ricky.png">
+                  </ion-thumbnail>
+                  <p>Ricky Mclaughlin</p>
+                </div>
+
+                <div class="right">
+                  <ion-button color="primary" fill="outline">Call</ion-button>
+
+                </div>
+
+              </div>
+              <div class="vehicle">
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <p>Ricky Mclaughlin</p>
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </ion-item>
+       -->
+
+      </ion-list>
+
+    </div>
+
+
+  </div>
 
 </ion-content>

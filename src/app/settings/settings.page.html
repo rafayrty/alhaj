@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Settings</ion-title>
+    <!-- <ion-buttons slot="end">
+      <ion-button (click)="settings()">Settings</ion-button>
+    </ion-buttons> -->
+
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+  <div class="settings">
+
+    <ion-grid>
+
+    <ion-row class="ion-align-items-center ion-justify-content-center" >
+        <ion-col size="12">
+
+            <div class="orderButton" (click)="settingsBTN($event,'settings/pilots')" >
+<div class="orderButtonCard">
+              <img src="/assets/images/pilots.svg" alt="">
+                    
+                    <ion-text>
+                        <h3 color="dark"> Manage Pilots</h3>
+                    </ion-text>
+                </div>
+
+            </div>
+       
+
+
+
+            </ion-col>
+        <ion-col>
+<div class="orderButton" (click)="settingsBTN($event,'settings/vehicles')">
+    <div class="orderButtonCard">
+
+        <img src="/assets/images/vehicles.svg" alt="">
+
+                
+        <ion-text>
+            <h3 color="dark"> Manage Vehicles</h3>
+        </ion-text>
+    </div>
+        
+</div>
+
+
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+</div>
+
+</ion-content>
+

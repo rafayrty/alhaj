@@ -1,11 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-title>{{title}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button>Settings</ion-button>
+      <ion-button (click)="settings()">Settings</ion-button>
     </ion-buttons>
 
   </ion-toolbar>

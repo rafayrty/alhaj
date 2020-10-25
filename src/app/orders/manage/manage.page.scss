@@ -1,0 +1,136 @@
+@function rem($size) {
+    @return $size / 16px * 1rem;
+  }
+  *{
+      margin:0;
+      padding:0;
+  }
+  ion-thumbnail{
+      img{
+          border-radius:40px;
+      }
+  }
+.searchBar{
+    max-width:86%;
+    margin:0 auto;
+    margin-top:1rem;
+}
+
+.orders-list{
+    max-width:86%;
+    margin:0 auto;
+    margin-bottom:2rem;
+    ion-item:not(:first-child){
+        margin-top:1rem;
+    }
+ion-item{
+    --padding-start:0;
+    --inner-padding-end:0;
+
+    .order{
+        margin-top:1rem;
+        width:100%;
+        border-radius: 10px;
+                border:1px solid var( --ion-color-medium-shade);
+.status.warning{
+    background:var(--ion-color-warning);
+
+}
+.status.success{
+    background:var(--ion-color-success);
+
+}
+.status.medium{
+    background:var(--ion-color-medium);
+
+}
+        .status{
+            display:flex;
+            justify-content: space-between;
+            color:var(--ion-color-medium-contrast);
+            font-size:rem(14px);
+            border-radius: 10px;
+            border:1px solid var(--ion-color-medium-shade);
+            border-top:none;
+            padding:.1rem 1rem;
+            h3{
+                margin:0;
+                font-size:rem(14px);
+                 font-weight:400;
+                 span{
+                     font-weight:700;
+                 }
+            }
+        }
+        .client{
+            margin-top:.5rem;
+            display:flex;
+            justify-content: space-between;
+            padding:.3rem 1rem;
+           .details{
+               h2{
+                   color:var(--ion-color-primary);
+                   font-size:rem(18px);
+                   font-weight:400;
+                   span{
+                    font-weight:600;
+                   }
+               }
+               p{
+                   font-size:rem(10px);
+                   color:var(--ion-color-primary);
+               }
+           }
+           ion-button{
+               --border-radius:20px;
+               --padding-start:1.2rem;
+               --padding-end:1.2rem;
+           }
+        }
+        .assigned{
+            padding:.3rem 1rem;
+            margin-top:1.2rem;
+            ion-text{
+                p{
+                    font-size:rem(10px);
+
+                }
+            }
+            .pilot{
+                display:flex;
+                justify-content: space-between;
+                margin-top:.5rem;
+                align-items: center;
+                .left{
+                    display:flex;
+                    align-items: center;
+                    p{
+                        margin-left:.75rem;
+                        font-size:rem(14px);
+
+                    }
+                }
+                ion-button{
+                    --border-radius:20px;
+                    --padding-start:1.2rem;
+                    --padding-end:1.2rem;
+                }
+
+            }
+            .vehicle{
+                margin-top:.5rem;
+                margin-bottom:.5rem;
+                display:flex;
+                align-items: center;
+                p{
+                    margin-left:.75rem;
+                    font-size:rem(14px);
+
+                }
+
+            }
+        }
+    }
+    
+    }
+}

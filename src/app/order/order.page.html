@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Order</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logOut()">Logout</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+<div class="order-empty" [@inOutAnimation] *ngIf="!order">
+  <h1>All is done</h1>
+<div id="svg">
+
+  <svg  viewBox="0 0 219 187" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="219" height="55" rx="10" fill="#F2F2F2"/>
+    <rect y="66" width="219" height="55" rx="10" fill="#F2F2F2"/>
+    <rect y="132" width="219" height="55" rx="10" fill="#F2F2F2"/>
+    <circle cx="192.5" cy="27.5" r="10.5" fill="white"/>
+    <circle cx="192.5" cy="93.5" r="10.5" fill="white"/>
+    <circle cx="192.5" cy="159.5" r="10.5" fill="white"/>
+    <path d="M198.171 24L199 24.7222L192.654 32L189.549 28.8971L190.327 28.1199L192.598 30.3905L198.171 24Z" fill="#E0E0E0"/>
+    <path d="M187 28.897L187.778 28.1199L190.879 31.2202L190.102 31.9974L187 28.897Z" fill="#E0E0E0"/>
+    <path d="M196.451 24.7214L195.621 24L191.725 28.4764L192.555 29.1977L196.451 24.7214Z" fill="#E0E0E0"/>
+    <path d="M198.171 90L199 90.7222L192.654 98L189.549 94.8971L190.327 94.1199L192.598 96.3905L198.171 90Z" fill="#E0E0E0"/>
+    <path d="M187 94.897L187.778 94.1199L190.879 97.2202L190.102 97.9974L187 94.897Z" fill="#E0E0E0"/>
+    <path d="M196.451 90.7214L195.621 90L191.725 94.4764L192.555 95.1977L196.451 90.7214Z" fill="#E0E0E0"/>
+    <path d="M198.171 156L199 156.722L192.654 164L189.549 160.897L190.327 160.12L192.598 162.39L198.171 156Z" fill="#E0E0E0"/>
+    <path d="M187 160.897L187.778 160.12L190.879 163.22L190.102 163.997L187 160.897Z" fill="#E0E0E0"/>
+    <path d="M196.451 156.721L195.621 156L191.725 160.476L192.555 161.198L196.451 156.721Z" fill="#E0E0E0"/>
+    <rect x="16" y="15" width="115" height="10" fill="white"/>
+    <rect x="16" y="81" width="115" height="10" fill="white"/>
+    <rect x="16" y="147" width="115" height="10" fill="white"/>
+    <rect x="16" y="31" width="64" height="10" fill="white"/>
+    <rect x="16" y="97" width="64" height="10" fill="white"/>
+    <rect x="16" y="163" width="64" height="10" fill="white"/>
+    </svg>
+  </div>
+  <p>You’ll get a notification when you receive a new order to deliver</p>
+
+</div>
+<div class="order-received" [@inOutAnimation] *ngIf="order">
+
+<div class="client">
+
+<h3 class="client-name">
+{{order.client}}
+</h3>
+<p>{{order.shipping}}</p>
+<ion-button color="success" (click)="call(order.phone)">Call Client</ion-button>
+</div>
+<hr>
+<div class="total">
+<ion-text color="medium">
+  <h6>Total collectible</h6>
+</ion-text>
+<div class="collectible">
+  <ion-chip color="success" outline="true">
+    <ion-label  >$ {{order.price}}</ion-label>
+  </ion-chip>
+</div>
+
+</div>
+
+<ion-text class="order" color="medium">
+  <h6>Order Details</h6>
+</ion-text>
+<div class="order-details" *ngIf="order.details">
+<p>Congue lacus libero duis vitae turpis. Felis, sit augue nulla lectus mauris porta tristique etiam. Maecenas malesuada arcu, est cras in neque. Leo cursus turpis urna rutrum lectus. Iaculis nec bibendum et scelerisque a amet, mattis. Commodo quisque mi viverra amet purus facilisis amet. Commodo leo et mauris consequat eget at. Tellus mauris, amet et eu ullamcorper. Tincidunt aenean nulla eu, cursus a sagittis tristique. Dictum sit et penatibus donec facilisi viverra. Id molestie porttitor ultricies justo, sapien tortor tempor, urna. Neque fringilla amet aliquam tellus nulla nibh.</p>
+
+</div>
+<div class="images" *ngIf="order.image">
+  <ion-thumbnail height="65" width="65">
+    <img src="{{order.image}}">
+  </ion-thumbnail>
+</div>
+</div>
+
+</ion-content>
+
+<ion-footer *ngIf="order">
+  <ion-button  expand="block" *ngIf="order.status=='Pending'" (click)="updateStatus($event,'Shipped',order.id)" > <ion-icon name="paper-plane-sharp"></ion-icon> <span>Mark as shipped </span></ion-button>
+  <ion-button  expand="block" *ngIf="order.status=='Shipped'" (click)="updateStatus($event,'Delivered',order.id)"  color="success"> <ion-icon name="checkmark-done-outline"></ion-icon> <span>Mark as Delivered </span></ion-button>
+
+</ion-footer>
+

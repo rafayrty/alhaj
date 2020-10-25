@@ -1,0 +1,917 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Http\Requests\CreditRequest;
+use Session;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use DB;
+use PayPal\Rest\ApiContext;
+use PayPal\Auth\OAuthTokenCredential;
+use PayPal\Api\Payer;
+use PayPal\Api\Amount;
+use PayPal\Api\Item;
+use PayPal\Api\ItemList;
+use PayPal\Api\Transaction;
+use PayPal\Api\RedirectUrls;
+use PayPal\Api\Payment;
+use App\Models\ShopEmailTemplate;
+use Redirect;
+use URL;
+use Input;
+use Carbon\Carbon;
+class PaymentController extends Controller
+{
+    public function __construct()
+    {/** PayPal api context **/
+        $paypal_conf = \Config::get('paypal');
+        $this->_api_context = new ApiContext(new OAuthTokenCredential(
+            $paypal_conf['client_id'],
+            $paypal_conf['secret'])
+        );
+        $this->_api_context->setConfig($paypal_conf['settings']);
+    
+    }
+
+    public function payWithpaypal(Request $request){
+
+        $result = [];
+        $currentLang = 'name_'.\Config::get('app.locale');
+        if(Session::get('products')){
+        
+        foreach(Session::get('products') as $product){
+        $result[] = $product[$currentLang];
+        }
+        }
+        $newResult = [];
+        if(Session::get('baskets')){
+        foreach(Session::get('baskets') as $basket){
+            $newResult[] = $basket[$currentLang];
+        }
+        }
+        
+            $product_names = implode(",",array_merge($result,$newResult));
+
+            
+            
+        $payer = new Payer();
+
+        $payer->setPaymentMethod('paypal');
+        $item_1 = new Item();
+        $item_1->setName($product_names) /** item name **/
+            ->setCurrency('ILS')
+            ->setQuantity(1)
+            ->setPrice(Session::get('total'));
+            
+            /** unit price **/
+        $item_list = new ItemList();
+
+        $item_list->setItems(array($item_1));
+        $amount = new Amount();
+
+        $amount->setCurrency('ILS')
+            ->setTotal(Session::get('total'));
+            $transaction = new Transaction();
+            
+        $transaction->setAmount($amount)
+            ->setItemList($item_list)
+            ->setDescription('Transaction Generated On'.date('m/d/Y h:i:s a', time()));
+            
+            $redirect_urls = new RedirectUrls();
+
+        $redirect_urls->setReturnUrl(URL::route('cart.payment.paypal.success')) /** Specify return URL **/
+            ->setCancelUrl(URL::route('cart.payment'));
+            $payment = new Payment();
+
+        $payment->setIntent('Sale')
+            ->setPayer($payer)
+            ->setRedirectUrls($redirect_urls)
+            ->setTransactions(array($transaction));
+
+        /** dd($payment->create($this->_api_context));exit; **/
+        try {
+
+            $payment->create($this->_api_context);
+
+        } catch (\PayPal\Exception\PPConnectionException $ex) {
+            if (\Config::get('app.debug')) {
+                \Session::put('error', 'Connection timeout');
+                return Redirect::route('cart.payment');
+            } else {
+                \Session::put('error', 'Some error occur, sorry for inconvenient');
+                return Redirect::route('cart.payment');
+            }
+        }
+        foreach ($payment->getLinks() as $link) {
+            if ($link->getRel() == 'approval_url') {
+                $redirect_url = $link->getHref();
+                break;
+            }
+        }/** add payment ID to session **/
+
+        DB::beginTransaction();
+        try {
+
+        $products = Session::get('products') ?? [];
+        $baskets = Session::get('baskets') ?? [];
+$order_id =  DB::table('sc_shop_order')->insertGetId(
+                [
+        'user_id' => auth()->user()->id,
+        'shipping_status' => 0,
+        'total' => Session::get('total'),
+         'subtotal' => Session::get('subtotal'),
+         'first_name' => Session::get('address')['first_name'],
+         'last_name' => Session::get('address')['last_name'],
+          'shipping'=>Session::get('shipping'),
+          'address' => Session::get('address')['address'],
+           'city' => Session::get('address')['city'],
+            'currency' => "ILS",
+             'lat' => Session::get('address')['lat'],
+              'lng' => Session::get('address')['lng'],
+               'type' => Session::get('address')['type'] ?? '',
+               'phone'=>Session::get('address')['phone'],
+               'email'=>auth()->user()->email,
+                'discount'=>Session::get('discount') ?? 0,
+                'coupon'=>Session::get('coupon') ?? '',
+                 'payment_method' => 'paypal',
+                  'user_agent' => $request->userAgent(),
+                  'comment'=>Session::get('comment') ?? ''
+                  ]
+                );
+                if (count($products) > 0) {
+                    foreach ($products as $product) {
+            DB::table('sc_shop_order_products')->insert(['order_id' => $order_id, 'product_id' => $product['product_id'],'price'=>$product['price'],'amount'=>$product['amount'],'originalprice'=>$product['originalprice']]);
+                    }
+                }
+            
+                if (count($baskets) > 0) {
+                    foreach ($baskets as $basket) {
+                        DB::table('sc_shop_order_baskets')->insert(
+            ['order_id' => $order_id, 'basket_id' => $basket['basketId'],'basket_amount'=>$basket['amount'],'basket_price'=>$basket['price'],'basket_items'=>$basket['productIds'],'basket_itemImages'=>implode(",",$basket['itemImages']),'wrapping_id'=>$basket['wrappingId'],'total_items'=>count(explode(",",$basket['productIds']))]
+                        );
+                    }
+                    
+                }
+        
+        
+
+
+        $paypal =  DB::table('sc_shop_paypal')->insertGetId(['payid'=>$payment->getId(),'order_id'=>$order_id]);
+
+DB::commit();
+            }catch(\Exception $e){
+        echo json_encode($e);
+                DB::rollback();
+            }
+
+        Session::put('paypal_payment_id', $payment->getId());
+        if (isset($redirect_url)) {
+
+
+
+
+            return Redirect::away($redirect_url);
+        }
+        \Session::put('error', 'Unknown error occurred');
+
+        return Redirect::route('cart.payment');
+    
+    
+    }
+    public function getPaymentStatus(){
+        /** Get the payment ID before session clear **/
+        $payment_id = Session::get('paypal_payment_id');
+        /** clear the session payment ID **/
+        Session::forget('paypal_payment_id');
+
+        if (empty(Input::get('PayerID')) || empty(Input::get('token'))) {
+            
+            \Session::put('error', 'Payment failed');
+            return Redirect::route('/');
+        }
+        $payment = Payment::get($payment_id, $this->_api_context);
+        $execution = new PaymentExecution();
+        $execution->setPayerId(Input::get('PayerID'));/**Execute the payment **/
+        $result = $payment->execute($execution, $this->_api_context);
+        if ($result->getState() == 'approved') {
+            \Session::put('success', 'Payment success');
+
+       return Redirect::route('/');
+    }
+    \Session::put('error', 'Payment failed');
+        return Redirect::route('/');
+    
+    }
+
+
+public function credit(Request $request){
+$result = [];
+$currentLang = 'name_'.\Config::get('app.locale');
+if(Session::get('products')){
+
+foreach(Session::get('products') as $product){
+$result[] = $product[$currentLang];
+}
+}
+$newResult = [];
+if(Session::get('baskets')){
+foreach(Session::get('baskets') as $basket){
+    $newResult[] = $basket[$currentLang];
+}
+}
+
+    $product_names = implode(",",array_merge($result,$newResult));
+
+
+    $products = Session::get('products') ?? [];
+$baskets = Session::get('baskets') ?? [];
+    DB::beginTransaction();
+try {
+    $order_id =  DB::table('sc_shop_order')->insertGetId(
+        [
+'user_id' => auth()->user()->id,
+'shipping_status' => 0,
+'total' => Session::get('total'),
+ 'subtotal' => Session::get('subtotal'),
+ 'first_name' => Session::get('address')['first_name'],
+ 'last_name' => Session::get('address')['last_name'],
+  'shipping'=>Session::get('shipping'),
+  'address' => Session::get('address')['address'],
+   'city' => Session::get('address')['city'],
+    'currency' => "ILS",
+     'lat' => Session::get('address')['lat'],
+      'lng' => Session::get('address')['lng'],
+       'type' => Session::get('address')['type'] ?? '',
+       'phone'=>Session::get('address')['phone'],
+       'email'=>auth()->user()->email,
+        'discount'=>Session::get('discount') ?? 0,
+        'coupon'=>Session::get('coupon') ?? '',
+         'payment_method' => 'credit',
+          'user_agent' => $request->userAgent(),
+          'comment'=>Session::get('comment') ?? ''
+          ]
+        );
+        if (count($products) > 0) {
+            foreach ($products as $product) {
+    DB::table('sc_shop_order_products')->insert(['order_id' => $order_id, 'product_id' => $product['product_id'],'price'=>$product['price'],'amount'=>$product['amount'],'originalprice'=>$product['originalprice']]);
+            }
+        }
+        if (count($baskets) > 0) {
+            foreach ($baskets as $basket) {
+                DB::table('sc_shop_order_baskets')->insert(
+    ['order_id' => $order_id, 'basket_id' => $basket['basketId'],'basket_amount'=>$basket['amount'],'basket_price'=>$basket['price'],'basket_items'=>$basket['productIds'],'basket_itemImages'=>implode(",",$basket['itemImages']),'wrapping_id'=>$basket['wrappingId'],'total_items'=>count(explode(",",$basket['productIds']))]
+                );
+            }
+            
+        }
+
+
+// $endpoint = "https://ng.paymeservice.com/api/generate-sale";
+ $endpoint = "https://preprod.paymeservice.com/api/generate-sale";
+    $response = Http::post($endpoint,  [
+   'seller_payme_id'=>"MPL15578-31381UTW-1IEPMQKD-S86RKXJC",
+    //  'seller_payme_id' => "MPL15982-54910AKN-IOXBBKR0-P4SDCJY3", 
+    'currency' => "ILS",
+    'product_name'=>$product_names,
+    'installments'=>1,
+    'transaction_id'=>$order_id,
+    'sale_price'=>(Session::get('total')*100),
+    'sale_callback_url'=>\URL::to("/")."/payment/credit/confirm",
+    'sale_return_url'=>\URL::to("/")."/payment/credit/success",
+    ]);
+    
+                  
+
+
+\DB::commit();
+
+    // url will be: http://my.domain.com/test.php?key1=5&key2=ABC;
+    
+    $statusCode = $response->getStatusCode();
+    $content = $response->body();
+$data = json_decode($content,true);
+if($data){
+$url = $data['sale_url']."?first_name=".$request->first_name."&last_name=".$request->last_name."&phone=".$request->phone."&email=".$request->email;
+return redirect()->to($data['sale_url']);
+}else{
+return redirect()->back()->with('message',"An Error Occurred With Payment Gateway");
+}
+} catch (\Exception $e){
+    dd($e);
+    // echo json_encode($e);
+    // die();
+    // Rollback Transaction
+    \DB::rollback();
+}
+
+}
+public function creditSuccess(Request $request){
+$this->emptyCart();
+    if($request->payme_status == "success"){
+        $order_id = $request->transaction_id;
+
+$result =   DB::table('sc_shop_credit_cards')->where('transaction_id',$request->transaction_id)->where('sale_status','completed')->get();
+// if($result){
+// return view('NazWebsite.success',compact('order_id'));
+// }
+
+//For Localhost Only
+return view('NazWebsite.success',compact('order_id'));
+    }else{
+        echo "<h1>An Error Occurred</h1>";
+    }
+}
+public function emptyCart(){
+    if(Session::has('baskets')){
+                Session::pull('baskets');
+    }
+    if(Session::has('products')){
+            Session::pull('products');
+    }
+
+    Session::pull('coupon');
+    Session::pull('discount');
+    Session::pull('address');
+    Session::pull('total');
+    Session::pull('subtotal');
+    Session::pull('shipping');
+
+}
+public function payPalSuccess(Request $request){
+    $this->emptyCart();
+
+    // Session::flush();
+    // payment?paymentId=PAYID-L5EZCPY5UV83169NP8935352&token=EC-6K636249J4478990J&PayerID=AD5RWEG6G36CE
+if($request->paymentId){
+    $payid = $request->paymentId;
+    DB::table('sc_shop_paypal')->where('payid',$payid)->update(['payment_status'=>'complete']);
+    $order_id = DB::table('sc_shop_paypal')->where('payid',$payid)->get()->first()->order_id;
+    $paypal_id = DB::table('sc_shop_paypal')->where('payid',$payid)->get()->first()->id;
+    DB::table('sc_shop_order')->where('id',$order_id)->update(['payment_[id'=>$paypal_id,'payment_status'=>1]);
+    $order = \App\Models\ShopOrder::findOrFail($order_id);
+    $this->sendOrderConfirmation($order);
+    return view('NazWebsite.success',compact('order_id'));
+
+}
+
+}
+public function creditConfirm(Request $request){
+    Log::info("working");
+    Log::info($request->all());
+        DB::beginTransaction();
+   
+   try{
+ if($request->status_code==0){
+
+   $order = \App\Models\ShopOrder::findOrFail($request->transaction_id);
+
+    $products = DB::table('sc_shop_order_products')
+->leftJoin('sc_shop_product_description','sc_shop_order_products.product_id','=','sc_shop_product_description.product_id')
+->leftJoin('sc_shop_product','sc_shop_order_products.product_id','=','sc_shop_product.id')
+->where('sc_shop_product_description.lang','he')
+->where('sc_shop_order_products.order_id',$order->id)->get();
+
+$baskets = DB::table('sc_shop_order_baskets')
+->leftJoin('sc_shop_basket_description','sc_shop_order_baskets.basket_id','=','sc_shop_basket_description.basket_id')
+->leftJoin('sc_shop_basket','sc_shop_order_baskets.basket_id','=','sc_shop_basket.id')
+->where('sc_shop_basket_description.lang','he')
+->where('sc_shop_order_baskets.order_id',$order->id)->get();
+  $items = [];
+if(count($products) > 0){
+
+foreach($products as $product){
+
+if($product->kind==0){
+$items[] = ['description'=>$product->name ." 100/גרם " ,'quantity'=>$product->amount,'unitprice'=>($product->originalprice / (1.17)),'original'=>$product->originalprice,'unitprice_incvat'=>$product->originalprice,'tax_exempt'=>0];
+}else{
+    $items[] = ['description'=>$product->name,'quantity'=>$product->amount,'unitprice'=>($product->originalprice / (1.17)),'original'=>$product->originalprice,'unitprice_incvat'=>$product->originalprice,'tax_exempt'=>0];
+}
+
+}
+
+}
+
+if(count($baskets) > 0){
+foreach($baskets as $basket){
+
+ $items[] = array_push($items,['description'=>$basket->name,'quantity'=>$basket->amount,'unitprice'=>($product->originalprice / (1.17)),'unitprice_incvat'=>$basket->originalprice,'tax_exempt'=>0]);
+}
+}
+$total = 0;
+
+if($order->shipping != 0){
+$items[] = ['description'=>'משלוח','unitprice'=>25,'original'=>25,'tax_exempt'=>1];
+$total =  25;
+
+}
+foreach($items as $item){
+    if($item['tax_exempt']!=1){
+            $total += $item['unitprice_incvat'];
+    }
+}
+
+
+
+
+ $endpoint = "https://api.icount.co.il/api/v3.php/doc/create";
+// $endpoint = "https://preprod.paymeservice.com/api/generate-sale";
+if($order->coupon!=''){
+    $discount = \DB::table('sc_shop_coupons')->where('code','like','%'.$order->coupon.'%')->get()->first()->discount;
+    $total = ($total - ($discount / 100) * $total);
+    $post =  [
+        // 'seller_payme_id'=>"MPL15578-31381UTW-1IEPMQKD-S86RKXJC",
+     'cid' => "naznuts", 
+    'user' => "naznutsapi",
+    'pass'=>"8de68d",
+    'doctype'=>"invrec",
+    'client_name'=>$request->buyer_name,
+    'email'=>$order->email,
+    'client_address'=>$order->address,
+    'lang'=>'he',
+    'hwc'=>"קנייה מעל 350₪ המשלוח חינם",
+    'tax_exempt'=>0,
+    'items'=>$items,
+    'discount'=>$discount,
+    'cc'=>[
+        'sum'=>$total,
+        'card_type'=>strtoupper($request->payme_transaction_card_brand),
+        'card_number'=>substr($request->buyer_card_mask, -4),
+		"holder_name"=>$request->buyer_name,
+		"holder_id"=>$request->buyer_social_id,
+		'confirmation_code'=>$request->payme_transaction_auth_number,
+        
+        ],
+        'send_email'=>1,
+        'email_to_client'=>0,
+        'email_to'=>sc_store('display_email'),
+        'email_cc_me'=>1,
+        'email_cc_to'=>sc_store('display_email')
+
+    ];
+}else{
+    $post =  [
+        // 'seller_payme_id'=>"MPL15578-31381UTW-1IEPMQKD-S86RKXJC",
+     'cid' => "naznuts", 
+    'user' => "naznutsapi",
+    'pass'=>"8de68d",
+    'doctype'=>"invrec",
+    'client_name'=>$request->buyer_name,
+    'email'=>$order->email,
+    'client_address'=>$order->address,
+    'lang'=>'he',
+    'hwc'=>"קנייה מעל 350₪ המשלוח חינם",
+    'tax_exempt'=>0,
+    'items'=>$items,
+    
+    'cc'=>[
+        'sum'=>$total,
+        'card_type'=>strtoupper($request->payme_transaction_card_brand),
+        'card_number'=>substr($request->buyer_card_mask, -4),
+		"holder_name"=>$request->buyer_name,
+		"holder_id"=>$request->buyer_social_id,
+		'confirmation_code'=>$request->payme_transaction_auth_number,
+        
+        ],
+        'send_email'=>1,
+        'email_to_client'=>0,
+        'email_to'=>sc_store('display_email'),
+        'email_cc_me'=>1,
+        'email_cc_to'=>sc_store('display_email')
+
+    ];
+}
+    $response = Http::post($endpoint,  $post);
+    $content = $response->body();
+$data = json_decode($content,true);
+
+Log::info($data);
+       $id =  DB::table('sc_shop_credit_cards')->insertGetId(array(
+           'transaction_id'=>$request->transaction_id,
+           'payme_sale_id'=>$request->payme_sale_id,
+           'payme_sale_code'=>$request->payme_sale_code,
+           'payme_sale_status'=>$request->payme_sale_status,
+           'payme_transaction_id'=>$request->payme_transaction_id,
+            'payme_transaction_card_brand'=>$request->payme_transaction_card_brand,
+           'price'=>$request->price,
+           'currency'=>$request->currency,
+           'sale_status'=>$request->sale_status,
+           'payme_transaction_auth_number'=>$request->payme_transaction_auth_number,
+           'buyer_card_mask'=>$request->buyer_card_mask,
+           'buyer_card_exp'=>$request->buyer_card_exp,
+           'buyer_email'=>$request->buyer_email,
+           'buyer_name'=>$request->buyer_name,
+           'buyer_phone'=>$request->buyer_phone,
+           'buyer_social_id'=>$request->buyer_social_id,
+           'buyer_card_is_foreign'=>$request->buyer_card_is_foreign,
+           'buyer_key'=>$request->buyer_key ,
+           'installments'=>$request->installments,
+           'sale_paid_date'=>$request->sale_paid_date,
+           'sale_release_date'=>$request->sale_release_date,
+           'is_token_sale'=>$request->is_token_sale,
+           'sale_invoice_url'=>$request->sale_invoice_url ?? "", 
+           'icount_invoice_copy'=>$data['doc_copy_url'],
+           'icount_invoice'=>$data['doc_url'],
+           'icount_invoice_id'=>$data['docnum']
+       ));
+   $update_order = DB::table('sc_shop_order')->where('id',$request->transaction_id)->update(['payment_status'=>1,'payment_id'=>$id]);
+
+   }else{
+    $update_order = DB::table('sc_shop_order')->where('id',$request->transaction_id)->update(['payment_status'=>0,'payment_id'=>null]);
+
+//    $delete_order = DB::table('sc_shop_order')->where('order_id',$transaction_id)->delete();
+//    $delete_product = DB::table('sc_shop_order_products')->where('order_id',$transaction_id)->delete();
+//    $delete_basket = DB::table('sc_shop_order_baskets')->where('order_id',$transaction_id)->delete();
+       Log::error($request->status_error_details);
+   }  
+   $order = \App\Models\ShopOrder::findOrFail($request->transaction_id);
+$this->sendOrderConfirmation($order);
+       \DB::commit();
+
+} catch (\Exception $e) {
+   Log::error($e);
+   // dd($e);
+   // die();
+   // Rollback Transaction
+
+   DB::rollback();
+
+}
+
+
+}
+
+public function pusherNotify($order){
+    $options = array('cluster' => env('PUSHER_APP_CLUSTER'), 'encrypted' => true);
+        $pusher = new \Pusher(
+                            env('PUSHER_APP_KEY'),
+                            env('PUSHER_APP_SECRET'),
+                            env('PUSHER_APP_ID'), 
+                            $options
+                        );
+
+        $data['message'] = 'A New Order Has Been Placed With Id :'.$order->id;
+        $pusher->trigger('notify-channel', 'App\\Events\\Notify', $data); 
+        return $data['message'];
+}
+public function sendOrderConfirmation($order)
+    {
+
+
+        
+$invoice = \DB::table('sc_shop_credit_cards')->where('transaction_id',$order->id)->get()->first()->icount_invoice_copy;
+        
+        $this->pusherNotify($order);
+        
+        
+        
+        
+        $dt = Carbon::parse($order->created_at);
+        $date = $dt->format('M jS \\, Y');  
+            $products = \DB::table('sc_shop_order_products')
+    ->leftJoin('sc_shop_product_description','sc_shop_order_products.product_id','=','sc_shop_product_description.product_id')
+    ->leftJoin('sc_shop_product','sc_shop_order_products.product_id','=','sc_shop_product.id')
+    ->select("sc_shop_product.image","sc_shop_product.kind","sc_shop_order_products.price","sc_shop_order_products.amount","sc_shop_product_description.name")
+    ->where('sc_shop_product_description.lang','he')
+    ->where('sc_shop_order_products.order_id',$order->id)->get(); 
+\Log::info($products);
+    $baskets = DB::table('sc_shop_order_baskets')
+    ->leftJoin('sc_shop_basket_description','sc_shop_order_baskets.basket_id','=','sc_shop_basket_description.basket_id')
+    ->leftJoin('sc_shop_basket','sc_shop_order_baskets.basket_id','=','sc_shop_basket.id')
+    ->where('sc_shop_basket_description.lang',"he")
+    ->where('sc_shop_order_baskets.order_id',$order->id)->get();
+    $html = '';
+    if(count($products) > 0){
+    foreach($products as $product){
+    $html .= '<div style="background-color:transparent;">
+    <div class="block-grid four-up no-stack" style="Margin: 0 auto; min-width: 320px; max-width: 650px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #FFFFFF;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFFFF;">
+        <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:650px"><tr class="layout-full-width" style="background-color:#FFFFFF"><![endif]-->
+        <!--[if (mso)|(IE)]><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 162px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <div class="img-container center fixedwidth" align="center" style="padding-right: 0px;padding-left: 0px;">
+                        <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img class="center fixedwidth" align="center" border="0" src="'.$product->image.'" alt="Image" title="Image" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 130px; display: block;" width="130">
+                        <!--[if mso]></td></tr></table><![endif]-->
+                    </div>
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 1px dotted #E8E8E8;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:30px; padding-bottom:35px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 161px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:1px dotted #E8E8E8; padding-top:30px; padding-bottom:35px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top: 10px; padding-bottom: 5px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:5px;padding-left:0px;">
+                        <div style="font-size: 12px; line-height: 1.2; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="font-size: 16px; line-height: 1.2; text-align: left; word-break: break-word; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px; color: #2190e3;"><strong>'.$product->name.'</strong></span></p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:0px;">
+                        <div style="font-size: 12px; line-height: 1.2; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="font-size: 14px; line-height: 1.2; text-align: left; word-break: break-word; mso-line-height-alt: 17px; margin: 0;">Product</p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 1px dotted #E8E8E8;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:55px; padding-bottom:5px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 161px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:1px dotted #E8E8E8; padding-top:55px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+                        <div style="font-size: 12px; line-height: 1.2; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="font-size: 20px; line-height: 1.2; text-align: center; word-break: break-word; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>'.$product->amount.'&nbsp;<span style="font-size:.8rem;font-weight:400;">'.($product->kind == 0 ? "KG" : " ").'</span></strong></span></p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <table class="divider" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" role="presentation" valign="top">
+                        <tbody>
+                            <tr style="vertical-align: top;" valign="top">
+                                <td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
+                                    <table class="divider_content" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 30px; width: 100%;" align="center" role="presentation" height="30" valign="top">
+                                        <tbody>
+                                            <tr style="vertical-align: top;" valign="top">
+                                                <td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" height="30" valign="top"><span></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:55px; padding-bottom:5px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 162px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:55px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 0px; padding-top: 0px; padding-bottom: 0px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:0px;padding-right:15px;padding-bottom:0px;padding-left:0px;">
+                        <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><span style="font-size: 20px;"><strong>₪ '.$product->price.'</strong></span></span></p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+    </div>
+    </div>
+    </div>';
+    
+    }
+    
+    
+    
+    }
+    
+    if(count($baskets) > 0){
+    
+    foreach ($baskets as $basket) {
+    
+    $html .='<div style="background-color:transparent;">
+    <div class="block-grid four-up no-stack" style="Margin: 0 auto; min-width: 320px; max-width: 650px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #FFFFFF;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFFFF;">
+        <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:650px"><tr class="layout-full-width" style="background-color:#FFFFFF"><![endif]-->
+        <!--[if (mso)|(IE)]><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 162px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <div class="img-container center fixedwidth" align="center" style="padding-right: 0px;padding-left: 0px;">
+                        <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img class="center fixedwidth" align="center" border="0" src='.$basket->image.' alt="Image" title="Image" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 130px; display: block;" width="130">
+                        <!--[if mso]></td></tr></table><![endif]-->
+                    </div>
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 1px dotted #E8E8E8;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:30px; padding-bottom:35px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 161px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:1px dotted #E8E8E8; padding-top:30px; padding-bottom:35px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top: 10px; padding-bottom: 5px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:5px;padding-left:0px;">
+                        <div style="font-size: 12px; line-height: 1.2; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="font-size: 16px; line-height: 1.2; text-align: left; word-break: break-word; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px; color: #2190e3;"><strong>'.$basket->name.'</strong></span></p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:0px;">
+                        <div style="font-size: 12px; line-height: 1.2; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="font-size: 14px; line-height: 1.2; text-align: left; word-break: break-word; mso-line-height-alt: 17px; margin: 0;">Basket</p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 1px dotted #E8E8E8;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:55px; padding-bottom:5px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 161px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:1px dotted #E8E8E8; padding-top:55px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+                        <div style="font-size: 12px; line-height: 1.2; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                                                 <!--    <p style="font-size: 20px; line-height: 1.2; text-align: center; word-break: break-word; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>'.count(explode(",",$basket->basket_items)).'</strong></span></p> -->
+
+                            <p style="font-size: 20px; line-height: 1.2; text-align: center; word-break: break-word; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>'.$basket->basket_amount.'</strong></span></p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <table class="divider" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" role="presentation" valign="top">
+                        <tbody>
+                            <tr style="vertical-align: top;" valign="top">
+                                <td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
+                                    <table class="divider_content" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 30px; width: 100%;" align="center" role="presentation" height="30" valign="top">
+                                        <tbody>
+                                            <tr style="vertical-align: top;" valign="top">
+                                                <td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" height="30" valign="top"><span></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td><td align="center" width="162" style="background-color:#FFFFFF;width:162px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:55px; padding-bottom:5px;"><![endif]-->
+        <div class="col num3" style="max-width: 320px; min-width: 162px; display: table-cell; vertical-align: top; width: 162px;">
+            <div style="width:100% !important;">
+                <!--[if (!mso)&(!IE)]><!-->
+                <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:55px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+                    <!--<![endif]-->
+                    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 0px; padding-top: 0px; padding-bottom: 0px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+                    <div style="color:#555555;font-family:Lato, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:0px;padding-right:15px;padding-bottom:0px;padding-left:0px;">
+                        <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+                            <p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><span style="font-size: 20px;"><strong>₪ '.$basket->price.'</strong></span></span></p>
+                        </div>
+                    </div>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                    <!--[if (!mso)&(!IE)]><!-->
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+        <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+    </div>
+    </div>
+    </div>';
+    
+    
+    }
+    
+    }
+        $checkContent = (new ShopEmailTemplate)->where('group', 'order_success_to_customer')->where('status', 1)->first();
+        if ($checkContent) {
+            $content = $checkContent->text;
+            $dataFind = [
+
+                '/\{\{\$first_name\}\}/',
+                '/\{\{\$last_name\}\}/',
+                '/\{\{\$address\}\}/',
+                '/\{\{\$order_id\}\}/',
+                '/\{\{\$order_date\}\}/',
+                '/\{\{\$total\}\}/',
+                '/\{\{\$shipping\}\}/',
+                '/\{\{\$discount\}\}/',
+                '/\{\{\$itemsList\}\}/',
+                '/\{\{\$coupon\}\}/',
+                '/\{\{\$subtotal\}\}/',
+                '/\{\{\$email\}\}/',
+                '/\{\{\$order_link\}\}/',
+                '/\{\{\$instagram\}\}/',
+                '/\{\{\$facebook\}\}/',
+                '/\{\{\$count\}\}/',
+                '/\{\{\$phone\}\}/',
+                '/\{\{\$terms\}\}/',
+                '/\{\{\$returns\}\}/',
+                                          
+            ];
+        $dataReplace = [
+                $order->first_name,
+                $order->last_name,
+                $order->address,
+                $order->id,
+                $date,
+                $order->total,
+                $order->shipping,
+                $order->discount ?? 0,
+                $html,
+                $order->coupon ?? "none",
+                $order->subtotal,
+                sc_store('display_email'),
+                $invoice,
+                sc_store('insta_link'),
+                sc_store('facebook_link'),
+                count($products) + count($baskets),
+                sc_store('long_phone'),
+                route('terms'),
+                route('terms')
+            ];
+            $content = preg_replace($dataFind, $dataReplace, $content);
+            $dataView = [
+                'content' => $content,
+            ];
+
+            $config = [
+                'to' => \App\Models\ShopUser::where('id',$order->user_id)->pluck('email')->first(),
+                'subject' => "Your Order Has Been Received | NAZNUTS",
+            ];
+            sc_send_mail('templates.default-new.mail.order_success_to_customer', $dataView, $config, $dataAtt = []);
+        }
+
+
+
+        $checkContent = (new ShopEmailTemplate)->where('group', 'order_success_to_admin')->where('status', 1)->first();
+        if ($checkContent) {
+            $content = $checkContent->text;
+            $dataFind = [
+
+                '/\{\{\$toname\}\}/',
+                '/\{\{\$orderID\}\}/',
+                '/\{\{\$email\}\}/',
+                '/\{\{\$address\}\}/',
+                '/\{\{\$shipping\}\}/',
+                '/\{\{\$discount\}\}/',
+                '/\{\{\$phone\}\}/',
+                '/\{\{\$comment\}\}/',
+                '/\{\{\$total\}\}/',
+                '/\{\{\$subtotal\}\}/',
+
+
+                                          
+            ];
+        $dataReplace = [
+                $order->first_name,
+                $order->id,
+                $order->email,
+                $order->address,
+                $order->shipping,
+                $order->discount ?? 0,
+                $order->phone,
+                $order->comment,
+                $order->total,
+                $order->subtotal
+            ];
+            $content = preg_replace($dataFind, $dataReplace, $content);
+            $dataView = [
+                'content' => $content,
+            ];
+
+            $config = [
+                'to' =>sc_store('display_email'),
+                'subject' => "New Order | NAZNUTS",
+            ];
+            sc_send_mail('templates.default-new.mail.order_success_to_admin', $dataView, $config, $dataAtt = []);
+        }
+
+    }
+    //
+}
