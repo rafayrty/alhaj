@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { LanguageService } from './services/language.service';
 import { TranslateService } from '@ngx-translate/core';
+import { FcmService } from './services/fcm.service';
 
 @Component({
   selector: 'app-root',
@@ -26,18 +27,22 @@ export class AppComponent {
     private store:Storage,
     private router:Router,
     private translate:TranslateService,
-    private languageService:LanguageService
-  ) {
+    private languageService:LanguageService,
+    private fcm:FcmService
+      ) {
     this.translate.onLangChange.subscribe((event) => {
       this.lang=event.lang;
       if (event.lang == 'ar') {
       this.ltrrtl = 'rtl';
+      document.documentElement.setAttribute("style", '--ion-font-family: -apple-system-font, "Cairo", sans-serif');
+
       }
       else {
+        document.documentElement.setAttribute("style", '--ion-font-family: -apple-system-font, "Roboto", "Segoe UI", sans-serif');
       this.ltrrtl = 'ltr';
       }
       document.getElementsByTagName("html")[0].setAttribute('lang', this.lang);
-      document.getElementsByTagName("body")[0].setAttribute('dir', this.ltrrtl);
+      document.getElementsByTagName("html")[0].setAttribute('dir', this.ltrrtl);
       });
     this.initializeApp();
   }
@@ -50,13 +55,18 @@ export class AppComponent {
 if(this.languageService.selected == 'ar'){
 
       document.getElementsByTagName("html")[0].setAttribute('lang',this.languageService.selected);
-      document.getElementsByTagName("body")[0].setAttribute('dir', 'rtl');
-
+      document.getElementsByTagName("html")[0].setAttribute('dir', 'rtl');
+      document.documentElement.setAttribute("style", '--ion-font-family: -apple-system-font, "Cairo", sans-serif');
+      }else{
+        document.documentElement.setAttribute("style", '--ion-font-family: -apple-system-font, "Roboto", "Segoe UI", sans-serif');
       }
       this.Storage.authState.subscribe(state => {
         if (state) {
           this.store.get('USER_INFO').then((response) => {
           let  res = response;
+
+          this.fcm.initPush(response.user.id);
+
          if(res.user.role=='Manager'){
               this.router.navigate(['home']);
             }else{

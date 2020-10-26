@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Settings</ion-title>
+    <ion-title>{{'SETTINGS.VEHICLES.title' | translate}}</ion-title>
     <!-- <ion-buttons slot="end">
       <ion-button (click)="settings()">Settings</ion-button>
     </ion-buttons> -->
@@ -12,7 +12,10 @@
 </ion-header>
 
 <ion-content>
-<ion-text class="swipe"><h6>Swipe items left for options</h6></ion-text>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.5" pullMin="100" pullMax="200">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+<ion-text class="swipe"><h6>{{'SETTINGS.VEHICLES.swipe' | translate}}</h6></ion-text>
 
 
 <div class="pilots" *ngIf="!loading">
@@ -33,13 +36,14 @@
 
       </ion-item>
       <ion-item-options>
-        <ion-item-option color="primary">
-          <ion-icon slot="bottom" (click)="edit(vehicle.id)" name="create-outline"></ion-icon>
-          Edit
+        <ion-item-option color="primary"  (click)="edit(vehicle.id)">
+          <ion-icon slot="bottom" name="create-outline"></ion-icon>
+          {{'edit'| translate}}
         </ion-item-option>
         <ion-item-option (click)="delete(vehicle.id,i)" color="danger">
           <ion-icon slot="bottom" name="trash-outline"></ion-icon>
-          Delete
+          {{'delete' | translate}}
+
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
@@ -127,5 +131,5 @@
 </ion-content>
 
 <ion-footer>
-  <ion-button  expand="block" routerLink="/settings/vehicles/create"> <ion-icon name="add-outline" ></ion-icon> Add A New Vehicle</ion-button>
+  <ion-button  expand="block" routerLink="/settings/vehicles/create"> <ion-icon name="add-outline" ></ion-icon>{{'SETTINGS.VEHICLES.new' | translate}}</ion-button>
 </ion-footer>

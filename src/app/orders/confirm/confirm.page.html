@@ -1,19 +1,18 @@
-<app-menu title="Assign A New Order" ></app-menu>
+<app-menu title="{{ 'CONFIRM.title' | translate}}" ></app-menu>
 <ion-content>
 <div class="confirm">
 
 <ion-text class="done">
-  <h6>Done!</h6>
+  <h6>{{ 'CONFIRM.done' | translate}}</h6>
 </ion-text>
 <ion-text class="sent">
-  <h1>Your order was sent</h1>
+  <h1>{{ 'CONFIRM.sent' | translate}}</h1>
 </ion-text>
 <ion-text class="notified">
-  <p>You’ll be notified when the pilot is delivering,
-    And when he’s available again</p>
+  <p>{{ 'CONFIRM.notify' | translate}}</p>
 </ion-text>
 <div class="new">
-  <ion-button color="light" expand="block">Create new order</ion-button>
+  <ion-button color="light" expand="block" routerLink="/orders/create">{{ 'CONFIRM.new' | translate}}</ion-button>
 </div>
 
 </div>

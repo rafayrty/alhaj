@@ -1,10 +1,13 @@
-<app-menu title="Manage Orders"></app-menu>
+<app-menu title="{{'MANAGE.title' | translate}}"></app-menu>
 <ion-content>
-
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.5" pullMin="100" pullMax="200">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
   <div class="manage-page">
     <div class="searchBar">
-      <ion-searchbar animated placeholder="Search" [(ngModel)]="searchOrders"
-      (ionChange)="filterOrders()" name="searchOrders"></ion-searchbar>
+      <ion-searchbar animated placeholder="{{'search' | translate}}" [(ngModel)]="searchOrders"
+      (ionChange)="fetchSearch()" name="searchOrders"></ion-searchbar>
 
     </div>
 
@@ -16,17 +19,17 @@
           <div class="order">
             <div class="status warning" [ngClass]="{'medium': order.status === 'Pending', 'warning':order.status === 'Shipped', 'success':order.status === 'Delivered' }"            >
               <div class="status-text">
-                <h3>Status: <span>{{order.status}}</span></h3>
+                <h3> {{'MANAGE.status' | translate}} <span>{{order.status}}</span></h3>
               </div>
               <div class="status-total">
-                <h3>Total Bill: <span>$ {{order.price}}</span></h3>
+                <h3>{{'MANAGE.total' | translate}}<span>₪ {{order.price}}</span></h3>
               </div>
             </div>
 
             <div class="client">
               <div class="details">
-                <h2>Client: <span>{{order.client}}</span></h2>
-                <p>Created on: {{date(order.created_at)}}</p>
+                <h2>{{'MANAGE.client' | translate}} <span>{{order.client}}</span></h2>
+                <p>{{'MANAGE.created' | translate}}{{date(order.created_at)}}</p>
               </div>
               <ion-button color="success" (click)="call(order.phone)">Call</ion-button>
 
@@ -34,7 +37,7 @@
 
             <div class="assigned">
               <ion-text color="medium">
-                <p>Assigned to:</p>
+                <p>{{'MANAGE.assigned' | translate}}</p>
               </ion-text>
               <div class="pilot">
                 <div class="left">
@@ -45,7 +48,7 @@
                 </div>
 
                 <div class="right">
-                  <ion-button color="primary" (click)="call(order.user.phone)" fill="outline">Call</ion-button>
+                  <ion-button color="primary" (click)="call(order.user.phone)" fill="outline">{{'call' | translate}}</ion-button>
 
                 </div>
 
@@ -176,4 +179,10 @@
 
   </div>
 
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

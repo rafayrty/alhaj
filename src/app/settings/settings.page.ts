@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Animation, AnimationController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { LanguageService } from '../services/language.service';
 
 import {
   Plugins,
   HapticsImpactStyle,
   Capacitor
 } from '@capacitor/core';
+import { TranslateService } from '@ngx-translate/core';
 
 const { Haptics } = Plugins;
 @Component({
@@ -15,8 +17,13 @@ const { Haptics } = Plugins;
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage implements OnInit {
+selectedLang:any;
+  constructor(private translate:TranslateService, private languageService:LanguageService,private route:Router,private animationCtrl: AnimationController) { 
 
-  constructor(private route:Router,private animationCtrl: AnimationController) { }
+  }
+  ionViewWillEnter(){
+    this.selectedLang = localStorage.getItem('SELECTED_LANGUAGE')
+  }
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
     // Native StatusBar available
 if (Capacitor.getPlatform() != 'web') {
@@ -31,6 +38,13 @@ if (Capacitor.getPlatform() != 'web') {
   }
   ngOnInit() {
   }
+  changeLang(){
+    this.hapticsImpactLight();
+    this.languageService.setLanguage(this.selectedLang);
+    // window.location.reload();
+
+  }
+
   async settingsBTN(e,route){
     const animation: Animation = this.animationCtrl.create()
     .addElement(e.target)

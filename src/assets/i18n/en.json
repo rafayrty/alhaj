@@ -21,6 +21,13 @@
         "new":"New order",
         "manage":"Manage orders"
     },
+    "CONFIRM":{
+        "title":"Assign A New Order",
+      "done":"Done!",
+      "sent":"Your Order Was Sent!",
+      "notify":"You’ll be notified when the pilot is delivering, And when he’s available again",
+      "new":"Create new order"
+    },
     "CREATE":{
         "title":"Create An Order",
         "name":"Your client name",
@@ -52,7 +59,7 @@
 
         }
     },
-    "manage":{
+    "MANAGE":{
         "title":"Manage orders",
         "status":"Status",
         "total":"Total bill:",
@@ -69,7 +76,8 @@
         "PILOTS":{
             "title":"Manage pilots",
             "swipe":"Swipe items left for options",
-            "new":"Add new pilot",
+            "new":"Add new Pilot",
+            "edit":"Edit A Pilot",
 
 
             "INPUTS":{
@@ -87,12 +95,15 @@
         "VEHICLES":{
             "title":"Manage vehicles",
             "swipe":"Swipe items left for options",
+            "edit":"Edit A Vehicle",
+            "new":"Add new Vehicle",
+
 
             "INPUTS":{
                 "photo":"Vehicle Photo",
                 "upload":"Upload Photo",
                 "name":"vehicle title",
-                "phone_placeholder":"Type name here"
+                "name_placeholder":"Type name here"
 
 
             }
@@ -116,7 +127,11 @@
 
         "DONE":{
             "all":"All is done",
-            "notification":"You’ll get a nootification when you receive a new order to deliver"
+            "notification":"You’ll get a notification when you receive a new order to deliver"
         }
+    },"STATUS":{
+        "out":"Out For Delivery",
+        "logged":"Logged Out",
+        "available":"Available"
     }
 }

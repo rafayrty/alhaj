@@ -8,6 +8,8 @@ import { CreatePageRoutingModule } from './create-routing.module';
 
 import { CreatePage } from './create.page';
 import { ComponentsModule } from '../../components.module'
+import { TranslateModule } from '@ngx-translate/core'; // add this
+
 @NgModule({
   imports: [
     CommonModule,
@@ -15,6 +17,7 @@ import { ComponentsModule } from '../../components.module'
     IonicModule,
     CreatePageRoutingModule,
     ComponentsModule,
+    TranslateModule
 
   ],
   declarations: [CreatePage]

@@ -32,6 +32,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   }),
   HttpClientModule,
   BrowserAnimationsModule,IonicStorageModule.forRoot(),    IonicModule.forRoot({
+    backButtonText: '',
     mode: 'ios'
   }), AppRoutingModule],
   providers: [

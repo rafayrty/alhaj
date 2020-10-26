@@ -4,9 +4,9 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Edit Pilot</ion-title>
+    <ion-title>{{'SETTINGS.PILOTS.edit' | translate}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="edit()">Done</ion-button>
+      <ion-button (click)="edit()">{{'done' | translate}}</ion-button>
     </ion-buttons>
 
   </ion-toolbar>
@@ -15,7 +15,7 @@
 <ion-content>
 <div class="create">
 <ion-text color="medium">
-  <h6>Pilot Photo</h6>
+  <h6>{{'SETTINGS.PILOTS.INPUTS.photo' | translate}}</h6>
 </ion-text>
 <div class="photo">
 <div class="image" *ngIf="!pilot.image" (click)="openCamera()">
@@ -35,7 +35,7 @@
 </div>
 
 <div class="buttons">
-<ion-button color="primary" expand="block" (click)="openCamera()" fill="solid">Upload Photo</ion-button>
+<ion-button color="primary" expand="block" (click)="openCamera()" fill="solid">{{'SETTINGS.PILOTS.INPUTS.upload' | translate}}</ion-button>
 <!-- <ion-button color="danger" expand="block"  fill="outline">Delete Photo</ion-button> -->
 
 </div>
@@ -46,20 +46,20 @@
 </div>
 <div class="form">
   <ion-item lines="none">
-    <ion-label color="medium"  position="stacked">Pilot Name</ion-label>
-    <ion-input placeholder="Type name here" autofocus="true" [(ngModel)]="pilot.name" name="name"></ion-input>
+    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.name' | translate}}</ion-label>
+    <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.name_placeholder' | translate}}" autofocus="true" [(ngModel)]="pilot.name" name="name"></ion-input>
     <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
 
   </ion-item>
   <ion-item lines="none">
-    <ion-label color="medium"  position="stacked">Pilot phone number</ion-label>
-    <ion-input placeholder="Type phone number here" [(ngModel)]="pilot.phone" name="phone"></ion-input>
+    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.phone' | translate}}</ion-label>
+    <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.phone_placeholder' | translate}}" [(ngModel)]="pilot.phone" name="phone"></ion-input>
     <span class="error" *ngIf="errors.length!=0 && errors.phone">{{errors.phone[0]}}</span>
 
   </ion-item>
   <ion-item lines="none">
-    <ion-label color="medium" position="stacked">Login ID</ion-label>
-    <ion-input placeholder="Make it short and unique..."   [(ngModel)]="pilot.login_id" name="loginId"></ion-input>
+    <ion-label color="medium" position="stacked">{{'SETTINGS.PILOTS.INPUTS.loginId' | translate}}</ion-label>
+    <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.loginId_placeholder' | translate}}"   [(ngModel)]="pilot.login_id" name="loginId"></ion-input>
     <span class="error" *ngIf="errors.length!=0 && errors.login_id">{{errors.login_id[0]}}</span>
 
   </ion-item>

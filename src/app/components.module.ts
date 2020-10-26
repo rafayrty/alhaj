@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { TranslateModule } from '@ngx-translate/core'; // add this
 
 
 
@@ -13,7 +14,8 @@ import { IonicModule } from '@ionic/angular';
     imports:[
         CommonModule,
         IonicModule,
-        FormsModule
+        FormsModule,
+        TranslateModule
     ]
 })
 

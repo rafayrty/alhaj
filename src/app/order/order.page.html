@@ -1,16 +1,19 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Order</ion-title>
+    <ion-title>{{'HOME.title' | translate}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="logOut()">Logout</ion-button>
+      <ion-button (click)="logOut()">{{'logout' | translate}}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.5" pullMin="100" pullMax="200">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 <div class="order-empty" [@inOutAnimation] *ngIf="!order">
-  <h1>All is done</h1>
+  <h1>{{'ORDER.DONE.all' | translate}}</h1>
 <div id="svg">
 
   <svg  viewBox="0 0 219 187" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +40,7 @@
     <rect x="16" y="163" width="64" height="10" fill="white"/>
     </svg>
   </div>
-  <p>You’ll get a notification when you receive a new order to deliver</p>
+  <p>{{'ORDER.DONE.notification' | translate}}</p>
 
 </div>
 <div class="order-received" [@inOutAnimation] *ngIf="order">
@@ -48,30 +51,30 @@
 {{order.client}}
 </h3>
 <p>{{order.shipping}}</p>
-<ion-button color="success" (click)="call(order.phone)">Call Client</ion-button>
+<ion-button color="success" (click)="call(order.phone)">{{'ORDER.call' | translate}}</ion-button>
 </div>
 <hr>
 <div class="total">
 <ion-text color="medium">
-  <h6>Total collectible</h6>
+  <h6>{{'ORDER.collectible' | translate}}</h6>
 </ion-text>
 <div class="collectible">
   <ion-chip color="success" outline="true">
-    <ion-label  >$ {{order.price}}</ion-label>
+    <ion-label  >₪ {{order.price}}</ion-label>
   </ion-chip>
 </div>
 
 </div>
 
 <ion-text class="order" color="medium">
-  <h6>Order Details</h6>
+  <h6>{{'ORDER.details' | translate}}</h6>
 </ion-text>
 <div class="order-details" *ngIf="order.details">
-<p>Congue lacus libero duis vitae turpis. Felis, sit augue nulla lectus mauris porta tristique etiam. Maecenas malesuada arcu, est cras in neque. Leo cursus turpis urna rutrum lectus. Iaculis nec bibendum et scelerisque a amet, mattis. Commodo quisque mi viverra amet purus facilisis amet. Commodo leo et mauris consequat eget at. Tellus mauris, amet et eu ullamcorper. Tincidunt aenean nulla eu, cursus a sagittis tristique. Dictum sit et penatibus donec facilisi viverra. Id molestie porttitor ultricies justo, sapien tortor tempor, urna. Neque fringilla amet aliquam tellus nulla nibh.</p>
+<p>{{order.details}}</p>
 
 </div>
 <div class="images" *ngIf="order.image">
-  <ion-thumbnail height="65" width="65">
+  <ion-thumbnail (click)="openViewer(order.image)" height="65" width="65">
     <img src="{{order.image}}">
   </ion-thumbnail>
 </div>
@@ -80,8 +83,8 @@
 </ion-content>
 
 <ion-footer *ngIf="order">
-  <ion-button  expand="block" *ngIf="order.status=='Pending'" (click)="updateStatus($event,'Shipped',order.id)" > <ion-icon name="paper-plane-sharp"></ion-icon> <span>Mark as shipped </span></ion-button>
-  <ion-button  expand="block" *ngIf="order.status=='Shipped'" (click)="updateStatus($event,'Delivered',order.id)"  color="success"> <ion-icon name="checkmark-done-outline"></ion-icon> <span>Mark as Delivered </span></ion-button>
+  <ion-button  expand="block" *ngIf="order.status=='Pending'" (click)="updateStatus($event,'Shipped',order.id)" > <ion-icon name="paper-plane-sharp"></ion-icon> <span>{{'ORDER.shipped' | translate}}</span></ion-button>
+  <ion-button  expand="block" *ngIf="order.status=='Shipped'" (click)="updateStatus($event,'Delivered',order.id)"  color="success"> <ion-icon name="checkmark-done-outline"></ion-icon> <span>{{'ORDER.delivered' | translate}} </span></ion-button>
 
 </ion-footer>
 

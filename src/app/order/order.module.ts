@@ -8,6 +8,7 @@ import { OrderPageRoutingModule } from './order-routing.module';
 
 import { OrderPage } from './order.page';
 import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
+import { TranslateModule } from '@ngx-translate/core'; // add this
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
     FormsModule,
     IonicModule,
     NgxIonicImageViewerModule,
-    OrderPageRoutingModule
+    OrderPageRoutingModule,
+    TranslateModule
   ],
   declarations: [OrderPage]
 })

@@ -8,6 +8,7 @@ import { CreatePageRoutingModule } from './create-routing.module';
 
 import { CreatePage } from './create.page';
 import { HttpClientModule } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core'; // add this
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { HttpClientModule } from '@angular/common/http';
     FormsModule,
     IonicModule,
     HttpClientModule,
-    CreatePageRoutingModule
+    CreatePageRoutingModule,
+    TranslateModule
   ],
   declarations: [CreatePage]
 })

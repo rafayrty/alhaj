@@ -8,6 +8,7 @@ import { EditPageRoutingModule } from './edit-routing.module';
 
 import { EditPage } from './edit.page';
 import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
+import { TranslateModule } from '@ngx-translate/core'; // add this
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
     FormsModule,
     IonicModule,
     EditPageRoutingModule,
-    NgxIonicImageViewerModule
+    NgxIonicImageViewerModule,
+    TranslateModule
   ],
   declarations: [EditPage]
 })

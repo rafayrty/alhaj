@@ -2,6 +2,9 @@
 
 <ion-content>
 
+
+
+
   <div class="create">
     <div class="step1" *ngIf="step1"   [@enterAnimation]>
 
@@ -10,34 +13,34 @@
 
         <div class="form">
           <ion-item lines="none">
-            <ion-label color="medium" position="stacked">Your client name</ion-label>
-            <ion-input placeholder="Type name here" [(ngModel)]="form.name"  name="name" autofocus="true"></ion-input>
+            <ion-label color="medium" position="stacked">{{'CREATE.name' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.name_placeholder' | translate}}" [(ngModel)]="form.name"  name="name" autofocus="true"></ion-input>
             <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
 
           </ion-item>
 
 
           <ion-item lines="none">
-            <ion-label color="medium" position="stacked">Client phone number</ion-label>
-            <ion-input placeholder="Type phone number here" [(ngModel)]="form.phone" name="phone" autofocus="true"></ion-input>
+            <ion-label color="medium" position="stacked">{{'CREATE.phone' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.phone_placeholder' | translate}}" [(ngModel)]="form.phone" name="phone" autofocus="true"></ion-input>
             <span class="error" *ngIf="errors.length!=0 && errors.phone">{{errors.phone[0]}}</span>
 
           </ion-item>
           <ion-item lines="none">
-            <ion-label color="medium" position="stacked">SHipping address</ion-label>
-            <ion-input placeholder="Type client shipping address here"  [(ngModel)]="form.address" name="address" autofocus="true"></ion-input>
+            <ion-label color="medium" position="stacked">{{'CREATE.address' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.address_placeholder' | translate}}"  [(ngModel)]="form.address" name="address" autofocus="true"></ion-input>
             <span class="error" *ngIf="errors.length!=0 && errors.address">{{errors.address[0]}}</span>
 
           </ion-item>
           <ion-item lines="none">
-            <ion-label color="medium" position="stacked">total collectible price</ion-label>
-            <ion-input placeholder="Type order price here"  [(ngModel)]="form.price" name="price" autofocus="true"></ion-input>
+            <ion-label color="medium" position="stacked">{{'CREATE.price' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.price_placeholder' | translate}}"  [(ngModel)]="form.price" name="price" autofocus="true"></ion-input>
             <span class="error" *ngIf="errors.length!=0 && errors.price">{{errors.price[0]}}</span>
 
           </ion-item>
           <ion-item lines="none">
-            <ion-label color="medium" position="stacked">Type your order</ion-label>
-            <ion-textarea autoGrow="true" rows="4" [(ngModel)]="form.order" name="order" placeholder="Type your order details here..."> </ion-textarea>
+            <ion-label color="medium" position="stacked">{{'CREATE.order' | translate}}</ion-label>
+            <ion-textarea autoGrow="true" rows="4" [(ngModel)]="form.order" name="order" placeholder="{{'CREATE.order_placeholder' | translate}}"> </ion-textarea>
             <span class="error" *ngIf="errors.length!=0 && errors.order">{{errors.order[0]}}</span>
             <span class="error" *ngIf="errors.length!=0 && errors.image">{{errors.image[0]}}</span>
           </ion-item>
@@ -70,11 +73,11 @@
       <div class="top">
         <div class="searchBar">
           <ion-searchbar animated  [(ngModel)]="searchPilots"
-          (ionChange)="filterPilots()" placeholder="Search" name="searchPilots"></ion-searchbar>
+          (ionChange)="filterPilots()" placeholder="{{'search' | translate}}" name="searchPilots"></ion-searchbar>
 
         </div>
         <ion-text>
-          Choose a item
+          {{'CREATE.PILOT.choose' | translate}}
         </ion-text>
       </div>
 
@@ -98,9 +101,9 @@
                 </ion-thumbnail>
                 <ion-label>
                   <h4>{{pilot.name}}</h4>
-                  <h6 class="warning" *ngIf="pilot.status == 'Out For Delivery'">Out For Delivery</h6>
-                  <h6 class="available" *ngIf="pilot.status == 'Available'">Out For Delivery</h6>
-                  <h6 class="danger" *ngIf="pilot.status == 'Logged Out'">Logged Out</h6>
+                  <h6 class="warning" *ngIf="pilot.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</h6>
+                  <h6 class="available" *ngIf="pilot.status == 'Available'">{{'STATUS.available' | translate}}</h6>
+                  <h6 class="danger" *ngIf="pilot.status == 'Logged Out'">{{'STATUS.logged' | translate}}</h6>
 
                 </ion-label>
                 <ion-radio slot="end" value="{{pilot.id}}"></ion-radio>
@@ -141,12 +144,12 @@
     <div class="step3" *ngIf="step3"   [@enterAnimation]>
       <div class="top">
         <div class="searchBar">
-          <ion-searchbar animated placeholder="Search" [(ngModel)]="searchVehicles"
+          <ion-searchbar animated placeholder="{{'search' | translate}}" [(ngModel)]="searchVehicles"
           (ionChange)="filterVehicles()" name="searchVehicles"></ion-searchbar>
 
         </div>
         <ion-text>
-          Choose a Vehicle
+          {{'CREATE.VEHICLE.choose' | translate}}
         </ion-text>
       </div>
 
@@ -169,8 +172,9 @@
                 </ion-thumbnail>
                 <ion-label>
                   <h4>{{vehicle.name}}</h4>
-                  <h6 class="available">{{vehicle.status}}</h6>
-                </ion-label>
+                  <h6 class="warning" *ngIf="vehicle.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</h6>
+                  <h6 class="available" *ngIf="vehicle.status == 'Available'">{{'STATUS.available' | translate}}</h6>
+                                </ion-label>
 
                 <ion-radio slot="end" value="{{vehicle.id}}"></ion-radio>
 
@@ -214,15 +218,15 @@
 
 
 <ion-footer *ngIf="step1">
-  <ion-button color="primary" (click)="next($event,'proceed')" expand="block">Proceed</ion-button>
+  <ion-button color="primary" (click)="next($event,'proceed')" expand="block"> {{'CREATE.proceed' | translate}}</ion-button>
 </ion-footer>
 
 
 <ion-footer *ngIf="step2">
-  <ion-button expand="block" (click)="next($event,'pilot')" color="success">Assign A Vehicle</ion-button>
+  <ion-button expand="block" (click)="next($event,'pilot')" color="success">{{'CREATE.VEHICLE.title' | translate}}</ion-button>
 </ion-footer>
 
 <ion-footer *ngIf="step3">
-  <ion-button expand="block" (click)="send($event)" color="success">Send</ion-button>
+  <ion-button expand="block" (click)="send($event)" color="success">{{'CREATE.VEHICLE.send' | translate}}</ion-button>
 
 </ion-footer>

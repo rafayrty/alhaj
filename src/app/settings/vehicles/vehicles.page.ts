@@ -120,4 +120,10 @@ this.router.navigateByUrl('/settings/vehicles/edit/'+id);
 
     await alert.present();
   }
+  doRefresh(event) {
+    this.fetchVehicles();
+      setTimeout(() => {
+          event.target.complete();
+        }, 2000);
+      }
 }

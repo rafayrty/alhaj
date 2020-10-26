@@ -3,9 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Add A New Vehicle</ion-title>
+    <ion-title>{{'SETTINGS.VEHICLES.new' | translate}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="insert()">Done</ion-button>
+      <ion-button (click)="insert()">{{'done' | translate}}</ion-button>
     </ion-buttons>
 
   </ion-toolbar>
@@ -14,7 +14,7 @@
 <ion-content>
 <div class="create">
 <ion-text color="medium">
-  <h6>Vehicle Photo</h6>
+  <h6>{{'SETTINGS.VEHICLES.INPUTS.photo' | translate}}</h6>
 </ion-text>
 <div class="photo">
 <div class="image" *ngIf="!image" (click)="openCamera()">
@@ -34,7 +34,7 @@
 </div>
 
 <div class="buttons">
-<ion-button color="primary" expand="block" (click)="openCamera()" fill="solid">Upload Photo</ion-button>
+<ion-button color="primary" expand="block" (click)="openCamera()" fill="solid">{{'SETTINGS.VEHICLES.INPUTS.upload' | translate}}</ion-button>
 <!-- <ion-button color="danger" expand="block"  fill="outline">Delete Photo</ion-button> -->
 
 </div>
@@ -45,8 +45,8 @@
 </div>
 <div class="form">
   <ion-item lines="none">
-    <ion-label color="medium"  position="stacked">Vehicle Name</ion-label>
-    <ion-input placeholder="Type name here" autofocus="true" [(ngModel)]="name" name="name"></ion-input>
+    <ion-label color="medium"  position="stacked">{{'SETTINGS.VEHICLES.INPUTS.name' | translate}}</ion-label>
+    <ion-input placeholder="{{'SETTINGS.VEHICLES.INPUTS.name_placeholder' | translate}}" autofocus="true" [(ngModel)]="name" name="name"></ion-input>
     <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
 
   </ion-item>

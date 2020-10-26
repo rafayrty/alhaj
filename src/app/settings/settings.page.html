@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Settings</ion-title>
+    <ion-title>{{'SETTINGS.title' | translate}}</ion-title>
     <!-- <ion-buttons slot="end">
       <ion-button (click)="settings()">Settings</ion-button>
     </ion-buttons> -->
@@ -13,7 +13,14 @@
 <ion-content>
 
   <div class="settings">
-
+    <ion-segment dir="ltr" style="    margin-top: 2rem;" (ionChange)="changeLang()" [(ngModel)]="selectedLang">
+      <ion-segment-button value="en">
+        <ion-label>EN</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ar">
+        <ion-label>AR</ion-label>
+      </ion-segment-button>
+    </ion-segment>
     <ion-grid>
 
     <ion-row class="ion-align-items-center ion-justify-content-center" >
@@ -24,7 +31,7 @@
               <img src="/assets/images/pilots.svg" alt="">
                     
                     <ion-text>
-                        <h3 color="dark"> Manage Pilots</h3>
+                        <h3 color="dark"> {{'SETTINGS.pilots' | translate}}</h3>
                     </ion-text>
                 </div>
 
@@ -42,7 +49,7 @@
 
                 
         <ion-text>
-            <h3 color="dark"> Manage Vehicles</h3>
+            <h3 color="dark"> {{'SETTINGS.vehicles' | translate}}</h3>
         </ion-text>
     </div>
         

@@ -24,10 +24,11 @@ errors:any = [];
 currentLang:any;
 selectedLang:any;
   constructor(private fcm:FcmService,private translate:TranslateService, private languageService:LanguageService, private route:Router,private store:StorageService,private storage:Storage) {
-    this.selectedLang = localStorage.getItem('SELECTED_LANGUAGE')
-    console.log(this.selectedLang);
+    
   }
-
+ionViewWillEnter(){
+  this.selectedLang = localStorage.getItem('SELECTED_LANGUAGE')
+}
   login(e){
     e.target.innerHTML = '<ion-spinner></ion-spinner>';
     e.target.setAttribute('disabled','disabled');
@@ -49,11 +50,22 @@ const doPost = async () => {
   });
   return ret;
 }
-doPost().then(res=>{
-  e.target.innerHTML = 'Login';
+doPost().then(async res=>{
+  e.target.innerHTML = this.translate.instant('LOGIN.btn');
   e.target.removeAttribute('disabled');
 if(res['status']==200){
-  this.fcm.initPush();
+  this.fcm.initPush(this.loginId);
+
+
+
+
+
+
+
+
+
+
+
 
 if(res['data'].user.role=='Manager'){
   this.store.login(res['data']);
@@ -61,8 +73,35 @@ if(res['data'].user.role=='Manager'){
 }else if(res['data'].user.role=='Pilot'){
   this.store.login(res['data']);
 
+
+      const ret = await Http.request({
+        method: 'POST',
+        url: `${SERVER_URL}/api/users/status`,
+        headers:{
+          'Accept':'application/json',
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer ' + res['data'].token
+        },
+        data:{
+          status:"Available"
+        }
+      });  
+      return ret;
+    
+
+
+
+
+
+
+
+
+
+
+
   this.route.navigateByUrl('/order');
 }
+this.loginId = "";
 // this.store.setObject(res['data']);
 console.log(res['data']);
 // this.roue.push
@@ -79,6 +118,7 @@ console.log(res['data']);
   }
 
   changeLang(){
+    
     this.languageService.setLanguage(this.selectedLang);
     // window.location.reload();
 

@@ -1,8 +1,8 @@
 <ion-header>
     <ion-toolbar>
-      <ion-title>Home</ion-title>
+      <ion-title>{{'HOME.title' | translate}}</ion-title>
       <ion-buttons slot="end">
-        <ion-button routerLink="/settings">Settings</ion-button>
+        <ion-button routerLink="/settings">{{'settings' | translate}}</ion-button>
       </ion-buttons>
   
     </ion-toolbar>
@@ -18,12 +18,12 @@
     <ion-row class="ion-align-items-center ion-justify-content-center" >
         <ion-col size="12">
 
-            <div class="orderButton"  (click)="orderBTN($event,'orders/create')" >
+            <div class="orderButton"   (click)="orderBTN($event,'orders/create')" >
 <div class="orderButtonCard">
               <img src="/assets/images/new.svg" alt="">
                     
                     <ion-text>
-                        <h3 color="dark"> New Order</h3>
+                        <h3 color="dark"> {{'HOME.new' | translate}}</h3>
                     </ion-text>
                 </div>
 
@@ -41,7 +41,7 @@
 
                 
         <ion-text>
-            <h3 color="dark"> Manage orders</h3>
+            <h3 color="dark"> {{'HOME.manage' | translate}}</h3>
         </ion-text>
     </div>
         
@@ -54,7 +54,7 @@
 
 </div>
 <div class="logoutbtn">
-    <ion-button color="danger" expand="block" (click)="logOut()"><ion-icon name="log-out-outline"></ion-icon>Logout</ion-button>
+    <ion-button color="danger" expand="block" (click)="logOut()"><ion-icon name="log-out-outline"></ion-icon>{{'HOME.logout' | translate}}</ion-button>
 </div>
 
 

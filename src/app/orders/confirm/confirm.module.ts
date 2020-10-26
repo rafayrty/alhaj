@@ -8,6 +8,7 @@ import { ConfirmPageRoutingModule } from './confirm-routing.module';
 
 import { ConfirmPage } from './confirm.page';
 import { ComponentsModule } from '../../components.module'
+import { TranslateModule } from '@ngx-translate/core'; // add this
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { ComponentsModule } from '../../components.module'
     FormsModule,
     IonicModule,
     ComponentsModule,
+    TranslateModule,
     ConfirmPageRoutingModule
   ],
   declarations: [ConfirmPage]

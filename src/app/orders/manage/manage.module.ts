@@ -8,12 +8,14 @@ import { ManagePageRoutingModule } from './manage-routing.module';
 
 import { ManagePage } from './manage.page';
 import { ComponentsModule } from '../../components.module'
+import { TranslateModule } from '@ngx-translate/core'; // add this
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    TranslateModule,
     ManagePageRoutingModule,
     ComponentsModule
     ],

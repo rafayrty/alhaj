@@ -17,6 +17,7 @@ import {
   HapticsImpactStyle,
   Capacitor
 } from '@capacitor/core';
+import { TranslateService } from '@ngx-translate/core';
 
 const { Haptics,Http } = Plugins;
 
@@ -72,10 +73,11 @@ form:any = {
   vehicle:""
 }
 title:string='Create A New Order'
-  constructor(private dataService:DataService,  public alertController: AlertController,private storage:Storage,private platform:Platform,private nav:NavController,private router:Router,private sanitizer : DomSanitizer,private photo:PhotoService) {
+  constructor(private translate:TranslateService, private dataService:DataService,  public alertController: AlertController,private storage:Storage,private platform:Platform,private nav:NavController,private router:Router,private sanitizer : DomSanitizer,private photo:PhotoService) {
     this.platform.backButton.subscribeWithPriority(10, () => {
 this.back();
     });
+    this.title = this.translate.instant('CREATE.title');
    }
 
    
@@ -108,6 +110,12 @@ filterVehicles(){
   this.vehicles = this.dataService.filterVehicles(this.searchVehicles);
 
 }
+doRefresh(event) {
+this.ngOnInit();
+  setTimeout(() => {
+    event.target.complete();
+  }, 2000);
+}
 fetchPilots(){
   this.storage.get('USER_INFO').then(res=>{
   const doGet = async () => {
@@ -126,6 +134,7 @@ fetchPilots(){
     console.log(res);
 this.pilots = res['data'];
 this.dataService.pilots = this.pilots;
+this.filterPilots()
 
 })
 })
@@ -149,13 +158,13 @@ fetchVehicles(){
   doGet().then(res=>{
 this.vehicles = res['data'];
 this.dataService.vehicles = this.vehicles;
+this.filterVehicles()
 })
 })
  
 }
   ngOnInit() {
-    this.filterPilots()
-    this.filterVehicles()
+ 
     this.fetchPilots();
     this.fetchVehicles();
   
@@ -225,7 +234,7 @@ if(type=='proceed'){
       e.target.innerHTML = 'Proceed';
       e.target.removeAttribute('disabled');
       if(res['status']==200){
-        this.title = "Assign A Pilot";
+        this.title = this.translate.instant('CREATE.PILOT.title');
         this.step1 = false;
         this.step2 = true;
         this.step3 = false;
@@ -254,7 +263,7 @@ if(type=='proceed'){
 if(this.form.pilot==""){
 this.presentAlert("Please Select A Pilot");
 }else{
-  this.title = "Assign A Vehicle";
+  this.title = this.translate.instant('CREATE.VEHICLE.title');
 
       this.step1 = false;
       this.step2 = false;
@@ -267,13 +276,13 @@ this.presentAlert("Please Select A Pilot");
   }
   back(){
     if(this.step3==true){
-      this.title = "Assign A Pilot";
+      this.title = this.translate.instant('CREATE.PILOT.title');
 
       this.step1 = false;
       this.step2 = true;
       this.step3 = false;
     }else if(this.step2==true){
-      this.title = "Create A New Order";
+      this.title = this.translate.instant('CREATE.title');
 
       this.step1 = true;
       this.step2 = false;
@@ -287,6 +296,8 @@ this.presentAlert("Please Select A Pilot");
     }
   }
   send(e){
+    this.hapticsImpactLight();
+
     e.target.innerHTML = '<ion-spinner></ion-spinner>';
     e.target.setAttribute('disabled','disabled');
 let data;
@@ -327,7 +338,7 @@ let data;
         return ret;
       }
       doPost().then(res=>{
-        e.target.innerHTML = 'Send';
+        e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
         e.target.removeAttribute('disabled');
         if(res['status']==200){
           this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 

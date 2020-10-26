@@ -47,7 +47,12 @@ if (Capacitor.getPlatform() != 'web') {
     this.hapticsImpact(HapticsImpactStyle.Heavy);
   }
 
-
+  doRefresh(event) {
+    this.fetchPilots();
+      setTimeout(() => {
+          event.target.complete();
+        }, 2000);
+      }
   fetchPilots(){
     this.storage.get('USER_INFO').then(res=>{
     console.log(res.token);

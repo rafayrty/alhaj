@@ -154,13 +154,13 @@
 <div class="login-form">
 
   <ion-text color="medium" class="text">
-    <h6>welcome back!</h6>
+    <h6>{{'LOGIN.welcome' | translate}}</h6>
   </ion-text>
 <form action="">
 
   <ion-item>
     <ion-label position="fixed">{{'LOGIN.loginId' | translate}}</ion-label>
-    <ion-input [(ngModel)]="loginId" name="loginId" placeholder="Type your login ID"></ion-input>
+    <ion-input [(ngModel)]="loginId" name="loginId" placeholder="{{'LOGIN.placeholder' | translate}}"></ion-input>
     <span class="error" *ngIf="errors.length!=0">{{errors.login_id[0]}}</span>
     <span class="error" *ngIf="message">{{message}}</span>
 
@@ -171,7 +171,7 @@
    (click)="login($event)"
     color="primary" 
     expand="block" 
-   >Login</ion-button>
+   >{{'LOGIN.btn' | translate}}</ion-button>
   
   </div>
 
