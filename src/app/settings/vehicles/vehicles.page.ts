@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import  '@capacitor-community/http';
 import {  SERVER_URL } from '../../../environments/environment';
 import { Storage } from '@ionic/storage';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonItemSliding } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
@@ -27,7 +27,21 @@ this.fetchVehicles();
       }
     });
    }
-
+   share(slidingItem: IonItemSliding) {
+    
+    slidingItem.getOpenAmount().then(res=>{
+alert("heyyy");
+console.log(res);
+      if(res==0){
+    slidingItem.open("start");
+  
+  }else{
+    slidingItem.close();
+  
+  }
+  
+    })
+    }
   ngOnInit() {
     this.fetchVehicles();
   }
@@ -72,7 +86,7 @@ if (Capacitor.getPlatform() != 'web') {
   }
   deleteConfirm(id,index){
     this.hapticsImpactHeavy();
-    this.vehicles.splice(index);
+    this.vehicles.splice(index,1);
 
     this.storage.get('USER_INFO').then(async res=>{
 

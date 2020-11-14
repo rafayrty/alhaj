@@ -21,14 +21,12 @@ const { PushNotifications,Http } = Plugins;
 export class FcmService {
  token:any;
 notify:any;
-loginId:any;
  constructor(private storage:Storage,public alertController: AlertController,private router: Router) { }
  
-  initPush(login_id) {
+  initPush() {
     if (Capacitor.platform !== 'web') {
       this.registerPush();
     }
-    this.loginId = login_id;
 
   }
   async presentAlert(title,body) {
@@ -46,7 +44,6 @@ loginId:any;
       if (permission.granted) {
         // Register with Apple / Google to receive push via APNS/FCM
         PushNotifications.register();
-   
       } else {
         // No permission for push granted
       }
@@ -56,7 +53,8 @@ loginId:any;
       'registration',
       (token: PushNotificationToken) => {
         this.token = token.value;
-
+        console.log(this.token);
+if(Capacitor.platform == 'android'){
     this.storage.get('USER_INFO').then(res=>{
       const doPost = async () => {
       const ret = await Http.request({
@@ -78,7 +76,7 @@ loginId:any;
     console.log(res);
   })
 });
-        console.log('My token: ' + JSON.stringify(token));
+}
       }
     );
  
@@ -97,6 +95,26 @@ if(data.role=='Manager'){
   audio.play();
   this.presentAlert(this.notify.title,this.notify.body);
 
+}else{
+  // if(this.router.url!='/order'){
+ 
+  // }
+  if(data.type=='normal'){
+    if(this.router.url=='/order'){
+      this.router.navigate(['home/1'],{replaceUrl:true});
+    }else{
+      var audio = new Audio('/assets/sound.mp3');
+      audio.play();
+      this.presentAlert(this.notify.title,this.notify.body);
+    }
+  }else{
+    var audio = new Audio('/assets/sound.mp3');
+    audio.play();
+    this.presentAlert(this.notify.title,this.notify.body);
+
+  }
+
+  // this.router.navigate(['/order'],{replaceUrl:true});
 }
         // console.log('Push received: ' + JSON.stringify(notification));
       }
@@ -117,6 +135,9 @@ if(data.role=='Manager'){
         const data = notification.notification.data;
         if(data.role=='Manager'){
           this.router.navigateByUrl('/orders/manage');
+        }else{
+          this.router.navigateByUrl('/order');
+
         }
         // console.log('Action performed: ' + JSON.stringify(notification.notification));
         // if (data.detailsId) {

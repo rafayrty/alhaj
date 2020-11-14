@@ -22,6 +22,11 @@ ion-list{
         --padding-top:.5rem;
         --padding-bottom:.5rem;
     }
+    h6{
+        color:var(--ion-color-medium);
+        font-size:rem(13px);
+
+    }
 }
 ion-footer{
     max-width:92%;

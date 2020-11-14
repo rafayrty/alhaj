@@ -7,7 +7,7 @@ export const environment = {
 };
 
 export const SERVER_URL = 'https://alhaj.nazadv.com/public';
-// export const SERVER_URL = 'http://192.168.1.2/alhaj/public';
+// export const SERVER_URL = 'http://192.168.1.5/alhaj/public';
 
 
 /*

@@ -6,7 +6,7 @@ import { LoginPage } from './login.page';
 
 import { LoginPageRoutingModule } from './login-routing.module';
 import { TranslateModule } from '@ngx-translate/core'; // add this
-
+import { ComponentsModule } from '../components.module'
 
 @NgModule({
   imports: [
@@ -14,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core'; // add this
     FormsModule,
     IonicModule,
     LoginPageRoutingModule,
+    ComponentsModule,
     TranslateModule
   ],
   declarations: [LoginPage]

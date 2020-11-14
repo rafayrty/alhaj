@@ -1,29 +1,38 @@
 <ion-header>
     <ion-toolbar>
-      <ion-title>{{'HOME.title' | translate}}</ion-title>
-      <ion-buttons slot="end">
-        <ion-button routerLink="/settings">{{'settings' | translate}}</ion-button>
+      <ion-title>{{'HOME.portal' | translate}}</ion-title>
+      <ion-buttons slot="start">
+            <ion-button (click)="logOut()">{{'logout' | translate}}</ion-button>
+        <!-- <ion-button routerLink="/settings">{{'settings' | translate}}</ion-button> -->
       </ion-buttons>
   
     </ion-toolbar>
+
   </ion-header>
   
 
 
 <ion-content>
     <div class="home">
-
+        <ion-segment dir="ltr" (ionChange)="changeLang()" [(ngModel)]="selectedLang">
+            <ion-segment-button value="en">
+              <ion-label>EN</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="ar">
+              <ion-label>AR</ion-label>
+            </ion-segment-button>
+          </ion-segment>
     <ion-grid>
 
     <ion-row class="ion-align-items-center ion-justify-content-center" >
         <ion-col size="12">
 
-            <div class="orderButton"   (click)="orderBTN($event,'orders/create')" >
+            <div class="orderButton"   (click)="orderBTN($event,'orders/manage')" >
 <div class="orderButtonCard">
               <img src="/assets/images/new.svg" alt="">
                     
-                    <ion-text>
-                        <h3 color="dark"> {{'HOME.new' | translate}}</h3>
+                    <ion-text class="manager-text">
+                        <h3> {{'HOME.manager' | translate}}</h3>
                     </ion-text>
                 </div>
 
@@ -33,15 +42,18 @@
 
 
             </ion-col>
-        <ion-col>
-<div class="orderButton" (click)="orderBTN($event,'orders/manage')">
+            <div class="separator" *ngIf="!hideDriver">
+                <hr>
+            </div>
+        <ion-col *ngIf="!hideDriver">
+<div class="orderButton" (click)="orderBTN($event,'order')">
     <div class="orderButtonCard">
 
         <img src="/assets/images/manage.svg" alt="">
 
                 
-        <ion-text>
-            <h3 color="dark"> {{'HOME.manage' | translate}}</h3>
+        <ion-text class="driver-text">
+            <h3> {{'HOME.driver' | translate}}</h3>
         </ion-text>
     </div>
         
@@ -53,10 +65,14 @@
     </ion-grid>
 
 </div>
-<div class="logoutbtn">
-    <ion-button color="danger" expand="block" (click)="logOut()"><ion-icon name="log-out-outline"></ion-icon>{{'HOME.logout' | translate}}</ion-button>
-</div>
 
 
 </ion-content>
 
+<!-- 
+<ion-footer>
+    <div class="logoutbtn">
+        <ion-button color="danger" expand="block" (click)="logOut()"><ion-icon name="log-out-outline"></ion-icon>{{'HOME.logout' | translate}}</ion-button>
+    </div>
+    
+</ion-footer> -->

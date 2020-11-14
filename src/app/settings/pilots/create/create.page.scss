@@ -2,6 +2,9 @@
 @function rem($size) {
     @return $size / 16px * 1rem;
   }
+  ion-content{
+    padding-bottom:1rem;
+}
 .create{
     max-width:90%;
     margin:1.8rem auto;
@@ -34,6 +37,8 @@
 }
 
 .form{
+    padding-bottom: 1rem;
+
     max-width:90%;
     margin:0 auto;
     ion-item{
@@ -49,7 +54,7 @@
        font-size:.8rem;
 
    }
-   ion-input,ion-textarea{
+   ion-input,ion-textarea,ion-select{
     --padding-end:.5rem;
     --padding-start:.5rem;
 

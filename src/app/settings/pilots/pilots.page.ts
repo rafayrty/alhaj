@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import  '@capacitor-community/http';
 import {  SERVER_URL } from '../../../environments/environment';
 import { Storage } from '@ionic/storage';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonItemSliding } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
@@ -18,7 +18,10 @@ const { Haptics,Http } = Plugins;
   styleUrls: ['./pilots.page.scss'],
 })
 export class PilotsPage implements OnInit {
-pilots:any = []
+disableSwipe:any;
+pilots:any = [];
+
+userId:any;
 loading:boolean = true;
   constructor(private router:Router,private activated:ActivatedRoute,public alertController: AlertController,private storage:Storage) {
     this.activated.queryParams.subscribe(params => {
@@ -27,11 +30,28 @@ this.fetchPilots();
       }
     });
    }
+   share(slidingItem: IonItemSliding) {
+    slidingItem.open("end");
 
+  slidingItem.getOpenAmount().then(res=>{
+// if(res==0){
+
+// }else{
+//   slidingItem.close();
+
+// }
+
+  })
+  }
   ngOnInit() {
+    this.storage.get('USER_INFO').then(res=>{
+this.userId = res.user.id;
+    });
     this.fetchPilots();
   }
+  
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
+    
     // Native StatusBar available
 if (Capacitor.getPlatform() != 'web') {
   Haptics.impact({
@@ -77,7 +97,7 @@ if (Capacitor.getPlatform() != 'web') {
   }
   deleteConfirm(id,index){
     this.hapticsImpactHeavy();
-    this.pilots.splice(index);
+    this.pilots.splice(index,1);
 
     this.storage.get('USER_INFO').then(async res=>{
 

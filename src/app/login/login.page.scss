@@ -52,6 +52,9 @@ ion-segment{
     ion-label{
       padding-left:1rem;
     }
+    ion-label:lang(ar){
+      padding-left:0rem;
+    }
     ion-input{
       width:90%;
       margin-left:1rem;

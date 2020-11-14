@@ -119,6 +119,7 @@ if(this.file){
     phone:this.pilot.phone,
     file:this.file,
     format:this.format,
+    role:this.pilot.role,
     login_id:this.pilot.login_id,
     
   }
@@ -126,6 +127,7 @@ if(this.file){
  data = {
     name:this.pilot.name,
     phone:this.pilot.phone,
+    role:this.pilot.role,
     login_id:this.pilot.login_id,
     
   }

@@ -1,0 +1,508 @@
+<!-- <app-menu [title]="title"></app-menu> -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="back()">
+      <ion-button class="back" ><ion-icon name="chevron-back-outline"></ion-icon> </ion-button>
+      <!-- <ion-back-button defaultHref="/home"></ion-back-button> -->
+    </ion-buttons>
+    <ion-title>{{title}}</ion-title>
+    <ion-buttons *ngIf="showSetting" slot="end">
+      <ion-button (click)="settings()">{{'settings' | translate}}</ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+    <ion-refresher slot="fixed" pullFactor="0.5" pullMin="100" pullMax="200" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+
+  <div class="create">
+  
+    <div class="step1" *ngIf="step1"   [@enterAnimation]>
+
+
+      <form action="" *ngIf="order">
+
+        <div class="form">
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">{{'CREATE.name' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.name_placeholder' | translate}}" [(ngModel)]="order.client"  name="name" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.name" [@enterAnimation]>{{errors.name[0]}}</span>
+
+          </ion-item>
+
+
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">{{'CREATE.phone' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.phone_placeholder' | translate}}" inputmode="tel" type="tel" [(ngModel)]="order.phone" name="phone" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.phone" [@enterAnimation]>{{errors.phone[0]}}</span>
+
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">{{'CREATE.address' | translate}}</ion-label>
+            <ion-input placeholder="{{'CREATE.address_placeholder' | translate}}"  [(ngModel)]="order.shipping" name="address" autofocus="true"></ion-input>
+            <span class="error" *ngIf="errors.length!=0 && errors.address" [@enterAnimation]>{{errors.address[0]}}</span>
+
+          </ion-item>
+<div *ngIf="order.status=='Waiting'">
+
+          <ion-radio-group value="biff" [(ngModel)]="order.orderType" name="orderType">
+        
+            <ion-item>
+              <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.immediate' | translate}}</ion-label>
+              <ion-radio mode="md" slot="start" value="normal"></ion-radio>
+            </ion-item>
+      <ion-item>
+        <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.schedule' | translate}}</ion-label>
+        <ion-radio mode="md" slot="start" value="schedule"></ion-radio>
+      </ion-item>
+      <ion-item *ngIf="order.orderType=='schedule'" [@enterAnimation]>
+        <ion-label>{{'CREATE.OPTIONS.date' | translate}}</ion-label>
+        <ion-datetime  cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" displayFormat="MMM DD, YYYY" [(ngModel)]='date' name="date" [min]="minDate" [max]="maxDate"       placeholder="Nov 19, 2020"></ion-datetime>
+      </ion-item>
+      <ion-item *ngIf="order.orderType=='schedule'" [@enterAnimation]>
+        <ion-label>{{'CREATE.OPTIONS.time' | translate}}</ion-label>
+        <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+      </ion-item>
+          </ion-radio-group>
+
+        </div>
+
+          <!-- Payment Record -->
+
+<ion-item>
+  <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.OPTIONS.payment' | translate}}</ion-label>
+  <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="order.payment" name="payment">
+    <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
+    <ion-select-option value="cod">{{'CREATE.OPTIONS.cod' | translate}}</ion-select-option>
+    <ion-select-option value="inshop">{{'CREATE.OPTIONS.inshop' | translate}}</ion-select-option>
+    <ion-select-option value="heno">{{'CREATE.OPTIONS.heno' | translate}}</ion-select-option>
+    <ion-select-option value="scania">{{'CREATE.OPTIONS.scania' | translate}}</ion-select-option>
+    <ion-select-option value="other">{{'CREATE.OPTIONS.other' | translate}}</ion-select-option>
+
+
+
+  </ion-select>
+</ion-item>
+
+<form action="" *ngIf="order.payment=='scania' || order.payment=='inshop' || order.payment=='heno'"  [@enterAnimation]>
+
+
+
+  <ion-item lines="none">
+    <ion-input placeholder="{{'CREATE.receipt' | translate}}" [(ngModel)]="order.receipt" (ionInput)="removeError()"  name="name" autofocus="true"></ion-input>
+    <span class="error"  *ngIf="customError.receipt">{{customError.receipt}}</span>
+
+  </ion-item>
+
+</form>
+      
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">{{'CREATE.order' | translate}}</ion-label>
+            <ion-textarea autoGrow="true" rows="4" [(ngModel)]="order.details" name="order" placeholder="{{'CREATE.order_placeholder' | translate}}"> </ion-textarea>
+            <span class="error" *ngIf="errors.length!=0 && errors.order">{{errors.order[0]}}</span>
+            <span class="error" *ngIf="errors.length!=0 && errors.image" [@enterAnimation]> {{errors.image[0]}}</span>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">{{'CREATE.note' | translate}}</ion-label>
+            <ion-textarea autoGrow="true" rows="1" [(ngModel)]="order.note" name="note" placeholder="{{'CREATE.note_placeholder' | translate}}"> </ion-textarea>
+
+            <span class="error" *ngIf="errors.length!=0 && errors.note" [@enterAnimation]>{{errors.note[0]}}</span>
+
+          </ion-item>
+          <div class="images">
+            <div class="image" *ngIf="order.image" >
+              <ion-thumbnail height="65" width="65">
+                <img [src]="order.image">
+              </ion-thumbnail>
+            </div>
+            <div class="image-upload">
+              <ion-button (click)="openCamera()">
+                <ion-icon name="camera-sharp"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+      </form>
+    </div>
+    <div class="step2" *ngIf="step2"   [@enterAnimation]>
+
+
+      <ion-list >
+        <ion-radio-group value="urgency" [(ngModel)]="order.type">
+          <ion-list-header>
+            <ion-label>{{'CREATE.OPTIONS.urgency' | translate}}</ion-label>
+          </ion-list-header>
+      
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.normal' | translate}}</ion-label>
+            <ion-radio slot="start" color="success" value="normal"></ion-radio>
+          </ion-item>
+      
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.urgent' | translate}}</ion-label>
+            <ion-radio slot="start" color="success" value="urgent"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+
+
+
+<div *ngIf="order.status == 'Waiting'">
+
+      <ion-list-header>
+        <ion-label>{{'HOME.driver' | translate}}</ion-label>
+      </ion-list-header>
+      <div Class="dropdown"  (click)="openPilot()" >
+        <div class="left" *ngIf="selectedPilot">
+
+        <img src="{{selectedPilot.image}}"  scroll="false" width="20%">
+        <p> {{selectedPilot.name}} 
+          <span class="danger" *ngIf="selectedPilot.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</span>
+          <span class="available" *ngIf="selectedPilot.status == 'Available'">{{'STATUS.available' | translate}}</span>
+          <span class="warning" *ngIf="selectedPilot.status == 'Logged Out'">{{'STATUS.logged' | translate}}</span>
+       
+        </div>
+<div class="right">
+  <ion-icon name="chevron-down-sharp"></ion-icon>
+</div>
+</div>
+      <ion-item lines="none" style="display:none;" >
+      
+        <ion-select placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changePilot()" #Pilotselect interface="alert" name="pilot" [(ngModel)]="pilot_id" >
+          <ion-select-option [value]="pilot.id" *ngFor="let pilot of pilots; let i = index">
+      
+      {{pilot.name}}  
+        </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+
+                    <!-- Vehicle Selection -->
+
+      <ion-list-header> 
+        <ion-label>{{'vehicle' | translate}}</ion-label>
+      </ion-list-header>
+
+              <div Class="dropdown"  (click)="openVehicle()"  >
+                <div class="left" *ngIf="selectedVehicle">
+        
+                <img src="{{selectedVehicle.image}}"  scroll="false" width="20%">
+                <p> {{selectedVehicle.name}} 
+                  <span class="danger" *ngIf="selectedVehicle.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</span>
+                  <span class="available" *ngIf="selectedVehicle.status == 'Available'">{{'STATUS.available' | translate}}</span>
+
+                </div>
+        <div class="right">
+          <ion-icon name="chevron-down-sharp"></ion-icon>
+        </div>
+        </div>
+              <ion-item lines="none" style="display:none;" >
+              
+                <ion-select placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changeVehicle()"  #Vehicleselect interface="alert" name="vehicle" [(ngModel)]="vehicle_id" >
+                  <ion-select-option [value]="vehicle.id" *ngFor="let vehicle of vehicles; let i = index">
+              
+              {{vehicle.name}}  
+                </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+
+            </div>
+
+
+
+
+
+
+
+<!-- 
+      
+
+
+
+
+      <ion-list>
+        <ion-radio-group value="payment" [(ngModel)]="order.payment" color="success">
+          <ion-list-header>
+            <ion-label>{{'CREATE.OPTIONS.payment' | translate}}</ion-label>
+          </ion-list-header>
+      
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.paid' | translate}}</ion-label>
+            <ion-radio slot="start" value="paid" color="success"></ion-radio>
+          </ion-item>
+      
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.cod' | translate}}</ion-label>
+            <ion-radio slot="start" value="cod" color="success"></ion-radio>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.inshop' | translate}}</ion-label>
+            <ion-radio slot="start" value="inshop" color="success"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.heno' | translate}}</ion-label>
+            <ion-radio slot="start" value="heno" color="success"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.scania' | translate}}</ion-label>
+            <ion-radio slot="start" value="scania" color="success"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{'CREATE.OPTIONS.other' | translate}}</ion-label>
+            <ion-radio slot="start" value="other" color="success"></ion-radio>
+          </ion-item>
+
+        </ion-radio-group>
+      </ion-list>
+    
+
+
+
+      <form action="" *ngIf="order.payment=='scania' || order.payment=='inshop' || order.payment=='heno'"  [@enterAnimation]>
+
+
+      <div class="form">
+
+      <ion-item lines="none">
+        <ion-input placeholder="Receipt ID" [(ngModel)]="order.receipt" (change)="removeError()"  name="name" autofocus="true"></ion-input>
+        <span class="error"  *ngIf="customError.receipt">{{customError.receipt}}</span>
+
+      </ion-item>
+    </div>
+
+  </form>
+  <ion-item *ngIf="orderType=='schedule'">
+    <ion-label>{{'CREATE.OPTIONS.date' | translate}}</ion-label>
+    <ion-datetime  cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" displayFormat="MMM DD, YYYY" [(ngModel)]='date' [min]="minDate" [max]="maxDate"       placeholder="Nov 19, 2020"></ion-datetime>
+  </ion-item>
+  <ion-item *ngIf="orderType=='schedule'">
+    <ion-label>{{'CREATE.OPTIONS.time' | translate}}</ion-label>
+    <ion-datetime  cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'    placeholder="11:47 AM"></ion-datetime>
+  </ion-item>
+ -->
+
+    </div>
+    <div class="step3" *ngIf="step3"   [@enterAnimation]    >
+
+
+      <!-- <div class="top">
+        <div class="searchBar">
+          <ion-searchbar animated  [(ngModel)]="searchPilots"
+          (ionChange)="filterPilots()" placeholder="{{'search' | translate}}" name="searchPilots"></ion-searchbar>
+
+        </div>
+        <ion-text>
+          {{'CREATE.PILOT.choose' | translate}}
+        </ion-text>
+      </div> -->
+
+<!-- 
+      <div class="items" *ngIf="orderType=='schedule' && pilots">
+
+        <ion-list lines="full">
+
+          <ion-radio-group value="pilot"  name="pilots" [(ngModel)]="pilot_id" mode="md">
+
+            <div class="item" *ngFor="let pilot of pilots; let i = index">
+
+              <ion-item >
+                <ion-thumbnail slot="start">
+                  <img  src="{{pilot.image}}">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>{{pilot.name}}</h4>
+                </ion-label>
+                <ion-radio slot="end" [value]="pilot.id"></ion-radio>
+
+
+              </ion-item>
+            </div>
+
+          </ion-radio-group>
+
+        </ion-list>
+      </div> -->
+
+
+      <!-- <div class="items" *ngIf="orderType!='schedule'  && pilots">
+
+
+
+        <ion-list lines="full" >
+
+          <ion-radio-group value="pilot"  name="pilot" [(ngModel)]="pilot_id" mode="md">
+
+            <div class="item" *ngFor="let pilot of pilots; let i = index">
+              <div class="overlay" *ngIf="pilot.status == 'Out For Delivery' || pilot.status == 'Logged Out'"></div>
+
+              <ion-item >
+                <ion-thumbnail slot="start">
+                  <img  src="{{pilot.image}}">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>{{pilot.name}}</h4>
+                  <h6 class="warning" *ngIf="pilot.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</h6>
+                  <h6 class="available" *ngIf="pilot.status == 'Available'">{{'STATUS.available' | translate}}</h6>
+                  <h6 class="danger" *ngIf="pilot.status == 'Logged Out'">{{'STATUS.logged' | translate}}</h6>
+
+                </ion-label>
+                <ion-radio slot="end" [value]="pilot.id"></ion-radio>
+
+
+              </ion-item>
+            </div>
+
+         
+          </ion-radio-group>
+
+        </ion-list>
+      </div> -->
+
+    </div>
+
+
+    <div class="step4" *ngIf="step4"   [@enterAnimation]>
+      <div class="top">
+        <div class="searchBar">
+          <ion-searchbar animated placeholder="{{'search' | translate}}" [(ngModel)]="searchVehicles"
+          (ionChange)="filterVehicles()" name="searchVehicles"></ion-searchbar>
+
+        </div>
+        <ion-text>
+          {{'CREATE.VEHICLE.choose' | translate}}
+        </ion-text>
+      </div>
+
+      <div class="items" *ngIf="orderType=='schedule' && vehicles">
+
+
+
+        <!-- List of Input Items -->
+        <ion-list lines="full">
+          <ion-radio-group value="vehicle" name="vehicles" [(ngModel)]="vehicle_id"  mode="md">
+            <div class="item" *ngFor="let vehicle of vehicles; let i = index">
+
+              <ion-item >
+                <ion-thumbnail slot="start">
+                  <img src="{{vehicle.image}}">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>{{vehicle.name}}</h4>
+                                </ion-label>
+
+                <ion-radio slot="end" value="{{vehicle.id}}"></ion-radio>
+
+              </ion-item>
+            </div>
+<!-- 
+            <div class="item">
+              <div class="overlay"></div>
+
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>Ricky Mclaughlin</h4>
+                  <h6 class="delivery">Available</h6>
+                </ion-label>
+
+                <ion-radio slot="end" value="1"></ion-radio>
+
+              </ion-item>
+            </div> -->
+          </ion-radio-group>
+
+
+        </ion-list>
+      </div>
+
+
+
+      <div class="items" *ngIf="orderType!='schedule'&& vehicles">
+
+
+
+        <!-- List of Input Items -->
+        <ion-list lines="full">
+          <ion-radio-group value="vehicle" name="vehicle" [(ngModel)]="vehicle_id" mode="md">
+
+            <div class="item" *ngFor="let vehicle of vehicles; let i = index">
+              <div class="overlay" *ngIf="vehicle.status == 'Out For Delivery'"></div>
+
+              <ion-item >
+                <ion-thumbnail slot="start">
+                  <img src="{{vehicle.image}}">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>{{vehicle.name}}</h4>
+                  <h6 class="warning" *ngIf="vehicle.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</h6>
+                  <h6 class="available" *ngIf="vehicle.status == 'Available'">{{'STATUS.available' | translate}}</h6>
+                                </ion-label>
+
+                <ion-radio slot="end" value="{{vehicle.id}}"></ion-radio>
+
+              </ion-item>
+            </div>
+<!-- 
+            <div class="item">
+              <div class="overlay"></div>
+
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <img src="/assets/images/ricky.png">
+                </ion-thumbnail>
+                <ion-label>
+                  <h4>Ricky Mclaughlin</h4>
+                  <h6 class="delivery">Available</h6>
+                </ion-label>
+
+                <ion-radio slot="end" value="1"></ion-radio>
+
+              </ion-item>
+            </div> -->
+          </ion-radio-group>
+
+
+        </ion-list>
+      </div>
+
+      <!-- <div class="assignVehicle">
+        <ion-button expand="block" (click)="send()" color="success">Send</ion-button>
+
+      </div> -->
+
+    </div>
+
+  </div>
+
+
+</ion-content>
+
+
+<div *ngIf="order">
+
+<ion-footer *ngIf="step1 && order" [@enterAnimation] style="display:flex;">
+  <ion-button color="primary"  (click)="next($event,'proceed')" expand="block" style="width:100%"> {{'CREATE.proceed' | translate}}</ion-button>
+</ion-footer>
+
+
+<ion-footer *ngIf="step2" [@enterAnimation]>
+  <ion-button expand="block" style="color:#fff;" (click)="send($event)" color="success">{{'CREATE.VEHICLE.send' | translate}}</ion-button>
+
+</ion-footer>
+</div>

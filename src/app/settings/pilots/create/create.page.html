@@ -44,18 +44,31 @@
   
 </div>
 <div class="form">
-  <ion-item lines="none">
-    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.name' | translate}}</ion-label>
-    <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.name_placeholder' | translate}}" autofocus="true" [(ngModel)]="name" name="name"></ion-input>
-    <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
+  <ion-item  lines="none">
+    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.role' | translate}}</ion-label>
+    <ion-select class="custom-options"  cancelText="{{'ALERTS.cancel' | translate}}"  okText="{{'done' | translate}}" interface="action-sheet" [(ngModel)]="role">
+      <ion-select-option value="Manager">{{'SETTINGS.PILOTS.INPUTS.manager' | translate}}</ion-select-option>
+      <ion-select-option value="Pilot">{{'SETTINGS.PILOTS.INPUTS.driver' | translate}}</ion-select-option>
+    </ion-select>
+    <span class="error" *ngIf="errors.length!=0 && errors.role">{{errors.role[0]}}</span>
 
   </ion-item>
-  <ion-item lines="none">
-    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.phone' | translate}}</ion-label>
-    <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.phone_placeholder' | translate}}" [(ngModel)]="phone" name="phone"></ion-input>
-    <span class="error" *ngIf="errors.length!=0 && errors.phone">{{errors.phone[0]}}</span>
+  <div >
+    <ion-item lines="none">
+      <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.name' | translate}}</ion-label>
+      <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.name_placeholder' | translate}}" autofocus="true" [(ngModel)]="name" name="name"></ion-input>
+      <span class="error" *ngIf="errors.length!=0 && errors.name">{{errors.name[0]}}</span>
+  
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.phone' | translate}}</ion-label>
+      <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.phone_placeholder' | translate}}" [(ngModel)]="phone" name="phone"></ion-input>
+      <span class="error" *ngIf="errors.length!=0 && errors.phone">{{errors.phone[0]}}</span>
+  
+    </ion-item>
 
-  </ion-item>
+  </div>
+
   <ion-item lines="none">
     <ion-label color="medium" position="stacked">{{'SETTINGS.PILOTS.INPUTS.loginId' | translate}}</ion-label>
     <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.loginId_placeholder' | translate}}"   [(ngModel)]="loginId" name="loginId"></ion-input>

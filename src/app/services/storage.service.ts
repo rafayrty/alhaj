@@ -2,13 +2,22 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { ToastController, Platform } from '@ionic/angular';
-import { BehaviorSubject } from 'rxjs';
-
+import { BehaviorSubject, Observable } from 'rxjs';
+import { SERVER_URL } from 'src/environments/environment';
+import '@capacitor-community/http';
+import {
+  Plugins,
+  HapticsImpactStyle,
+  Capacitor
+} from '@capacitor/core';
+const { Haptics,Http } = Plugins;
 
 @Injectable()
 export class StorageService {
 
-  authState = new BehaviorSubject(false);
+  // authState = new BehaviorSubject(false);
+  // authState: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  isAuthenticatedUser: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   constructor(
     private router: Router,
@@ -20,14 +29,6 @@ export class StorageService {
       this.ifLoggedIn();
     });
   }
-
-  ifLoggedIn() {
-    this.storage.get('USER_INFO').then((response) => {
-      if (response) {
-        this.authState.next(true);
-      }
-    });
-  }
   async getInfo(){
      let res = "";
     this.storage.get('USER_INFO').then((response) => {
@@ -37,22 +38,47 @@ export class StorageService {
     return res;
     }
     
-  login(data) {
-    this.storage.set('USER_INFO', data).then((response) => {
-      this.authState.next(true);
-    });
-  }
+    ifLoggedIn() {
+      this.storage.get('USER_INFO').then((response) => {
+        if (response) {
+          this.isAuthenticatedUser.next(true);
+        }
+      });
+      return this.isAuthenticatedUser.value;
 
-  logout() {
-    this.storage.remove('USER_INFO').then(() => {
-      this.router.navigate(['login']);
-      this.authState.next(false);
-    });
-  }
+    }
+  
+  
+    login(data):  Observable<boolean> {
+      this.storage.set('USER_INFO', data).then((response) => {
+        this.isAuthenticatedUser.next(true);
+        if(response.user.role=='Manager'){
+          this.router.navigateByUrl('/orders/manage',{replaceUrl:true});
 
-  isAuthenticated() {
-    return this.authState.value;
-  }
+        }else{
+          this.router.navigateByUrl('home',{replaceUrl:true});
+        }
+        return response;
+
+      });
+      return this.isAuthenticatedUser;
+    }
+  
+    logout() {
+      this.storage.remove('USER_INFO').then((response) => {
+if(response==undefined){
+  this.isAuthenticatedUser.next(false);
+   window.location.reload();
+  // this.router.navigate(['login'],{replaceUrl:true});
+}
+
+       
+      });
+
+    
+    }
+  
+
 
 
 

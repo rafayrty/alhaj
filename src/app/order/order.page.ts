@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostBinding, OnInit } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import {  SERVER_URL } from '../../environments/environment';
 import { Storage } from '@ionic/storage';
-import { CallNumber } from '@ionic-native/call-number/ngx';
-import { AlertController, ModalController,LoadingController } from '@ionic/angular';
+import { AlertController, ModalController,LoadingController, NavController } from '@ionic/angular';
 import { ViewerModalComponent } from 'ngx-ionic-image-viewer';
 
 import {
@@ -21,40 +20,26 @@ import {
   HapticsNotificationType
 } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
+import { NavigationExtras, Router } from '@angular/router';
+import { NewOrderService } from '../new-order.service';
 const { Http,Haptics } = Plugins;
+
 @Component({
   selector: 'app-order',
   templateUrl: './order.page.html',
   styleUrls: ['./order.page.scss'],
-  animations: [
-    trigger(
-      'inOutAnimation', 
-      [
-        transition(
-          ':enter', 
-          [
-            style({ opacity: 0 }),
-            animate('.3s ease-out', 
-                    style({  opacity: 1 }))
-          ]
-        ),
-        transition(
-          ':leave', 
-          [
-            style({ opacity: 1 }),
-            animate('.3s ease-in', 
-                    style({opacity: 0 }))
-          ]
-        )
-      ]
-    )
-  ]
 })
 export class OrderPage implements OnInit {
-order:any;
+order:any=false;
 loader:any;
+ordersEmpty:any=false;
+orders:any = [];
+tab:any="ongoing";
+push:any;
+self:any;
+  currentLang: string;
 
-  constructor(private loadingController:LoadingController, private translate:TranslateService,public modalController: ModalController,public alertController: AlertController, private callNumber: CallNumber,private store:StorageService,private storage:Storage) { }
+  constructor(private newOrder:NewOrderService,private router:Router,private navCtrl:NavController,private loadingController:LoadingController, private translate:TranslateService,public modalController: ModalController,public alertController: AlertController,private store:StorageService,private storage:Storage) { }
   async presentLoading() {
     this.loader = await this.loadingController.create({
      cssClass: 'my-custom-class',
@@ -70,9 +55,22 @@ loader:any;
       this.loader = null;
   }
 }
+tabchange(event){
+  if(this.tab=='ongoing'){
+
+    this.fetchOrder();
+      }else{
+        this.fetchUpcoming();
+      }  
+}
 doRefresh(event) {
+  if(this.tab=='ongoing'){
+
 this.fetchOrder();
-  setTimeout(() => {
+  }else{
+    this.fetchUpcoming();
+  }  
+setTimeout(() => {
       event.target.complete();
     }, 2000);
   }
@@ -118,42 +116,37 @@ if (Capacitor.getPlatform() != 'web') {
       cssClass: 'my-custom-class',
       header: title,
       message:body,
-      buttons: ['OK']
+      buttons: [this.translate.instant('okay')]
     });
 
     await alert.present();
   }
   ngOnInit(){
-
   }
   ionViewWillEnter() {
+    this.tab = "ongoing";
+   this.fetchOrder();
+    this.fetchUpcoming();
+      this.currentLang = this.translate.currentLang;
     
-    this.fetchOrder();
-    let self = this;
+//  PushNotifications.addListener(
+//   'pushNotificationActionPerformed',
+//   async (notification: PushNotificationActionPerformed) => {
+//     const data = notification.notification.data;
+//     // if(data.role !="Manager"){
+//     //   window.location.reload();
+//     // }
 
-PushNotifications.addListener(
-  'pushNotificationActionPerformed',
-  async (notification: PushNotificationActionPerformed) => {
-    const data = notification.notification.data;
-    if(data.role !="Manager"){
-      window.location.reload();
-    }
-
-  });
+//   });
     // Show us the notification payload if the app is open on our device
-    PushNotifications.addListener('pushNotificationReceived',
-      (notification: PushNotification) => {
-      
-this.hapticsImpactHeavy();
-window.location.reload();
-
-
-
-});
-
-
-
-    
+   
+    // PushNotifications.addListener('pushNotificationReceived',this.pushOrder());
+  //   this.hapticsImpactHeavy();
+  //   this.pushOrder();
+  //   this.fetchOrder();
+  //  // this.router.navigate(['/order'],{replaceUrl:true});
+   
+  //  });
   }
   logOut(){
 
@@ -191,11 +184,9 @@ this.hideLoader();
  }
  call(num){
    this.hapticsImpactHeavy();
-  // let tel_number = num;
-  // window.open(`tel:${tel_number}`, '_system')
-  this.callNumber.callNumber(num, true)
-.then(res => console.log('Launched dialer!', res))
-.catch(err => console.log('Error launching dialer', err));
+  let tel_number = num;
+  window.open(`tel:${tel_number}`, '_system')
+
 }
 confirmStatus(e,status,id){
 
@@ -216,22 +207,23 @@ confirmStatus(e,status,id){
           status:status
         }
       });
-      console.log(ret);
-
       return ret;
     }
     doGet().then(res=>{
       if(res){
-        if(status=='Shipped'){
-          e.target.innerHTML = `<ion-icon name="paper-plane-sharp"></ion-icon> <span>${this.translate.instant('ORDER.shipped')}</span>`;
+        if(status=="On The Way"){
+          e.target.innerHTML = `${this.translate.instant('ORDER.shipped')}`;
           e.target.removeAttribute('disabled');
-        }else{
-          e.target.innerHTML = `<ion-icon name="checkmark-done-outline"></ion-icon> <span>${this.translate.instant('ORDER.delivered')}</span>`;
+        }else if(status=='Preparing'){
+          e.target.innerHTML = `${this.translate.instant('ORDER.preparing')}`;
+          e.target.removeAttribute('disabled');
+        }else if(status=='Delivered'){
+          e.target.innerHTML = `${this.translate.instant('ORDER.delivered')}`;
           e.target.removeAttribute('disabled');
         }
       }
       if(res.data){
-        this.order = res.data;
+        this.pushOrder();
       }else{
         this.order = false;
       }
@@ -244,10 +236,13 @@ async updateStatus(e,status,id) {
   this.hapticsImpactLight();
 
   let msg = "";
-  if(status=="Shipped"){
+  if(status=="On The Way"){
     msg = this.translate.instant('ALERTS.shipped');
-  }else if(status=="Delivered"){
+  }else if(status=="Preparing"){
+    msg = this.translate.instant('ALERTS.preparing');
+  }else if(status=='Delivered'){
     msg = this.translate.instant('ALERTS.delivered');
+
   }
   const alert = await this.alertController.create({
     cssClass: 'my-custom-class',
@@ -275,6 +270,8 @@ async updateStatus(e,status,id) {
   await alert.present();
 }
 pushOrder(){
+  this.presentLoading();
+
   this.storage.get('USER_INFO').then(async res=>{
       const ret = await Http.request({
         method: 'GET',
@@ -286,12 +283,106 @@ pushOrder(){
         },
       });
 
+      this.hideLoader();
 
 this.order = ret.data;
   console.log(this.order);
       return ret;
   });
 }
+fetchUpcoming(){
+  this.presentLoading();
+
+  this.storage.get('USER_INFO').then(res=>{
+    const doGet = async () => {
+      const ret = await Http.request({
+        method: 'GET',
+        url: `${SERVER_URL}/api/upcomingOrders`,
+        headers:{
+          'Accept':'application/json',
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer ' + res.token
+        },
+      });
+ 
+      return ret;
+    }
+    doGet().then(res=>{
+      if(res.data){
+      this.orders = res.data;
+      if(this.orders.length==0 || this.orders == undefined){
+        this.ordersEmpty = true;
+      }else{
+        this.ordersEmpty = false;
+      }
+      this.hideLoader();
+        // this.order = false;
+      }
+
+    })
+  });
+  
+
+  }
+  
+view(id){
+  let url ='/order-detail/'+id;
+  this.router.navigate([url]);
+}
+day(date){
+  let lang = 'en-GB'
+if(this.currentLang == 'en'){
+lang = 'en-GB';
+}else{
+ lang = 'ar-SA';
+
+}
+let dateOutput = new Date(date).toLocaleDateString(
+lang,
+{
+weekday:'short',
+}
+);
+
+return dateOutput;
+}
+  date(date){
+  //   let lang = 'en-GB'
+  //   if(this.currentLang == 'en'){
+  // lang = 'en-GB';
+  //   }else{
+  //    lang = 'ar-EG';
+  
+  //   }
+   let dateOutput = new Date(date).toLocaleDateString(
+     'en-GB',
+      {
+      //  weekday:'short',
+       month: 'numeric',
+       day: 'numeric',
+      }
+    ); 
+    return dateOutput;
+   } 
+   time(time){
+  //   let lang = 'en-GB'
+  //   if(this.currentLang == 'en'){
+  // lang = 'en-GB';
+  //   }else{
+  //    lang = 'ar-EG';
+  
+  //   }
+  
+    let dateOutput = new Date(time).toLocaleTimeString(
+     'en-GB',
+      {
+        hour:'numeric',
+        minute:'numeric'
+      }
+    ); 
+    return dateOutput;
+  }
+
  fetchOrder(){
    
   this.storage.get('USER_INFO').then(res=>{
@@ -315,7 +406,6 @@ this.order = ret.data;
        var audio = new Audio('/assets/sound.mp3');
         audio.play();
         this.order = res.data;
-        console.log(this.order);
 
       }else{
         this.order = false;

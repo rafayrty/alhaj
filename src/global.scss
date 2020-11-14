@@ -40,3 +40,111 @@ h1,h2,h3,h4,h5,h6{
     margin:.5rem 0;
     font-size:.87rem;
   }
+
+  //Animations
+
+@keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+  $n: 3;
+
+.boxes {
+  transform-origin: center bottom;
+  transform:scale(0);
+  animation: stagger 1000ms ease forwards;
+
+  @for $x from 2 through $n {
+    &:nth-child(#{$x}) {
+      animation-delay: 333ms * ($x - 1);
+    }
+  }
+}
+
+@keyframes stagger{
+    to {
+      transform: scale(1);
+    }
+  }
+
+
+
+  $n: 3;
+
+  .width115 {
+    width:0px;
+    animation: widthfull 1000ms ease forwards;
+     animation-delay:1s;
+    @for $x from 2 through $n {
+      &:nth-child(#{$x}) {
+        animation-delay: 330ms * ($x - 1);
+      }
+    }
+  }
+  
+  @keyframes widthfull{
+      to {
+        width: 115px;
+      }
+    }
+
+
+    $n: 3;
+
+    .width64 {
+      width:0px;
+      animation: widthhalf 1000ms ease forwards;
+      animation-delay:1.6s;
+
+      @for $x from 2 through $n {
+        &:nth-child(#{$x}) {
+          animation-delay: 330ms * ($x - 1);
+        }
+      }
+    }
+    
+    @keyframes widthhalf{
+        to {
+          width: 64px;
+        }
+      }
+      $n: 3;
+
+      .circle {
+        opacity: 0;
+        animation: fade-in-scale 300ms ease forwards;
+        animation-delay:2.6s;
+        transform-origin: center center;
+        transform:scale(1);
+
+        @for $x from 2 through $n {
+          &:nth-child(#{$x}) {
+            animation-delay: 100ms * ($x - 1);
+          }
+        }
+      }
+      @keyframes fade-in-scale {
+        50% {
+            transform:scale(1.05);
+          opacity: 1;
+        }
+        100%{
+            transform:scale(1); 
+            opacity: 1;
+         
+        }
+      }
+
+      $n: 9;
+
+      .paths {
+       opacity:0;
+        animation: fade-in 300ms ease forwards;
+        animation-delay:2.9s;
+      }
+    
+      .view-order{
+        --border-radius:0;
+    }
+

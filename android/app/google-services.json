@@ -30,6 +30,13 @@
             {
               "client_id": "74307812269-88uvcd5ilkc6incaj54ss4f242tmpo1k.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "74307812269-6d9f5kpd9q47tu0iq7o7vfhm6tcrpfsc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alhaj.app"
+              }
             }
           ]
         }

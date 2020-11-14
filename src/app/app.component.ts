@@ -4,7 +4,7 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { StorageService } from './services/storage.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { LanguageService } from './services/language.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,7 +28,8 @@ export class AppComponent {
     private router:Router,
     private translate:TranslateService,
     private languageService:LanguageService,
-    private fcm:FcmService
+    private fcm:FcmService,
+    private route: ActivatedRoute,
       ) {
     this.translate.onLangChange.subscribe((event) => {
       this.lang=event.lang;
@@ -48,6 +49,8 @@ export class AppComponent {
   }
 
   initializeApp() {
+    this.fcm.initPush();
+
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
@@ -60,24 +63,39 @@ if(this.languageService.selected == 'ar'){
       }else{
         document.documentElement.setAttribute("style", '--ion-font-family: -apple-system-font, "Roboto", "Segoe UI", sans-serif');
       }
-      this.Storage.authState.subscribe(state => {
-        if (state) {
+
           this.store.get('USER_INFO').then((response) => {
           let  res = response;
+        if(res){
+          // this.route.queryParams
+          // .subscribe(params=>{
+          //   console.log(params);
+    
+          // console.log(this.router.url);
+          if(this.router.url == '/'){
+            if(res.user.role=='Manager'){
+              this.router.navigateByUrl('/orders/manage',{ replaceUrl: true });
 
-          this.fcm.initPush(response.user.id);
-
-         if(res.user.role=='Manager'){
-              this.router.navigate(['home']);
             }else{
-              this.router.navigate(['order']);
+              this.router.navigateByUrl('home',{ replaceUrl: true });
 
             }
-          });   
-        } else {
+          }
+        }else{
           this.router.navigate(['login']);
+
         }
-      });
+          // if(this.router.url == '/'){
+
+          
+        //  if(res.user.role=='Manager'){
+        //       this.router.navigate(['home']);
+        //     }else{
+        //       this.router.navigate(['order']);
+
+        //     }
+          });   
+       
     });
   }
 }

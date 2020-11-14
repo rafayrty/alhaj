@@ -1,5 +1,6 @@
 {
-    "wait":"Please wait...",
+    
+     "wait":"Please wait...",
      "search":"Search",
      "back":"Back",
      "settings":"Settings",
@@ -8,6 +9,19 @@
      "edit":"Edit",
      "delete":"Delete",
      "done":"Done!",
+     "client":"Call Client",
+     "ongoing":"On-Going",
+     "upcoming":"Upcoming",
+     "vehicle":"Vehicle",
+     "warning":"Warning",
+     "okay":"OK",
+
+
+    "EMPTY":{
+        "order":"No Orders Found",
+        "vehicles":"No Vehicles Found",
+        "pilots":"No drivers Found"
+    },
 
     "LOGIN":{
         "loginId":"Login ID",
@@ -19,14 +33,19 @@
         "title":"Home",
         "logout":"Logout",
         "new":"New order",
-        "manage":"Manage orders"
+        "manage":"Manage orders",
+        "manager":"Manager",
+        "driver":"Driver",
+        "portal":"Choose A Portal",
+        "created":"Created By",
+        "last":"Last Modified"
     },
     "CONFIRM":{
         "title":"Assign A New Order",
       "done":"Done!",
       "sent":"Your Order Was Sent!",
-      "notify":"You’ll be notified when the pilot is delivering, And when he’s available again",
-      "new":"Create new order"
+      "notify":"You’ll be notified when the order status is updated",
+      "new":"Back To Orders"
     },
     "CREATE":{
         "title":"Create An Order",
@@ -34,17 +53,39 @@
         "name_placeholder":"Your client name",
         "phone":"Client phone number",
         "phone_placeholder":"Client phone number",
-        "address":"SHipping address",
+        "address":"Shipping address",
         "address_placeholder":"Type client shipping address here",
-        "price":"total collectible price",
-        "price_placeholder":"Type order price here",
+        "note":"NOTES",
+        "note_placeholder":"Type Your Notes",
         "order":"Type your order",
         "order_placeholder":"Type your order",
         "proceed":"Proceed",
+        "schedule":"Schedule",
+        "immediate":"Immediate",
+        "receipt":"Receipt Id",
+         
+
+        "OPTIONS":{
+            "payment":"Payment/Record",
+            "urgency":"Urgency",
+            
+             "normal":"Normal",
+             "urgent":"Urgent",
+            "paid":"Paid",
+            "cod":"Cash On Delivery",
+            "inshop":"In Shop",
+            "heno":"Heno",
+            "scania":"Scania",
+            "other":"Other",
+            "date":"Scheduled Date",
+            "time":"Scheduled Time"
+        },
+
+
 
         "PILOT":{
-            "title":"Assign a pilot",
-            "choose":"Choose a pilot"
+            "title":"Assign a driver",
+            "choose":"Choose a driver"
         },"VEHICLE":{
             "title":"Assign a vehicle",
             "choose":"Choose a vehicle",
@@ -54,7 +95,7 @@
             "title":"Assign the order",
             "done":"Done!",
             "order":"Your order was sent",
-            "notified":"You’ll be notified when the pilot is delivering, And when he’s available again",
+            "notified":"You’ll be notified when the driver is delivering, And when he’s available again",
             "new":"Create new order"
 
         }
@@ -65,30 +106,44 @@
         "total":"Total bill:",
         "client":"Client: ",
         "created":"Created on:",
-        "assigned":"Assigned to:"
+        "assigned":"Assigned to:",
+
+                  "receipt":"Receipt Id",
+                  "payment":"Record/Payment",
+                  "history":"History",
+                  "today":"Today",
+                  "tomorrow":"Tomorrow",
+                  "upcoming":"Upcoming",
+                  "address":"Address",
+                  "delivered":"Delivered On",
+                  "view":"View Order"
+
         
     },
     "SETTINGS":{
         "title":"Settings",
-        "pilots":"Manage Pilots",
+        "pilots":"Manage Users",
         "vehicles":"Manage Vehicles",
 
         "PILOTS":{
-            "title":"Manage pilots",
+            "title":"Manage Users",
             "swipe":"Swipe items left for options",
-            "new":"Add new Pilot",
-            "edit":"Edit A Pilot",
-
+            "new":"Add new User",
+            "edit":"Edit A User",
+            
 
             "INPUTS":{
-                "photo":"Pilot Photo",
+                "photo":"User Photo",
                 "upload":"Upload Photo",
-                "name":"Pilot Name",
+                "name":"User Name",
                 "name_placeholder":"Type name here",
-                "phone":"Pilot phone number",
+                "phone":"User phone number",
                 "phone_placeholder":"Type phone number here",
                 "loginId":"Login ID",
-                "loginId_placeholder":"Make it short and unique..."
+                "loginId_placeholder":"Make it short and unique...",
+                "role":"User Role",
+                "manager":"Manager",
+                "driver":"Driver"
             
             }
         },
@@ -110,21 +165,28 @@
         }
     },
     "ALERTS":{
+        "time":"Please Select A Date & Time",
+        "select_pilot":"Please Select A Driver",
+        "select_vehicle":"Please Select A Vehicle",
         "title":"Confirmation",
-        "pilots":"Are You Sure You Want To Delete This <strong>Pilot</strong>!",
+        "orders":"Are You Sure You Want To Delete This <strong>Driver</strong>!",
+        "pilots":"Are You Sure You Want To Delete This <strong>Driver</strong>!",
         "vehicles":"Are You Sure You Want To Delete This <strong>Vehicle</strong>!",
         "cancel":"Cancel",
         "confirm":"Confirm",
         "shipped":"Are you sure you want to mark this order as shipped?",
-        "delivered":"Are you sure you want to mark this order as delivered?"
+        "delivered":"Are you sure you want to mark this order as delivered?",
+        "preparing":"Are you sure you want to mark this order as prepared?",
+        "receipt":"Please Add A Receipt"
     },
     "ORDER":{
+        "settings":"Order Settings",
         "call":"Call Client",
         "collectible":"Total collectible",
         "details":"Order Details",
         "shipped":"Mark as shipped",
         "delivered":"Mark as Delivered",
-
+        "preparing":"Mark As Preparing",
         "DONE":{
             "all":"All is done",
             "notification":"You’ll get a notification when you receive a new order to deliver"
@@ -132,6 +194,12 @@
     },"STATUS":{
         "out":"Out For Delivery",
         "logged":"Logged Out",
-        "available":"Available"
+        "available":"Available",
+        "on":"On The Way",
+        "waiting":"Waiting",
+        "preparing":"Preparing",
+        "Shipped":"Shipped",
+        "delivered":"Delivered"
+        
     }
 }

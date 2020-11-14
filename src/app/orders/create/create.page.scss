@@ -87,6 +87,14 @@
             }
         }
     }
+//Step2
+
+
+
+
+
+
+
 
 //Step2
 
@@ -95,6 +103,7 @@
     max-width:86%;
     margin:0 auto;
 }
+
 ion-text{
     color:var(--ion-color-medium);
     max-width:86%;
@@ -143,6 +152,10 @@ ion-text{
                 color:var(--ion-color-danger);
                 
             }
+            h6.out{
+                color:var(--ion-color-danger);
+                
+            }
          
         }
     }
@@ -165,4 +178,76 @@ ion-footer{
     max-width:92%;
     margin:0 auto;
     margin-bottom:1rem;
+    .schedule{
+        --background:#F2994A;
+    }
 }
+ion-radio-group.schedule ion-radio{
+    margin-right:.8rem;
+}
+ion-radio-group.schedule{
+    margin:1rem .5rem;
+}
+.dropdown{
+    border:1px solid #92949C;
+    display:flex;
+    flex-direction: row;
+    padding: .4rem 1.6rem;
+    border-radius: 60px;
+    align-items: center;
+    justify-content: space-between;
+    max-width:80%;
+    margin:0 auto;
+
+    .left{
+        display:flex;
+        flex-direction: row;
+        align-items: center;
+
+ 
+    img{
+        width: 60px;
+        height: 60px;
+        border-radius: 60px;
+    }
+    p{
+        line-height:1.6;
+        width: 100%;
+        margin-left:1.5rem;
+        span{
+            display:block;
+
+        }
+    }
+    p:lang(ar){
+        margin-right:1.5rem;
+
+    }
+}
+ion-icon{
+    color:#92949C;
+    font-size:1.2rem;
+}
+
+
+}
+
+span.available{
+    color:var(--ion-color-success);
+
+}
+
+span.danger{
+    color:var(--ion-color-danger);
+    
+}
+span.warning{
+    color:var(--ion-color-warning);
+}
+.back{
+    font-size: 1.4rem;
+    --padding-start: .0;
+  }
+  .back:lang(ar){
+    transform:rotate(360deg);
+  }

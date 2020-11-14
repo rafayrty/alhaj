@@ -45,6 +45,17 @@
   
 </div>
 <div class="form">
+  <ion-item  lines="none">
+    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.role' | translate}}</ion-label>
+    <ion-select class="custom-options"  cancelText="{{'ALERTS.cancel' | translate}}"  okText="{{'done' | translate}}" interface="action-sheet" [(ngModel)]="pilot.role">
+      <ion-select-option value="Manager">{{'SETTINGS.PILOTS.INPUTS.manager' | translate}}</ion-select-option>
+      <ion-select-option value="Pilot">{{'SETTINGS.PILOTS.INPUTS.driver' | translate}}</ion-select-option>
+    </ion-select>
+    <span class="error" *ngIf="errors.length!=0 && errors.role">{{errors.role[0]}}</span>
+
+  </ion-item>
+  <div>
+
   <ion-item lines="none">
     <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.name' | translate}}</ion-label>
     <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.name_placeholder' | translate}}" autofocus="true" [(ngModel)]="pilot.name" name="name"></ion-input>
@@ -57,13 +68,14 @@
     <span class="error" *ngIf="errors.length!=0 && errors.phone">{{errors.phone[0]}}</span>
 
   </ion-item>
+</div>
   <ion-item lines="none">
     <ion-label color="medium" position="stacked">{{'SETTINGS.PILOTS.INPUTS.loginId' | translate}}</ion-label>
     <ion-input placeholder="{{'SETTINGS.PILOTS.INPUTS.loginId_placeholder' | translate}}"   [(ngModel)]="pilot.login_id" name="loginId"></ion-input>
     <span class="error" *ngIf="errors.length!=0 && errors.login_id">{{errors.login_id[0]}}</span>
 
   </ion-item>
- 
+
 
 
 

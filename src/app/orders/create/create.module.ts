@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -20,6 +20,6 @@ import { TranslateModule } from '@ngx-translate/core'; // add this
     TranslateModule
 
   ],
-  declarations: [CreatePage]
+  declarations: [CreatePage  ]
 })
 export class CreatePageModule {}

@@ -31,6 +31,7 @@ phone:any = "";
 loginId:any = "";
 loader:any;
 format:any;
+role:any = "Pilot";
 errors:any = []
   constructor(private translate:TranslateService,private router:Router,private http:HttpClient,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
 
@@ -89,7 +90,8 @@ if (Capacitor.getPlatform() != 'web') {
           phone:this.phone,
           login_id:this.loginId,
           file:this.file,
-          format:this.format
+          format:this.format,
+          role:this.role
         }
       });
       return ret;

@@ -22,7 +22,7 @@ vehicles: any = [];
     });
   }
 
-  filterVehicles(searchTerm) {
+  filterVehicles(searchTerm)  {
     return this.vehicles.filter(item => {
       return item.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1;
     });
@@ -37,7 +37,7 @@ vehicles: any = [];
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/users`,
+        url: `${SERVER_URL}/api/pilots`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',

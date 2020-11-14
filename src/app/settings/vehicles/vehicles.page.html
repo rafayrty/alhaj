@@ -15,7 +15,7 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.5" pullMin="100" pullMax="200">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-<ion-text class="swipe"><h6>{{'SETTINGS.VEHICLES.swipe' | translate}}</h6></ion-text>
+<!-- <ion-text class="swipe"><h6>{{'SETTINGS.VEHICLES.swipe' | translate}}</h6></ion-text> -->
 
 
 <div class="pilots" *ngIf="!loading">
@@ -25,8 +25,7 @@
 
 
     <!-- Sliding item with icon bottom options on end side -->
-    <ion-item-sliding *ngFor="let vehicle of vehicles; let i = index">
-      <ion-item>
+    <ion-item *ngFor="let vehicle of vehicles; let i = index"  >
         <ion-thumbnail slot="start">
           <img src="{{vehicle.image}}">
         </ion-thumbnail>
@@ -34,19 +33,16 @@
           <h2>{{vehicle.name}}</h2>
         </ion-label>
 
-      </ion-item>
-      <ion-item-options>
-        <ion-item-option color="primary"  (click)="edit(vehicle.id)">
-          <ion-icon slot="bottom" name="create-outline"></ion-icon>
-          {{'edit'| translate}}
-        </ion-item-option>
-        <ion-item-option (click)="delete(vehicle.id,i)" color="danger">
-          <ion-icon slot="bottom" name="trash-outline"></ion-icon>
-          {{'delete' | translate}}
+      <ion-buttons slot="end">
+        <ion-button color="primary" fill="solid"  (click)="edit(vehicle.id)">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="delete(vehicle.id,i)" fill="solid" color="danger">
+          <ion-icon name="trash-outline"></ion-icon>
 
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
 </ion-list>
 </div>
 
