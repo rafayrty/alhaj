@@ -67,6 +67,11 @@ const routes: Routes = [
     canActivate: [AuthGuard]
 
   },
+  {
+    path: 'order-view/:id',
+    loadChildren: () => import('./order-view/order-view.module').then( m => m.OrderViewPageModule),
+    canActivate: [AuthGuard]
+  },
 ];
 
 @NgModule({

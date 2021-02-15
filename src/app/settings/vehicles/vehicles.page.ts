@@ -10,6 +10,7 @@ import {
   HapticsImpactStyle,
   Capacitor
 } from '@capacitor/core';
+import { TranslateService } from '@ngx-translate/core';
 const { Haptics,Http } = Plugins;
 
 @Component({
@@ -20,7 +21,7 @@ const { Haptics,Http } = Plugins;
 export class VehiclesPage implements OnInit {
 vehicles:any = []
 loading:boolean = true;
-  constructor(private router:Router,private activated:ActivatedRoute,public alertController: AlertController,private storage:Storage) {
+  constructor(private translate:TranslateService,private router:Router,private activated:ActivatedRoute,public alertController: AlertController,private storage:Storage) {
     this.activated.queryParams.subscribe(params => {
       if (params && params.reload) {
 this.fetchVehicles();
@@ -112,18 +113,18 @@ this.router.navigateByUrl('/settings/vehicles/edit/'+id);
     this.hapticsImpactLight();
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
-      header: 'Confirm!',
-      message: 'Are You Sure You Want To Delete This <strong>Pilot</strong>!!!',
+      header: this.translate.instant('ALERTS.title'),
+      message:this.translate.instant('ALERTS.vehicles'),
       buttons: [
         {
-          text: 'Cancel',
+          text: this.translate.instant('ALERTS.cancel'),
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
             console.log('Confirm Cancel: blah');
           }
         }, {
-          text: 'Confirm',
+          text: this.translate.instant('ALERTS.confirm'),
           handler: () => {
             this.deleteConfirm(id,index);
 

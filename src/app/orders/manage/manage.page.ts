@@ -159,25 +159,7 @@ changedTab(){
   ); 
   return dateOutput;
 }
- created(date){
-//    let lang = 'en-GB'
-//    if(this.currentLang == 'en'){
-// lang = 'en-GB';
-//    }else{
-//     lang = 'ar-EG';
 
-//    }
-  let dateOutput = new Date(date).toLocaleDateString(
-    'en-GB',
-     {
-      // weekday:'short',
-      month: 'numeric',
-      day: 'numeric',
-      year:'numeric',
-     }
-   ); 
-   return dateOutput;
- }
  loadData(event) {
    if(this.searchOrders != ''){
     event.target.complete();
@@ -356,6 +338,26 @@ filterOrders(){
   this.orders = this.dataService.filterOrders(this.searchOrders);
  
 }
+created(date){
+  //    let lang = 'en-GB'
+  //    if(this.currentLang == 'en'){
+  // lang = 'en-GB';
+  //    }else{
+  //     lang = 'ar-EG';
+  
+  //    }
+
+    let dateOutput = new Date(date).toLocaleDateString(
+      'en-GB',
+       {
+        // weekday:'short',
+        month: 'numeric',
+        day: 'numeric',
+        year:'numeric',
+       }
+     ); 
+     return dateOutput;
+   }
 day(date){
       let lang = 'en-GB'
     if(this.currentLang == 'en'){
@@ -364,7 +366,7 @@ day(date){
      lang = 'ar-SA';
  
     }
-let dateOutput = new Date(date).toLocaleDateString(
+let dateOutput = new Date(date.replace(/ /g,"T")).toLocaleDateString(
   lang,
   {
     weekday:'short',
@@ -380,7 +382,7 @@ return dateOutput;
 //      lang = 'ar-EG';
  
 //     }
-    let dateOutput = new Date(date).toLocaleDateString(
+    let dateOutput = new Date(date.replace(/ /g,"T")).toLocaleDateString(
        'en-GB',
        {
         //  weekday:'short',
@@ -392,6 +394,7 @@ return dateOutput;
        }
      ); 
      return dateOutput;
+    //  return dateOutput.replace(/-/g, '/');
    }
 // date(date){
 //  let dateOutput = new Date(date).toLocaleDateString(

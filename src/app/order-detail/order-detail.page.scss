@@ -71,7 +71,7 @@
     line-height: 1;
     position: absolute;
     top: 115%;
-    color: rgba(60, 60, 67, 0.6);
+    color: var(--ion-color-progress);
     margin-bottom: 8px;
   }
   .progress-bar .step .bullet{
@@ -441,7 +441,7 @@ ion-footer{
     border-radius: 20px;
     z-index: 0;
     top: 7px;
-    right: 68%;
+    left: -568%;
     --padding-end: 2.2rem;
     --padding-start: 2.2rem;
     --border-radius: 20px;

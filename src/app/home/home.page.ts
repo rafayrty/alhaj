@@ -68,6 +68,7 @@ if (Capacitor.getPlatform() != 'web') {
     this.hapticsImpact(HapticsImpactStyle.Light);
   }
   ngOnInit() {
+
   }
   ionViewDidEnter(){
     this.selectedLang = localStorage.getItem('SELECTED_LANGUAGE')

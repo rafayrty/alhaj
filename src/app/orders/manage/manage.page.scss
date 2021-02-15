@@ -11,7 +11,7 @@
       }
   }
   .tabs{
-      background:#f2f2f2;
+      background:var(--ion-color-segment-bg);
       padding:1rem 0;
       ion-segment{
 max-width:90%;
@@ -30,7 +30,7 @@ ion-segment-button{
     .datePicker{
         flex-basis:30%;
 
-        background: #EDEDED;
+        background: var(--ion-color-date-picker);
         color: var(--ion-color-danger);
         display: flex;
         align-items: center;
@@ -45,7 +45,6 @@ ion-segment-button{
        .datePicker:lang(ar){
         flex-basis:30%;
 
-        background: #EDEDED;
         color: var(--ion-color-danger);
         display: flex;
         padding: .25rem .4rem;
@@ -110,8 +109,8 @@ ion-item{
     p{
 
         display:inline-block;
-        background: #C4C4C4;
-        color: #fff;
+        background: var(--ion-color-delivery-bg);
+        color:#fff;
         font-size:rem(12px);
         padding:.1rem .8rem;
         text-transform: capitalize;

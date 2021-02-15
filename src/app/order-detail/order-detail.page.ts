@@ -174,18 +174,26 @@ time(time){
   return dateOutput;
 }
 created(date){
-
- let dateOutput = new Date(date).toLocaleDateString(
-   'en-GB',
-    {
-    //  weekday:'short',
-     month: 'numeric',
-     day: 'numeric',
-    }
-  ); 
-  return dateOutput;
+  // console.log(new Date(date.replace(/-/g, "/")).toDateString(),"normal");
+  // console.log(date.replace(/ /g,"T"));
+  let current_datetime = new Date(date)
+let formatted_date = current_datetime.getDate() + "-" + (current_datetime.getMonth() + 1) + "-" + current_datetime.getFullYear()
+return formatted_date.replace(/-/g, "/");
+// let dateOutput = new Date(date).toLocaleDateString(
+//    'en-GB',
+//     {
+//     //  weekday:'short',
+//      month: 'numeric',
+//      day: 'numeric',
+//     }
+//   ); 
+//  alert(dateOutput);
+  // return dateOutput;
 }
 day(date){
+  // date = date+" 14:03:35T12:03:45.000000Z";
+
+// console.log(date);
   let lang = 'en-GB'
 if(this.currentLang == 'en'){
 lang = 'en-GB';
@@ -193,7 +201,7 @@ lang = 'en-GB';
  lang = 'ar-SA';
 
 }
-let dateOutput = new Date(date).toLocaleDateString(
+let dateOutput = new Date(date.replace(/ /g,"T")).toLocaleDateString(
 lang,
 {
 weekday:'short',
@@ -204,7 +212,8 @@ return dateOutput;
 }
 date(date){
 
-  let dateOutput = new Date(date).toLocaleDateString(
+
+  let dateOutput = new Date(date.replace(/ /g,"T")).toLocaleDateString(
      'en-GB',
      {
       //  weekday:'short',

@@ -30,9 +30,10 @@ const { Http,Haptics } = Plugins;
   styleUrls: ['./order.page.scss'],
 })
 export class OrderPage implements OnInit {
-order:any=false;
+currentOrders:any=[];
 loader:any;
 ordersEmpty:any=false;
+
 orders:any = [];
 tab:any="ongoing";
 push:any;
@@ -225,13 +226,14 @@ confirmStatus(e,status,id){
       if(res.data){
         this.pushOrder();
       }else{
-        this.order = false;
+        this.currentOrders = [];
       }
 
     })
   });
 
 }
+
 async updateStatus(e,status,id) {
   this.hapticsImpactLight();
 
@@ -285,8 +287,8 @@ pushOrder(){
 
       this.hideLoader();
 
-this.order = ret.data;
-  console.log(this.order);
+this.currentOrders = ret.data;
+  console.log(this.currentOrders);
       return ret;
   });
 }
@@ -324,46 +326,73 @@ fetchUpcoming(){
   
 
   }
-  
+  open(id){
+    let url ='/order-view/'+id;
+    this.router.navigate([url]);
+  }
 view(id){
   let url ='/order-detail/'+id;
   this.router.navigate([url]);
 }
+
+created(date){
+  //    let lang = 'en-GB'
+  //    if(this.currentLang == 'en'){
+  // lang = 'en-GB';
+  //    }else{
+  //     lang = 'ar-EG';
+  
+  //    }
+
+    let dateOutput = new Date(date).toLocaleDateString(
+      'en-GB',
+       {
+        // weekday:'short',
+        month: 'numeric',
+        day: 'numeric',
+        year:'numeric',
+       }
+     ); 
+     return dateOutput;
+   }
 day(date){
-  let lang = 'en-GB'
-if(this.currentLang == 'en'){
-lang = 'en-GB';
-}else{
- lang = 'ar-SA';
-
-}
-let dateOutput = new Date(date).toLocaleDateString(
-lang,
-{
-weekday:'short',
-}
-);
-
+      let lang = 'en-GB'
+    if(this.currentLang == 'en'){
+ lang = 'en-GB';
+    }else{
+     lang = 'ar-SA';
+ 
+    }
+let dateOutput = new Date(date.replace(/ /g,"T")).toLocaleDateString(
+  lang,
+  {
+    weekday:'short',
+  }
+); 
 return dateOutput;
 }
   date(date){
-  //   let lang = 'en-GB'
-  //   if(this.currentLang == 'en'){
-  // lang = 'en-GB';
-  //   }else{
-  //    lang = 'ar-EG';
-  
-  //   }
-   let dateOutput = new Date(date).toLocaleDateString(
-     'en-GB',
-      {
-      //  weekday:'short',
-       month: 'numeric',
-       day: 'numeric',
-      }
-    ); 
-    return dateOutput;
-   } 
+//     let lang = 'en-GB'
+//     if(this.currentLang == 'en'){
+//  lang = 'en-GB';
+//     }else{
+//      lang = 'ar-EG';
+ 
+//     }
+    let dateOutput = new Date(date.replace(/ /g,"T")).toLocaleDateString(
+       'en-GB',
+       {
+        //  weekday:'short',
+         month: 'numeric',
+         day: 'numeric',
+         year:'numeric',
+         hour:'numeric',
+         minute:'numeric'
+       }
+     ); 
+     return dateOutput;
+    //  return dateOutput.replace(/-/g, '/');
+   }
    time(time){
   //   let lang = 'en-GB'
   //   if(this.currentLang == 'en'){
@@ -405,10 +434,10 @@ return dateOutput;
    
        var audio = new Audio('/assets/sound.mp3');
         audio.play();
-        this.order = res.data;
+        this.currentOrders = res.data;
 
       }else{
-        this.order = false;
+        this.currentOrders = [];
       }
 
     })

@@ -9,7 +9,7 @@ ion-content{
     padding-bottom:1rem;
 }
 .tabs{
-    background:#f2f2f2;
+    background:var(--ion-color-segment-bg);
     padding:1rem 0;
     ion-segment{
 max-width:90%;
