@@ -3,6 +3,9 @@
 
 
 !node_modules/
+android/*
+e2e/*
+www/*
 
 node_modules/*
 !node_modules/@capacitor
