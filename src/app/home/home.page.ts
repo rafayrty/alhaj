@@ -25,12 +25,12 @@ hideDriver:any = true;
 currentLang:any;
 selectedLang:any;
   constructor(private translate:TranslateService, private languageService:LanguageService,private store:StorageService,private active:ActivatedRoute,private Storage:Storage,private route:Router,private animationCtrl: AnimationController) {
-this.Storage.get('USER_INFO').then((response)=>{
-  let  res = response;
-  if(res.user.role=='Pilot'){
-    this.hideDriver = false;
-  }
-});
+// this.Storage.get('USER_INFO').then((response)=>{
+//   let  res = response;
+//   if(res.user.role=='Pilot'){
+//     this.hideDriver = false;
+//   }
+// });
 this.active.paramMap.subscribe( paramMap => {
   let id =paramMap.get('reload');
   if(id=='1'){

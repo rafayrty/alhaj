@@ -45,7 +45,6 @@ ionViewDidEnter(){
 
 }
   login(e){
-    this.fcm.initPush();
 
     e.target.innerHTML = '<ion-spinner></ion-spinner>';
     e.target.setAttribute('disabled','disabled');

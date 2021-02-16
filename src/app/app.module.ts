@@ -15,24 +15,30 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { environment } from '../environments/environment';
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
 }
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule,TranslateModule.forRoot({
-    loader: {
-      provide: TranslateLoader,
-      useFactory: HttpLoaderFactory,
-      deps: [HttpClient]
-    }
-  }),
-  HttpClientModule,
-  BrowserAnimationsModule,IonicStorageModule.forRoot(),    IonicModule.forRoot({
-    backButtonText: '',
-    mode: 'ios'
-  }), AppRoutingModule],
+  imports: [BrowserModule, TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
+    HttpClientModule,
+    NgxsModule.forRoot([]),
+    NgxsReduxDevtoolsPluginModule.forRoot(),
+    BrowserAnimationsModule, IonicStorageModule.forRoot(), IonicModule.forRoot({
+      backButtonText: '',
+      mode: 'ios'
+    }), AppRoutingModule,
+  ],
   providers: [
     StatusBar,
     SplashScreen,
@@ -40,7 +46,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     HttpClientModule,
 
     NgxIonicImageViewerModule,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    {
+      provide: RouteReuseStrategy,
+      useClass: IonicRouteStrategy
+    }
   ],
   bootstrap: [AppComponent]
 })

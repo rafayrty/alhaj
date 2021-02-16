@@ -32,26 +32,5 @@ localStorage.setItem(LNG_KEY, lng);
 
 // this.set(LNG_KEY,lng)
   }
-  async set(key: string, value: any): Promise<any> {
-    try {
-    const result = await this.storage.set(key, value);
-    return true;
-    } catch (reason) {
-    console.log(reason);
-    return false;
-    }
-    }
-    // to get a key/value pair
-    async get(key: string): Promise<any> {
-    try {
-    const result = await this.storage.get(key);
-    if (result != null) {
-    return result;
-    }
-    return null;
-    } catch (reason) {
-    console.log(reason);
-    return null;
-    }
-    }
+  
 }

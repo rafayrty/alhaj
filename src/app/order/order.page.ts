@@ -429,7 +429,8 @@ return dateOutput;
       return ret;
     }
     doGet().then(res=>{
-      if(res.data){
+      if(res.data.length != 0){
+        alert(JSON.stringify(res.data));
        this.hapticsNotification(HapticsNotificationType.SUCCESS);
    
        var audio = new Audio('/assets/sound.mp3');
