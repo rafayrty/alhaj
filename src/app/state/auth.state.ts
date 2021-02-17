@@ -1,17 +1,18 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { Login } from "./auth.actions";
+import { AuthService } from "../services/auth.service";
+import { Login,Logout } from "./auth.actions";
 import { AuthStateModel } from "./auth.model";
+import {map,tap} from 'rxjs/operators';
+import { HttpResponse } from "@capacitor-community/http";
 
-export class Logout {
-    static readonly type = '[Auth] Logout';
-  }
 
   @State<AuthStateModel>({
     name: 'auth',
     defaults: {
       token: null,
-      user: null
+      user: null,
+
     }
   })
   @Injectable()
@@ -25,31 +26,32 @@ export class Logout {
     static isAuthenticated(state: AuthStateModel): boolean {
       return !!state.token;
     }
+      
+    @Selector()
+    static user(state: AuthStateModel): any {
+      return state.user;
+    }
+ 
   
-    // constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) {}
+
+
+    @Action(Login)
+    login(ctx: StateContext<AuthStateModel>, action: Login) {
+        // console.log("From Store",action.payload);
+          ctx.patchState({
+            token: action.payload.token,
+            user: action.payload.user
+          });
+    }
   
-    // @Action(Login)
-    // login(ctx: StateContext<AuthStateModel>, action: Login) {
-    //   return this.authService.login(action.payload).pipe(
-    //     tap((result: { token: string }) => {
-    //       ctx.patchState({
-    //         token: result.token,
-    //         username: action.payload.username
-    //       });
-    //     })
-    //   );
-    // }
-  
-    // @Action(Logout)
-    // logout(ctx: StateContext<AuthStateModel>) {
-    //   const state = ctx.getState();
-    //   return this.authService.logout(state.token).pipe(
-    //     tap(() => {
-    //       ctx.setState({
-    //         token: null,
-    //         username: null
-    //       });
-    //     })
-    //   );
-    // }
+    @Action(Logout)
+    logout(ctx: StateContext<AuthStateModel>) {
+        console.log("Action Called",ctx);
+      const state = ctx.getState();
+          ctx.setState({
+            token: null,
+            user: null
+          });
+    }
   }

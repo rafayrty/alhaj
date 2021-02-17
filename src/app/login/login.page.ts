@@ -11,7 +11,8 @@ import { Plugins } from '@capacitor/core';
 import { LanguageService } from '../services/language.service';
 const { Http } = Plugins;
 import { FcmService } from '../services/fcm.service';
-
+import { Store } from '@ngxs/store';
+import { Login } from '../state/auth.actions'
 @Component({
   selector: 'app-login',
   templateUrl: 'login.page.html',
@@ -23,7 +24,7 @@ message:string = "";
 errors:any = [];
 currentLang:any;
 selectedLang:any;
-  constructor(private fcm:FcmService,private translate:TranslateService, private languageService:LanguageService, private route:Router,private store:StorageService,private storage:Storage) {
+  constructor(private state: Store,private fcm:FcmService,private translate:TranslateService, private languageService:LanguageService, private route:Router,private store:StorageService,private storage:Storage) {
     
   }
 ionViewDidEnter(){
@@ -40,6 +41,12 @@ ionViewDidEnter(){
   //   }
   // });
 
+
+
+
+}
+
+tempLogin(){
 
 
 
@@ -71,6 +78,8 @@ doPost().then(async res=>{
 
 if(res['status']==200){
   let data = res['data'];
+  this.state.dispatch(new Login(data));
+
   // this.store.login(res['data']);
   this.store.login(res['data']).subscribe(
     async (res) => {
@@ -164,16 +173,16 @@ this.loginId = "";
 
   ionViewWillEnter(){
  
-        this.storage.get('USER_INFO').then((response) => {
-        let  res = response;
-       if(res.user.role=='Manager'){
-            this.route.navigate(['/orders/manage'], { replaceUrl: true });
+      //   this.storage.get('USER_INFO').then((response) => {
+      //   let  res = response;
+      //  if(res.user.role=='Manager'){
+      //       this.route.navigate(['/orders/manage'], { replaceUrl: true });
 
-          }else{
-            this.route.navigate(['home'], { replaceUrl: true });
+      //     }else{
+      //       this.route.navigate(['home'], { replaceUrl: true });
 
-          }
-        });   
+      //     }
+      //   });   
       
  
 

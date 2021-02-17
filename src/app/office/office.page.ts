@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from "../../services/data.service";
-import {  SERVER_URL } from '../../../environments/environment';
+import { DataService } from "../services/data.service";
+import {  SERVER_URL } from '../../environments/environment';
 import { Router } from '@angular/router';
 import '@capacitor-community/http';
 import { LoadingController, ModalController } from '@ionic/angular';
@@ -20,11 +20,11 @@ import { AuthState } from 'src/app/state/auth.state';
 const { Haptics,Http } = Plugins;
 
 @Component({
-  selector: 'app-manage',
-  templateUrl: './manage.page.html',
-  styleUrls: ['./manage.page.scss'],
+  selector: 'app-office',
+  templateUrl: './office.page.html',
+  styleUrls: ['./office.page.scss'],
 })
-export class ManagePage implements OnInit {
+export class OfficePage implements OnInit {
 orders:any=[];
 searchOrders:any = "";
 loader:any;
@@ -54,16 +54,15 @@ if (Capacitor.getPlatform() != 'web') {
 }
  
   }
-  async logOut(){
-    let token = this.state.selectSnapshot(AuthState.token);
-
+  logOut(){
+          this.storage.get('USER_INFO').then(async res=>{
         const ret = await Http.request({
           method: 'POST',
           url: `${SERVER_URL}/api/users/status`,
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + token
+            'Authorization': 'Bearer ' + res.token
           },
           data:{
             status:"Logged Out"
@@ -72,6 +71,7 @@ if (Capacitor.getPlatform() != 'web') {
 
         return ret;
 
+      })
     this.store.logout();
    //  this.route.navigateByUrl('/login');
  }
@@ -200,7 +200,7 @@ fetchSearch2(e){
     this.currentPage = 1;
 this.fetchOrders();
   }else{
-    let token = this.state.selectSnapshot(AuthState.token);
+  this.storage.get('USER_INFO').then(res=>{
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -208,7 +208,7 @@ this.fetchOrders();
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + token
+          'Authorization': 'Bearer ' + res.token
         }
       });
       return ret;
@@ -223,6 +223,7 @@ this.fetchOrders();
     }
   })
   
+  })
 }
 }
 
@@ -254,9 +255,7 @@ if(this.searchDate.substr(0,10)!=new Date().toISOString().substr(0,10)){
       url =`${SERVER_URL}/api/fetchOrders/${this.currentTab}?date=${this.searchDate.substr(0,10)}`
 
     }
-
-    let token = this.state.selectSnapshot(AuthState.token);
-
+  this.storage.get('USER_INFO').then(res=>{
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -264,7 +263,7 @@ if(this.searchDate.substr(0,10)!=new Date().toISOString().substr(0,10)){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + token
+          'Authorization': 'Bearer ' + res.token
         }
       });
       return ret;
@@ -279,6 +278,7 @@ if(this.searchDate.substr(0,10)!=new Date().toISOString().substr(0,10)){
     }
   })
   
+  })
 }
 
 }
@@ -293,8 +293,7 @@ navigate(url){
 }
   fetchOrders(){
     this.presentLoading();
-    let token = this.state.selectSnapshot(AuthState.token);
-
+    this.storage.get('USER_INFO').then(res=>{
       const doGet = async () => {
         const ret = await Http.request({
           method: 'GET',
@@ -302,7 +301,7 @@ navigate(url){
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + token
+            'Authorization': 'Bearer ' + res.token
           }
         });
         return ret;
@@ -331,6 +330,7 @@ navigate(url){
         this.ordersEmpty = false;
     }
     this.hideLoader();
+    })
     })
      
   }

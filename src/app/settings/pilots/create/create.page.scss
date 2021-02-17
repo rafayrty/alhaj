@@ -72,3 +72,18 @@
     }
 
 }
+    .radio-btns{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        .radio-btn{
+            width:60%;
+            display:flex;
+            align-items:center;
+
+            ion-checkbox{
+                margin:0 .5rem;
+            }
+        }
+    }
+

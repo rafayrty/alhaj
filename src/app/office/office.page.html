@@ -7,10 +7,8 @@
 
       <!-- <ion-back-button defaultHref="/home"   *ngIf="!logOutBtn"></ion-back-button> -->
     </ion-buttons>
-    <ion-title>{{'MANAGE.title' | translate}}</ion-title>
-    <ion-buttons *ngIf="showSetting" slot="end">
-      <ion-button routerLink="/settings">{{'settings' | translate}}</ion-button>
-    </ion-buttons>
+    <ion-title>Office</ion-title>
+
 
   </ion-toolbar>
 </ion-header>
@@ -19,16 +17,13 @@
   <div class="tabs">
     <ion-segment scrollable value="tabs" (ionChange)="changedTab()" [(ngModel)]="currentTab" >
       <ion-segment-button value="history">
-        <ion-label>{{'MANAGE.history' | translate}}</ion-label>
+        <ion-label>All</ion-label>
       </ion-segment-button>
       <ion-segment-button value="today">
-        <ion-label>{{'MANAGE.today' | translate}}</ion-label>
+        <ion-label>Unrecorded</ion-label>
       </ion-segment-button>
       <ion-segment-button value="tomorrow">
-        <ion-label>{{'MANAGE.tomorrow' | translate}}</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="upcoming">
-        <ion-label>{{'MANAGE.upcoming' | translate}}</ion-label>
+        <ion-label>Recorded</ion-label>
       </ion-segment-button>
     </ion-segment>
 
@@ -285,11 +280,11 @@
 
   </div>
   <!-- fab placed to the top and end and on the top edge of the content overlapping header -->
-  <ion-fab vertical="bottom" (click)="navigate('/orders/create')" horizontal="end" slot="fixed">
+  <!-- <ion-fab vertical="bottom" (click)="navigate('/orders/create')" horizontal="end" slot="fixed">
     <ion-fab-button>
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"

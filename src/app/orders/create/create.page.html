@@ -1,5 +1,5 @@
 <!-- <app-menu [title]="title"></app-menu> -->
-<ion-header>
+<ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons slot="start" (click)="back()">
       <ion-button class="back" ><ion-icon name="chevron-back-outline"></ion-icon> </ion-button>
@@ -36,20 +36,29 @@
 
           </ion-item>
 
-
           <ion-item lines="none">
             <ion-label color="medium" position="stacked">{{'CREATE.phone' | translate}}</ion-label>
             <ion-input placeholder="{{'CREATE.phone_placeholder' | translate}}" inputmode="tel" type="tel" [(ngModel)]="form.phone" name="phone" autofocus="true"></ion-input>
             <span class="error" *ngIf="errors.length!=0 && errors.phone" [@enterAnimation]>{{errors.phone[0]}}</span>
 
           </ion-item>
+
           <ion-item lines="none">
             <ion-label color="medium" position="stacked">{{'CREATE.address' | translate}}</ion-label>
             <ion-input placeholder="{{'CREATE.address_placeholder' | translate}}"  [(ngModel)]="form.address" name="address" autofocus="true"></ion-input>
             <span class="error" *ngIf="errors.length!=0 && errors.address" [@enterAnimation]>{{errors.address[0]}}</span>
 
           </ion-item>
-          <ion-radio-group value="biff" [(ngModel)]="orderType" name="orderType">
+
+          <ion-item lines="none">
+            <ion-label color="medium" position="stacked">Location</ion-label>
+
+            <agm-map [latitude]="lat" [longitude]="lng" mapDraggable="true" [zoom]="12">
+              <agm-marker [latitude]="lat" [longitude]="lng" [markerDraggable]="true" animation="DROP" (dragEnd)="updateLocation($event)"></agm-marker>
+            </agm-map>
+
+          </ion-item>
+          <!-- <ion-radio-group value="biff" [(ngModel)]="orderType" name="orderType">
         
             <ion-item>
               <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.immediate' | translate}}</ion-label>
@@ -67,10 +76,10 @@
         <ion-label>{{'CREATE.OPTIONS.time' | translate}}</ion-label>
         <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'  name="time"  placeholder="11:47 AM"></ion-datetime>
       </ion-item>
-          </ion-radio-group>
+          </ion-radio-group> -->
 <!-- Payment Record -->
 
-<ion-item>
+<!-- <ion-item>
   <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.OPTIONS.payment' | translate}}</ion-label>
   <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="payment" name="payment">
     <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
@@ -83,9 +92,9 @@
 
 
   </ion-select>
-</ion-item>
+</ion-item> -->
 
-<form action="" *ngIf="payment=='scania' || payment=='inshop' || payment=='heno'"  [@enterAnimation]>
+<!-- <form action="" *ngIf="payment=='scania' || payment=='inshop' || payment=='heno'"  [@enterAnimation]>
 
 
 
@@ -95,7 +104,7 @@
 
   </ion-item>
 
-</form>
+</form> -->
 
 
 
@@ -145,7 +154,7 @@
     </div>
     <div class="step2" *ngIf="step2"   [@enterAnimation]>
 
-      <ion-list>
+      <!-- <ion-list>
         <ion-radio-group value="urgency" [(ngModel)]="type">
           <ion-list-header>
             <ion-label>{{'CREATE.OPTIONS.urgency' | translate}}</ion-label>
@@ -161,21 +170,47 @@
             <ion-radio slot="start" color="success" value="urgent"></ion-radio>
           </ion-item>
         </ion-radio-group>
-      </ion-list>
+      </ion-list> -->
+
+            <!-- Collectors Selection -->
+            <ion-list-header>
+              <ion-label>Collector</ion-label>
+            </ion-list-header>
+            <div Class="dropdown" *ngFor="let selectedCollect of selectedCollector"     (click)="openCollector()" >
+              <div class="left">
+            
+              <img src="{{selectedCollect.image}}"  scroll="false" width="20%">
+              <p> {{selectedCollect.name}} </p>
+               
+              </div>
+            <div class="right">
+            <ion-icon name="chevron-down-sharp"></ion-icon>
+            </div>
+            </div>
+
+            <ion-item lines="none" style="display:none;" >
+            
+              <ion-select multiple  placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changeCollector()" #Collectorselect interface="alert" name="driver" [(ngModel)]="form.collector" >
+                <ion-select-option   [value]="collector.id" *ngFor="let collector of collectors; let i = index">
+            {{collector.name}}  
+              </ion-select-option>
+              </ion-select>
+            </ion-item>
+            
 
             <!-- Driver Selection -->
 
       <ion-list-header>
         <ion-label>{{'HOME.driver' | translate}}</ion-label>
       </ion-list-header>
-      <div Class="dropdown"  (click)="openPilot()" >
+      <div Class="dropdown" *ngFor="let selectedDrive of selectedDriver"  (click)="openDriver()" >
         <div class="left">
 
-        <img src="{{selectedPilot.image}}"  scroll="false" width="20%">
-        <p> {{selectedPilot.name}} 
-          <span class="danger" *ngIf="selectedPilot.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</span>
-          <span class="available" *ngIf="selectedPilot.status == 'Available'">{{'STATUS.available' | translate}}</span>
-          <span class="warning" *ngIf="selectedPilot.status == 'Logged Out'">{{'STATUS.logged' | translate}}</span>
+        <img src="{{selectedDrive.image}}"  scroll="false" width="20%">
+        <p> {{selectedDrive.name}} 
+          <span class="danger" *ngIf="selectedDrive.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</span>
+          <span class="available" *ngIf="selectedDrive.status == 'Available'">{{'STATUS.available' | translate}}</span>
+          <span class="warning" *ngIf="selectedDrive.status == 'Logged Out'">{{'STATUS.logged' | translate}}</span>
         </div>
 <div class="right">
   <ion-icon name="chevron-down-sharp"></ion-icon>
@@ -183,10 +218,10 @@
 </div>
       <ion-item lines="none" style="display:none;" >
       
-        <ion-select placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changePilot()" #Pilotselect interface="alert" name="pilot" [(ngModel)]="form.pilot" >
-          <ion-select-option [value]="pilot.id" *ngFor="let pilot of pilots; let i = index">
+        <ion-select multiple placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changeDriver()" #Driverselect interface="alert" name="driver" [(ngModel)]="form.driver" >
+          <ion-select-option   [value]="driver.id" *ngFor="let driver of drivers; let i = index">
       
-      {{pilot.name}}  
+      {{driver.name}}  
         </ion-select-option>
         </ion-select>
       </ion-item>
@@ -196,13 +231,13 @@
         <ion-label>{{'vehicle' | translate}}</ion-label>
       </ion-list-header>
 
-              <div Class="dropdown"  (click)="openVehicle()"  >
+              <div Class="dropdown" *ngFor="let selectedVehicl of selectedVehicle"  (click)="openVehicle()"  >
                 <div class="left">
         
-                <img src="{{selectedVehicle.image}}"  scroll="false" width="20%">
-                <p> {{selectedVehicle.name}} 
-                  <span class="danger" *ngIf="selectedVehicle.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</span>
-                  <span class="available" *ngIf="selectedVehicle.status == 'Available'">{{'STATUS.available' | translate}}</span>
+                <img src="{{selectedVehicl.image}}"  scroll="false" width="20%">
+                <p> {{selectedVehicl.name}} 
+                  <span class="danger" *ngIf="selectedVehicl.status == 'Out For Delivery'">{{'STATUS.out' | translate}}</span>
+                  <span class="available" *ngIf="selectedVehicl.status == 'Available'">{{'STATUS.available' | translate}}</span>
                 </div>
         <div class="right">
           <ion-icon name="chevron-down-sharp"></ion-icon>
@@ -210,7 +245,7 @@
         </div>
               <ion-item lines="none" style="display:none;" >
               
-                <ion-select placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changeVehicle()"  #Vehicleselect interface="alert" name="vehicle" [(ngModel)]="form.vehicle" >
+                <ion-select multiple placeholder="Select One" okText="{{'ALERTS.confirm' | translate}}" cancelText="{{'ALERTS.cancel' | translate}}" (ionChange)="changeVehicle()"  #Vehicleselect interface="alert" name="vehicle" [(ngModel)]="form.vehicle" >
                   <ion-select-option [value]="vehicle.id" *ngFor="let vehicle of vehicles; let i = index">
               
               {{vehicle.name}}  
@@ -219,13 +254,62 @@
               </ion-item>
 
 
+             <ion-list>
+              <ion-list-header>
+                <ion-label>Schedule</ion-label>
+              </ion-list-header>
+              <ion-item  >
+                <ion-label>Start Date</ion-label>
+                <ion-datetime  cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" displayFormat="MMM DD, YYYY" [(ngModel)]='date' name="date" [min]="minDate" [max]="maxDate"       placeholder="Nov 19, 2020"></ion-datetime>
+              </ion-item>
+              <ion-item >
+                <ion-label>Start Time</ion-label>
+                <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+              </ion-item>
+
+              <ion-item >
+                <ion-label>End Time</ion-label>
+                <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-checkbox color="primary"></ion-checkbox>
+                <ion-label>Urgent</ion-label>
+
+              </ion-item>
+            </ion-list>
 
 
 
+            <ion-list>
+              <ion-list-header>
+                <ion-label>Record</ion-label>
+              </ion-list-header>
+              <ion-item>
 
+              <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.OPTIONS.payment' | translate}}</ion-label>
+              <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="payment" name="payment">
+                <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
+                <ion-select-option value="cod">{{'CREATE.OPTIONS.cod' | translate}}</ion-select-option>
+                <ion-select-option value="inshop">{{'CREATE.OPTIONS.inshop' | translate}}</ion-select-option>
+                <ion-select-option value="heno">{{'CREATE.OPTIONS.heno' | translate}}</ion-select-option>
+                <ion-select-option value="scania">{{'CREATE.OPTIONS.scania' | translate}}</ion-select-option>
+                <ion-select-option value="other">{{'CREATE.OPTIONS.other' | translate}}</ion-select-option>
+            
+            
+            
+              </ion-select>
+            </ion-item>
+            <ion-item class="receipt-item" lines="none">
+              <ion-input class="receipt-input" placeholder="{{'CREATE.receipt' | translate}}" [(ngModel)]="receipt" (ionInput)="removeError()"  name="name" autofocus="true"></ion-input>
+              <span class="error"  *ngIf="customError.receipt">{{customError.receipt}}</span>
+          
+            </ion-item>
+              <ion-item lines="none" style="padding-bottom:1rem;">
+                <ion-checkbox color="primary"></ion-checkbox>
+                <ion-label>Add Shipping Certificate</ion-label>
 
-
-
+              </ion-item>
+            </ion-list>
 
 
 
@@ -280,7 +364,7 @@
 
 <!-- 
 <ion-footer *ngIf="step2" [@enterAnimation]>
-  <ion-button expand="block" style="color:#fff;" (click)="next($event,'pilot')" color="success">{{'CREATE.PILOT.title' | translate}}</ion-button>
+  <ion-button expand="block" style="color:#fff;" (click)="next($event,'driver')" color="success">{{'CREATE.PILOT.title' | translate}}</ion-button>
 </ion-footer>
 
 

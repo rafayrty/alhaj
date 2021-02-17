@@ -9,6 +9,8 @@ import { Storage } from '@ionic/storage';
 import { LanguageService } from './services/language.service';
 import { TranslateService } from '@ngx-translate/core';
 import { FcmService } from './services/fcm.service';
+import { Store } from '@ngxs/store';
+import { AuthState } from './state/auth.state';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +32,7 @@ export class AppComponent {
     private languageService:LanguageService,
     private fcm:FcmService,
     private route: ActivatedRoute,
+    private state:Store
       ) {
     this.translate.onLangChange.subscribe((event) => {
       this.lang=event.lang;
@@ -63,38 +66,41 @@ if(this.languageService.selected == 'ar'){
       }else{
         document.documentElement.setAttribute("style", '--ion-font-family: -apple-system-font, "Roboto", "Segoe UI", sans-serif');
       }
-
-          this.store.get('USER_INFO').then((response) => {
-          let  res = response;
-        if(res){
-          // this.route.queryParams
-          // .subscribe(params=>{
-          //   console.log(params);
-    
-          // console.log(this.router.url);
-          if(this.router.url == '/'){
-            if(res.user.role=='Manager'){
-              this.router.navigateByUrl('/orders/manage',{ replaceUrl: true });
-
-            }else{
-              this.router.navigateByUrl('home',{ replaceUrl: true });
-
-            }
+      const isAuthenticated = this.state.selectSnapshot(AuthState.isAuthenticated);
+          if(isAuthenticated){
+            this.router.navigateByUrl('home',{replaceUrl:true});
           }
-        }else{
-          this.router.navigate(['login']);
+        //   this.store.get('USER_INFO').then((response) => {
+        //   let  res = response;
+        // if(res){
+        //   // this.route.queryParams
+        //   // .subscribe(params=>{
+        //   //   console.log(params);
+    
+        //   // console.log(this.router.url);
+        //   if(this.router.url == '/'){
+        //     if(res.user.role=='Manager'){
+        //       this.router.navigateByUrl('/orders/manage',{ replaceUrl: true });
 
-        }
-          // if(this.router.url == '/'){
-
-          
-        //  if(res.user.role=='Manager'){
-        //       this.router.navigate(['home']);
         //     }else{
-        //       this.router.navigate(['order']);
+        //       this.router.navigateByUrl('home',{ replaceUrl: true });
 
         //     }
-          });   
+        //   }
+        // }else{
+        //   this.router.navigate(['login']);
+
+        // }
+        //   // if(this.router.url == '/'){
+
+          
+        // //  if(res.user.role=='Manager'){
+        // //       this.router.navigate(['home']);
+        // //     }else{
+        // //       this.router.navigate(['order']);
+
+        // //     }
+        //   });   
        
     });
   }

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header translucent="true">
     <ion-toolbar>
       <ion-title>{{'HOME.portal' | translate}}</ion-title>
       <ion-buttons slot="start">
@@ -25,27 +25,53 @@
     <ion-grid>
 
     <ion-row class="ion-align-items-center ion-justify-content-center" >
-        <ion-col size="12">
+        <ion-col size="6">
 
             <div class="orderButton"   (click)="orderBTN($event,'orders/manage')" >
 <div class="orderButtonCard">
-              <img src="/assets/images/new.svg" alt="">
                     
-                    <ion-text class="manager-text">
+                    <ion-text class="manager-text" [ngClass]="{'unactive':!roles.manager}" >
                         <h3> {{'HOME.manager' | translate}}</h3>
                     </ion-text>
                 </div>
 
             </div>
-       
-
-
-
             </ion-col>
-            <div class="separator" *ngIf="!hideDriver">
-                <hr>
+            <ion-col size="6">
+                <div class="orderButton"   (click)="orderBTN($event,'collector')" >
+    <div class="orderButtonCard">                        
+                        <ion-text class="collector-text" [ngClass]="{'unactive':!roles.collector}">
+                            <h3> Collector</h3>
+                        </ion-text>
+                    </div>
+    
+                </div>
+       </ion-col>
+
+       <ion-col size="6">
+        <div class="orderButton"   (click)="orderBTN($event,'office')"  >
+<div class="orderButtonCard">                        
+                <ion-text class="office-text" [ngClass]="{'unactive':!roles.office}">
+                    <h3> Office</h3>
+                </ion-text>
             </div>
-        <ion-col *ngIf="!hideDriver">
+
+        </div>
+</ion-col>
+
+<ion-col size="6">
+    <div class="orderButton"   (click)="orderBTN($event,'driver')" >
+<div class="orderButtonCard">                        
+            <ion-text class="driver-text" [ngClass]="{'unactive':!roles.driver}">
+                <h3> {{'HOME.driver' | translate}}</h3>
+            </ion-text>
+        </div>
+
+    </div>
+</ion-col>
+
+     
+        <!-- <ion-col *ngIf="!hideDriver">
 <div class="orderButton" (click)="orderBTN($event,'order')">
     <div class="orderButtonCard">
 
@@ -60,7 +86,7 @@
 </div>
 
 
-        </ion-col>
+        </ion-col> -->
       </ion-row>
     </ion-grid>
 

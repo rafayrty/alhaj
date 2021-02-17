@@ -18,6 +18,10 @@ import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from '../environments/environment';
+import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
+import { AuthState } from './state/auth.state';
+import { AgmCoreModule } from '@agm/core';
+
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
 }
@@ -32,8 +36,14 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     }),
     HttpClientModule,
-    NgxsModule.forRoot([]),
+    NgxsModule.forRoot([AuthState]),
     NgxsReduxDevtoolsPluginModule.forRoot(),
+    NgxsStoragePluginModule.forRoot({
+      key: ['auth.user','auth.token'],
+    }),
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyA3xZMib4wH3ZYtLCXd3OdLBqMkXg_xi-0'
+    }),
     BrowserAnimationsModule, IonicStorageModule.forRoot(), IonicModule.forRoot({
       backButtonText: '',
       mode: 'ios'

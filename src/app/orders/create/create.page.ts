@@ -18,6 +18,8 @@ import {
 } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { Store } from '@ngxs/store';
+import { AuthState } from 'src/app/state/auth.state';
 
 const { Haptics,Http } = Plugins;
 @HostBinding('@enterAnimation')
@@ -54,20 +56,24 @@ const { Haptics,Http } = Plugins;
   ]
 })
 export class CreatePage implements OnInit {
-  @ViewChild('Pilotselect', { static: false }) Pilotselect: IonSelect;
+  @ViewChild('Driverselect', { static: false }) Driverselect: IonSelect;
   @ViewChild('Vehicleselect', { static: false }) Vehicleselect: IonSelect;
+  @ViewChild('Collectorselect', { static: false }) Collectorselect: IonSelect;
 
   @ViewChild(IonBackButtonDelegate, { static: false }) backButton: IonBackButtonDelegate;
-  public searchPilots: string = "";
+  public searchDrivers: string = "";
   public searchVehicles: string = "";
   minDate: String = new Date().toISOString();
   maxDate: any = new Date(new Date().setDate(new Date().getDate() + 10)).toISOString();
   interfaceOptions:{
-    cssClass:'pilot-class',
+    cssClass:'driver-class',
   }
-
-  pilots:any;
+  lat = 32.701580;
+  lng = 35.298149;
+  drivers:any;
 vehicles:any;
+collectors:any;
+
 date:any;
 time:any;
 file:any;
@@ -88,22 +94,25 @@ form:any = {
   address:"",
   note:"",
   order:"",
-  pilot:"",
-  vehicle:""
+  driver:"",
+  vehicle:"",
+  collector:""
 }
 loader:any;
-selectedPilot:any;
-selectedVehicle:any;
+selectedDriver:any = [];
+selectedVehicle:any = [];
+selectedCollector:any = [];
+
 showSetting:boolean=false;
 
 title:string='Create A New Order'
-  constructor(private loadingController:LoadingController,   private translate:TranslateService, private dataService:DataService,  public alertController: AlertController,private storage:Storage,private platform:Platform,private nav:NavController,private router:Router,private sanitizer : DomSanitizer,private photo:PhotoService) {
-    this.storage.get('USER_INFO').then((response) => {
-      let  res = response;
-     if(res.user.role=='Manager'){
-      this.showSetting = true;
-        }
-      });   
+  constructor(private state:Store,private loadingController:LoadingController,   private translate:TranslateService, private dataService:DataService,  public alertController: AlertController,private storage:Storage,private platform:Platform,private nav:NavController,private router:Router,private sanitizer : DomSanitizer,private photo:PhotoService) {
+    // this.storage.get('USER_INFO').then((response) => {
+    //   let  res = response;
+    //  if(res.user.role=='Manager'){
+    //   this.showSetting = true;
+    //     }
+    //   });   
    
     this.platform.backButton.subscribeWithPriority(10, () => {
 this.back();
@@ -129,11 +138,12 @@ if (Capacitor.getPlatform() != 'web') {
   }
 
 
-filterPilots(){
+  updateLocation(e){
+   this.lng = e.latLng.lng();
+   this.lat = e.latLng.lat();
+  }
 
-  this.pilots = this.dataService.filterPilots(this.searchPilots);
 
-}
 async presentLoading() {
   this.loader = await this.loadingController.create({
    cssClass: 'my-custom-class',
@@ -150,11 +160,7 @@ hideLoader() {
   }
 }
 
-filterVehicles(){
 
-  this.vehicles = this.dataService.filterVehicles(this.searchVehicles);
-
-}
 doRefresh(event) {
 
 
@@ -165,64 +171,47 @@ this.ngOnInit();
     event.target.complete();
   }, 2000);
 }
-fetchPilots(){
+fetchData(){
   this.presentLoading();
+  let token = this.state.selectSnapshot(AuthState.token);
 
-  this.storage.get('USER_INFO').then(res=>{
   const doGet = async () => {
     const ret = await Http.request({
       method: 'GET',
-      url: `${SERVER_URL}/api/pilots`,
+      url: `${SERVER_URL}/api/data`,
       headers:{
         'Accept':'application/json',
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + res.token
+        'Authorization': 'Bearer ' + token
       }
     });
     return ret;
   }
   doGet().then(res=>{
     console.log(res);
-this.pilots = res['data'];
-this.dataService.pilots = this.pilots;
-this.form.pilot = this.pilots[0].id
-this.selectedPilot = this.pilots[0];
-this.filterPilots()
-this.fetchVehicles();
-})
-})
- 
-}
-fetchVehicles(){
-  this.storage.get('USER_INFO').then(res=>{
-  console.log(res.token);
-  const doGet = async () => {
-    const ret = await Http.request({
-      method: 'GET',
-      url: `${SERVER_URL}/api/vehicles`,
-      headers:{
-        'Accept':'application/json',
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + res.token
-      }
-    });
-    return ret;
-  }
-  doGet().then(res=>{
-this.vehicles = res['data'];
-this.dataService.vehicles = this.vehicles;
-this.form.vehicle = this.vehicles[0].id
-this.selectedVehicle = this.vehicles[0];
-this.filterVehicles()
-this.hideLoader();
+this.drivers = res['data'].drivers;
+this.form.driver = this.drivers[0].id
+this.selectedDriver.push(this.drivers[0]);
 
-})
+this.vehicles = res['data'].vehicles;
+this.form.vehicle = this.vehicles[0].id
+this.selectedVehicle.push(this.vehicles[0]);
+
+this.collectors = res['data'].collectors;
+this.form.collector = this.collectors[0].id
+this.selectedCollector.push(this.collectors[0]);
+
+
+
+this.hideLoader();
+// this.fetchVehicles();
 })
  
 }
+
   ngOnInit() {
  
-    this.fetchPilots();  
+    this.fetchData();  
 
   }
 
@@ -244,31 +233,28 @@ this.hideLoader();
 
     await alert.present();
   }
-  changePilot(){
+  changeCollector(){
 
-  //   let form = this.form;
-  //   this.selectedPilot =  this.pilots.filter(function(pilot,form) {
-  //     return pilot.id == form.pilot;
-  // });
-  let startsWith = id => (element, index, array) => {
-    return element.id === id;
+
+    if(this.form.collector.length != 0){
+      let selected = this.form.collector;
+    this.selectedCollector = this.collectors.filter((collector) => selected.includes(collector.id));
+    }
+
+
   }
-   this.selectedPilot =  this.pilots.filter(startsWith(this.form.pilot));
-   this.selectedPilot = this.selectedPilot[0];
 
-}
-
-  openPilot(){
+  openCollector(){
     this.hapticsImpactLight();
-    this.Pilotselect.open();
+    this.Collectorselect.open();
     setTimeout(() => {
       // According to the class style "div.alert-radio-group button" to get html elements
-let buttonElements = document.querySelectorAll('div.alert-radio-group button');
+let buttonElements = document.querySelectorAll('div.alert-checkbox-group button');
 
       // Determine whether the obtained element is not null
 if (!buttonElements.length) {
           // Empty, then get it again      
- this.openPilot();
+ this.openCollector();
 } else {
           // If it is not empty, loop through the obtained html element (that is, the html element where the information of the AlertController list is traversed)
  for (let index = 0; index < buttonElements.length; index++) {
@@ -276,25 +262,55 @@ if (!buttonElements.length) {
    let buttonElement = buttonElements[index];
 
               // Then take the information in the list according to the html element
-   let optionLabelElement = buttonElement.querySelector('.alert-radio-label');
+   let optionLabelElement = buttonElement.querySelector('.alert-checkbox-label');
    
               // Splice the picture name to display the picture, pay attention to the picture naming, must be consistent with the binding field, then add Image for this element   
-   optionLabelElement.innerHTML += '<img  src="'+this.pilots[index].image+'" style="width:20px;height:20px;float:right;margin-right: 15px;"/>';
+   optionLabelElement.innerHTML += '<img  src="'+this.collectors[index].image+'" style="width:20px;height:20px;float:right;margin-right: 15px;"/>';
+ }
+}
+}, 100);
+  }
+
+  changeDriver(){
+
+if(this.form.driver.length != 0){
+  let selected = this.form.driver;
+this.selectedDriver = this.drivers.filter((driver) => selected.includes(driver.id));
+}
+}
+
+  openDriver(){
+    this.hapticsImpactLight();
+    this.Driverselect.open();
+    setTimeout(() => {
+      // According to the class style "div.alert-radio-group button" to get html elements
+let buttonElements = document.querySelectorAll('div.alert-checkbox-group button');
+
+      // Determine whether the obtained element is not null
+if (!buttonElements.length) {
+          // Empty, then get it again      
+ this.openDriver();
+} else {
+          // If it is not empty, loop through the obtained html element (that is, the html element where the information of the AlertController list is traversed)
+ for (let index = 0; index < buttonElements.length; index++) {
+              // According to the subscript to take the html element
+   let buttonElement = buttonElements[index];
+
+              // Then take the information in the list according to the html element
+   let optionLabelElement = buttonElement.querySelector('.alert-checkbox-label');
+   
+              // Splice the picture name to display the picture, pay attention to the picture naming, must be consistent with the binding field, then add Image for this element   
+   optionLabelElement.innerHTML += '<img  src="'+this.drivers[index].image+'" style="width:20px;height:20px;float:right;margin-right: 15px;"/>';
  }
 }
 }, 100);
   }
   changeVehicle(){
 
-    //   let form = this.form;
-    //   this.selectedPilot =  this.pilots.filter(function(pilot,form) {
-    //     return pilot.id == form.pilot;
-    // });
-    let startsWith = id => (element, index, array) => {
-      return element.id === id;
-    }
-     this.selectedVehicle =  this.vehicles.filter(startsWith(this.form.vehicle));
-     this.selectedVehicle = this.selectedVehicle[0];
+if(this.form.vehicle.length != 0){
+  let selected = this.form.vehicle;
+this.selectedVehicle = this.vehicles.filter((vehicle) => selected.includes(vehicle.id));
+}
   
   }
 
@@ -303,7 +319,7 @@ if (!buttonElements.length) {
     this.Vehicleselect.open();
     setTimeout(() => {
       // According to the class style "div.alert-radio-group button" to get html elements
-let buttonElements = document.querySelectorAll('div.alert-radio-group button');
+let buttonElements = document.querySelectorAll('div.alert-checkbox-group button');
 
       // Determine whether the obtained element is not null
 if (!buttonElements.length) {
@@ -316,7 +332,7 @@ if (!buttonElements.length) {
    let buttonElement = buttonElements[index];
 
               // Then take the information in the list according to the html element
-   let optionLabelElement = buttonElement.querySelector('.alert-radio-label');
+   let optionLabelElement = buttonElement.querySelector('.alert-checkbox-label');
    
               // Splice the picture name to display the picture, pay attention to the picture naming, must be consistent with the binding field, then add Image for this element   
    optionLabelElement.innerHTML += '<img  src="'+this.vehicles[index].image+'" style="width:20px;height:20px;float:right;margin-right: 15px;"/>';
@@ -417,7 +433,9 @@ data = {
   image:this.file,
   format:this.format,
   address:this.form.address,
-  note:this.form.note
+  note:this.form.note,
+  lat:this.lat,
+  lng:this.lng
   }
 }else{
 data = {
@@ -425,81 +443,19 @@ data = {
   phone:this.form.phone,
   order:this.form.order,
   address:this.form.address,
-  note:this.form.note
+  note:this.form.note,
+  lat:this.lat,
+  lng:this.lng
           }
 }
 if(type=='proceed'){
 
 
-  if(this.orderType=='schedule'){
-    let ahead = true;
-    if(this.payment=='scania' || this.payment=='inshop' || this.payment=='heno'){
-      // console.log(this.receipt)
-      // if(this.receipt==""){
-      //   ahead = false; 
-      //   this.customError.receipt = this.translate.instant('ALERTS.receipt')
-      // }
-  
 
-
-    }
-    
-    if(this.date==null || this.time==null){
-      ahead = false;
-      this.presentAlert(this.translate.instant('ALERTS.time'));
-    }
-
-
-  if(ahead){
-    e.target.innerHTML = '<ion-spinner></ion-spinner>';
-    e.target.setAttribute('disabled','disabled');
-  
-    this.storage.get('USER_INFO').then(res=>{
-      const doPost = async () => {
-        const ret = await Http.request({
-          method: 'POST',
-          url: `${SERVER_URL}/api/orders/proceed`,
-          headers:{
-            'Accept':'application/json',
-            'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + res.token
-          },
-          data:data
-        });
-        return ret;
-      }
-      doPost().then(res=>{
-        e.target.innerHTML = 'Proceed';
-        e.target.removeAttribute('disabled');
-        if(res['status']==200){
-          this.title = this.translate.instant('ORDER.settings');
-          this.step1 = false;
-          this.step2 = true;
-        // this.router.navigate(["/settings/vehicles"], navigationExtras);
-        }else if(res['status']==422){
-          this.errors = res['data'].errors;
-  
-          }
-  })
-    })
-  
-    
-  }
-  
-  
-  }else{
-    let ahead = true;
-    if(this.payment=='scania' || this.payment=='inshop' || this.payment=='heno'){
-      // if(this.receipt==''){
-      //   ahead = false;
-      //   this.customError.receipt = this.translate.instant('ALERTS.receipt')
-      // }
-    }
-    if(ahead){
       e.target.innerHTML = '<ion-spinner></ion-spinner>';
       e.target.setAttribute('disabled','disabled');
-    
-      this.storage.get('USER_INFO').then(res=>{
+      let token = this.state.selectSnapshot(AuthState.token);
+
         const doPost = async () => {
           const ret = await Http.request({
             method: 'POST',
@@ -507,7 +463,7 @@ if(type=='proceed'){
             headers:{
               'Accept':'application/json',
               'Content-Type':'application/json',
-              'Authorization': 'Bearer ' + res.token
+              'Authorization': 'Bearer ' + token
             },
             data:data
           });
@@ -526,11 +482,6 @@ if(type=='proceed'){
     
             }
     })
-      })
-    
-    }
-    
-  }
 
 }
 
@@ -588,7 +539,7 @@ let data;
         date:this.date,
         time:this.time,
         receipt:this.receipt,
-        pilot:this.form.pilot,
+        driver:this.form.driver,
         order:this.form.order,
         vehicle:this.form.vehicle
         }
@@ -605,7 +556,7 @@ let data;
         date:this.date,
         time:this.time,
         receipt:this.receipt,
-        pilot:this.form.pilot,
+        driver:this.form.driver,
         vehicle:this.form.vehicle
                 }
       }

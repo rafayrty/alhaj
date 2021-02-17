@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
@@ -44,6 +44,47 @@
   
 </div>
 <div class="form">
+
+
+    <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.role' | translate}}</ion-label>
+    <div  class="radio-btns" style="margin-top:.5rem;">
+      <div class="radio-btn">
+        <ion-item lines="none">
+
+        <ion-checkbox [(ngModel)]="role.manager" value="1" color="primary"></ion-checkbox>
+        <ion-label>Manager</ion-label>
+        </ion-item>
+      </div>
+      <div class="radio-btn">
+        <ion-item lines="none">
+
+        <ion-checkbox [(ngModel)]="role.collector" value="2" color="primary"></ion-checkbox>
+        <ion-label>Collector</ion-label>
+        </ion-item>
+      
+      </div>
+    </div>
+    <div   class="radio-btns" >
+      <div class="radio-btn">
+        <ion-item lines="none">
+
+        <ion-checkbox [(ngModel)]="role.office" value="3" color="primary"></ion-checkbox>
+        <ion-label>Office</ion-label>
+        </ion-item>
+      </div>
+      <div class="radio-btn">
+        <ion-item lines="none">
+
+        <ion-checkbox [(ngModel)]="role.driver" value="4" color="primary"></ion-checkbox>
+        <ion-label>Driver</ion-label>
+      </ion-item>
+
+      </div>
+
+    </div>
+
+
+<!-- 
   <ion-item  lines="none">
     <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.role' | translate}}</ion-label>
     <ion-select class="custom-options"  cancelText="{{'ALERTS.cancel' | translate}}"  okText="{{'done' | translate}}" interface="action-sheet" [(ngModel)]="role">
@@ -52,7 +93,7 @@
     </ion-select>
     <span class="error" *ngIf="errors.length!=0 && errors.role">{{errors.role[0]}}</span>
 
-  </ion-item>
+  </ion-item> -->
   <div >
     <ion-item lines="none">
       <ion-label color="medium"  position="stacked">{{'SETTINGS.PILOTS.INPUTS.name' | translate}}</ion-label>

@@ -13,6 +13,7 @@
   },
   "private": true,
   "dependencies": {
+    "@agm/core": "^3.0.0-beta.0",
     "@angular/animations": "^10.2.0",
     "@angular/common": "~10.0.0",
     "@angular/core": "~10.0.0",
@@ -32,6 +33,7 @@
     "@ionic/storage": "^2.3.1",
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^6.0.0",
+    "@ngxs/storage-plugin": "^3.7.1",
     "@ngxs/store": "^3.7.1",
     "ngSelectBox": "git+https://github.com/nidhishkrishnan/ngSelectBox.git",
     "ngx-ionic-image-viewer": "^0.7.4",
@@ -48,6 +50,7 @@
     "@capacitor/cli": "2.4.2",
     "@ionic/angular-toolkit": "^2.3.0",
     "@ngxs/devtools-plugin": "^3.7.1",
+    "@types/googlemaps": "^3.39.13",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",

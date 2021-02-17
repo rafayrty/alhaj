@@ -22,14 +22,16 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { NewOrderService } from '../new-order.service';
+import { Store } from '@ngxs/store';
+import { AuthState } from '../state/auth.state';
 const { Http,Haptics } = Plugins;
 
 @Component({
-  selector: 'app-order',
-  templateUrl: './order.page.html',
-  styleUrls: ['./order.page.scss'],
+  selector: 'driver-collector',
+  templateUrl: './driver.page.html',
+  styleUrls: ['./driver.page.scss'],
 })
-export class OrderPage implements OnInit {
+export class DriverPage implements OnInit {
 currentOrders:any=[];
 loader:any;
 ordersEmpty:any=false;
@@ -40,7 +42,7 @@ push:any;
 self:any;
   currentLang: string;
 
-  constructor(private newOrder:NewOrderService,private router:Router,private navCtrl:NavController,private loadingController:LoadingController, private translate:TranslateService,public modalController: ModalController,public alertController: AlertController,private store:StorageService,private storage:Storage) { }
+  constructor(private state:Store,private newOrder:NewOrderService,private router:Router,private navCtrl:NavController,private loadingController:LoadingController, private translate:TranslateService,public modalController: ModalController,public alertController: AlertController,private store:StorageService,private storage:Storage) { }
   async presentLoading() {
     this.loader = await this.loadingController.create({
      cssClass: 'my-custom-class',
@@ -156,7 +158,7 @@ if (Capacitor.getPlatform() != 'web') {
 
 this.presentLoading();
   
-    this.storage.get('USER_INFO').then(res=>{
+let token = this.state.selectSnapshot(AuthState.token);
       const doGet = async () => {
         const ret = await Http.request({
           method: 'POST',
@@ -164,7 +166,7 @@ this.presentLoading();
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + res.token
+            'Authorization': 'Bearer ' + token
           },
           data:{
             status:"Logged Out"
@@ -177,7 +179,7 @@ doGet().then(res=>{
   this.store.logout();
 this.hideLoader();
 })
-    });
+  
 
   
 
@@ -194,15 +196,15 @@ confirmStatus(e,status,id){
   e.target.setAttribute('disabled','disabled');
 
 
-  this.storage.get('USER_INFO').then(res=>{
-    const doGet = async () => {
+  let token = this.state.selectSnapshot(AuthState.token);
+  const doGet = async () => {
       const ret = await Http.request({
         method: 'POST',
         url: `${SERVER_URL}/api/orders/status/${id}`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
         data:{
           status:status
@@ -230,7 +232,7 @@ confirmStatus(e,status,id){
       }
 
     })
-  });
+
 
 }
 
@@ -271,17 +273,19 @@ async updateStatus(e,status,id) {
 
   await alert.present();
 }
-pushOrder(){
+  async pushOrder(){
   this.presentLoading();
+  
+  let token = this.state.selectSnapshot(AuthState.token);
+  let user = this.state.selectSnapshot(AuthState.user);
 
-  this.storage.get('USER_INFO').then(async res=>{
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/orders/user/${res.user.id}`,
+        url: `${SERVER_URL}/api/orders/user/${user.id}`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
       });
 
@@ -290,12 +294,11 @@ pushOrder(){
 this.currentOrders = ret.data;
   console.log(this.currentOrders);
       return ret;
-  });
+
 }
 fetchUpcoming(){
   this.presentLoading();
-
-  this.storage.get('USER_INFO').then(res=>{
+let token = this.state.selectSnapshot(AuthState.token)
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -303,7 +306,7 @@ fetchUpcoming(){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
       });
  
@@ -322,7 +325,6 @@ fetchUpcoming(){
       }
 
     })
-  });
   
 
   }
@@ -413,16 +415,16 @@ return dateOutput;
   }
 
  fetchOrder(){
-   
-  this.storage.get('USER_INFO').then(res=>{
-    const doGet = async () => {
+  let token = this.state.selectSnapshot(AuthState.token);
+  let user = this.state.selectSnapshot(AuthState.user);
+      const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/orders/user/${res.user.id}`,
+        url: `${SERVER_URL}/api/orders/user/${user.id}`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
       });
 
@@ -442,7 +444,6 @@ return dateOutput;
       }
 
     })
-  });
   
 
   }

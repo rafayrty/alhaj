@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
@@ -31,6 +31,11 @@
         </ion-thumbnail>
         <ion-label>
           <h2>{{pilot.name}}</h2>
+          <p class="roles">
+            <span *ngFor="let role of pilot.roles; let isLast=last">{{role.name}} {{isLast ? '' : '- '}}</span>
+            <!-- Manager - Officer - Collector - Driver -->
+          
+          </p>
           <h6 *ngIf="pilot.role=='Manager'">{{'SETTINGS.PILOTS.INPUTS.manager' | translate}}</h6>
           <h6 *ngIf="pilot.role=='Pilot'">{{'SETTINGS.PILOTS.INPUTS.driver' | translate}}</h6>
 

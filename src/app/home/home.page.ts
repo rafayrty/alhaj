@@ -3,6 +3,8 @@ import { Animation, AnimationController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 import { Storage } from '@ionic/storage';
+import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+
 import '@capacitor-community/http';
 
 import {
@@ -13,6 +15,10 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../services/language.service';
 import { SERVER_URL } from 'src/environments/environment';
+import { AuthState } from '../state/auth.state';
+import { Logout } from '../state/auth.actions';
+
+import { VirtualTimeScheduler } from 'rxjs';
 
 const { Haptics,Http } = Plugins;
 @Component({
@@ -24,7 +30,14 @@ export class HomePage implements OnInit {
 hideDriver:any = true;
 currentLang:any;
 selectedLang:any;
-  constructor(private translate:TranslateService, private languageService:LanguageService,private store:StorageService,private active:ActivatedRoute,private Storage:Storage,private route:Router,private animationCtrl: AnimationController) {
+user:any;
+roles:any= {
+manager:false,
+driver:false,
+collector:false,
+office:false
+}
+  constructor(private actions: Actions,private translate:TranslateService,private state:Store, private languageService:LanguageService,private store:StorageService,private active:ActivatedRoute,private Storage:Storage,private route:Router,private animationCtrl: AnimationController) {
 // this.Storage.get('USER_INFO').then((response)=>{
 //   let  res = response;
 //   if(res.user.role=='Pilot'){
@@ -36,6 +49,7 @@ this.active.paramMap.subscribe( paramMap => {
   if(id=='1'){
 this.route.navigateByUrl('order',{replaceUrl:true})
   }
+
 })
     //     this.store.authState.subscribe(state => {
 //       if (state) {
@@ -68,31 +82,54 @@ if (Capacitor.getPlatform() != 'web') {
     this.hapticsImpact(HapticsImpactStyle.Light);
   }
   ngOnInit() {
+  this.user =  this.state.selectSnapshot(AuthState.user);
+if(this.user.roles.find(x => x.name =='Manager')){
+this.roles.manager = true;
+}
+if(this.user.roles.find(x => x.name =='Collector')){
+  this.roles.collector = true;
+}
+ if(this.user.roles.find(x => x.name =='Driver')){
+  this.roles.driver = true;
+} 
+if(this.user.roles.find(x => x.name =='Office')){
+  this.roles.office = true;
+}
+console.log(this.roles);
 
+
+
+// console.log(this.user);
   }
   ionViewDidEnter(){
     this.selectedLang = localStorage.getItem('SELECTED_LANGUAGE')
   }
   logOut(){
-    this.Storage.get('USER_INFO').then(async res=>{
-      console.log(res);
-      const ret = await Http.request({
-        method: 'POST',
-        url: `${SERVER_URL}/api/users/status`,
-        headers:{
-          'Accept':'application/json',
-          'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
-        },
-        data:{
-          status:"Logged Out"
-        }
-      });  
-      this.store.logout();
+    // this.Storage.get('USER_INFO').then(async res=>{
+    //   console.log(res);
+    //   const ret = await Http.request({
+    //     method: 'POST',
+    //     url: `${SERVER_URL}/api/users/status`,
+    //     headers:{
+    //       'Accept':'application/json',
+    //       'Content-Type':'application/json',
+    //       'Authorization': 'Bearer ' + res.token
+    //     },
+    //     data:{
+    //       status:"Logged Out"
+    //     }
+    //   });  
+    //   this.store.logout();
 
-      return ret;
+    //   return ret;
 
+    // })
+    this.state.dispatch(new Logout()).subscribe(()=>{
+      this.route.navigate(['/login']);
     })
+    this.actions.pipe(ofActionDispatched(Logout)).subscribe(() => {
+      this.route.navigate(['/login']);
+    });
     //  this.route.navigateByUrl('/login');
   }
   async orderBTN(e,route){

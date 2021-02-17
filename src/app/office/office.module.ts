@@ -4,10 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { OrderPageRoutingModule } from './order-routing.module';
+import { OfficePageRoutingModule } from './office-routing.module';
 
-import { OrderPage } from './order.page';
-import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
+import { OfficePage } from './office.page';
 import { TranslateModule } from '@ngx-translate/core'; // add this
 
 @NgModule({
@@ -15,10 +14,9 @@ import { TranslateModule } from '@ngx-translate/core'; // add this
     CommonModule,
     FormsModule,
     IonicModule,
-    NgxIonicImageViewerModule,
-    OrderPageRoutingModule,
-    TranslateModule
+    TranslateModule,
+    OfficePageRoutingModule
   ],
-  declarations: [OrderPage]
+  declarations: [OfficePage]
 })
-export class OrderPageModule {}
+export class OfficePageModule {}

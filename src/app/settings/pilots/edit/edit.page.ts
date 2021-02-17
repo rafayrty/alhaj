@@ -16,6 +16,8 @@ import {
 import { decimalDigest } from '@angular/compiler/src/i18n/digest';
 import { typeWithParameters } from '@angular/compiler/src/render3/util';
 import { ViewerModalComponent } from 'ngx-ionic-image-viewer';
+import { Store } from '@ngxs/store';
+import { AuthState } from 'src/app/state/auth.state';
 
 const { Haptics,Http } = Plugins;
 
@@ -31,7 +33,13 @@ pilot:any = {image:''};
 file:any;
 pilotId:any;
 format:any;
-  constructor(private translate:TranslateService,public modalController: ModalController,private router:Router,private active: ActivatedRoute,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
+role:any = {
+  manager:false,
+driver:false,
+collector:false,
+office:false
+};
+  constructor(private translate:TranslateService,private state:Store,public modalController: ModalController,private router:Router,private active: ActivatedRoute,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
 
 
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
@@ -57,7 +65,7 @@ if (Capacitor.getPlatform() != 'web') {
   }
   fetchPilot(id){
 
-    this.storage.get('USER_INFO').then(res=>{
+    let token = this.state.selectSnapshot(AuthState.token);
       const doGet = async () => {
         const ret = await Http.request({
           method: 'GET',
@@ -65,16 +73,29 @@ if (Capacitor.getPlatform() != 'web') {
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + res.token
+            'Authorization': 'Bearer ' + token
           }
         });
         return ret;
       }
       doGet().then(res=>{
     this.pilot = res['data'];
+    this.pilot.roles.forEach(role => {
+      if(role.name == 'Manager'){
+        this.role.manager = true;
+      }
+      if(role.name == 'Driver'){
+        this.role.driver = true;
+      }
+      if(role.name == 'Collector'){
+        this.role.collector = true;
+      }
+      if(role.name == 'Office'){
+        this.role.office = true;
+      }
+    });
       this.hideLoader();
   })
-    })
   }
   async openViewer(src) {
     const modal = await this.modalController.create({
@@ -119,7 +140,7 @@ if(this.file){
     phone:this.pilot.phone,
     file:this.file,
     format:this.format,
-    role:this.pilot.role,
+    role:this.role,
     login_id:this.pilot.login_id,
     
   }
@@ -127,12 +148,14 @@ if(this.file){
  data = {
     name:this.pilot.name,
     phone:this.pilot.phone,
-    role:this.pilot.role,
+    role:this.role,
     login_id:this.pilot.login_id,
     
   }
-}
-  this.storage.get('USER_INFO').then(res=>{
+} 
+
+let token = this.state.selectSnapshot(AuthState.token);
+
     const doPost = async () => {
       const ret = await Http.request({
         method: 'POST',
@@ -140,7 +163,7 @@ if(this.file){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
         data:data
       });
@@ -165,7 +188,6 @@ console.log(this.errors);
   // this.pilots = res['data'];
   //   this.loading = false;
 })
-  })
 
 
   }

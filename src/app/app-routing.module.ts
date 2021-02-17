@@ -56,8 +56,8 @@ const routes: Routes = [
 
   },
   {
-    path: 'order',
-    loadChildren: () => import('./order/order.module').then( m => m.OrderPageModule),
+    path: 'collector',
+    loadChildren: () => import('./collector/collector.module').then( m => m.CollectorPageModule),
     canActivate: [AuthGuard]
 
   },
@@ -71,6 +71,14 @@ const routes: Routes = [
     path: 'order-view/:id',
     loadChildren: () => import('./order-view/order-view.module').then( m => m.OrderViewPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'driver',
+    loadChildren: () => import('./driver/driver.module').then( m => m.DriverPageModule)
+  },
+  {
+    path: 'office',
+    loadChildren: () => import('./office/office.module').then( m => m.OfficePageModule)
   },
 ];
 

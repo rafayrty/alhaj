@@ -15,6 +15,8 @@ import {
 } from '@capacitor/core';
 import { decimalDigest } from '@angular/compiler/src/i18n/digest';
 import { NavigationExtras,Router } from '@angular/router';
+import { Store } from '@ngxs/store';
+import { AuthState } from 'src/app/state/auth.state';
 
 const { Haptics } = Plugins;
 
@@ -31,9 +33,14 @@ phone:any = "";
 loginId:any = "";
 loader:any;
 format:any;
-role:any = "Pilot";
+role:any = {
+  manager:false,
+driver:false,
+collector:false,
+office:false
+};
 errors:any = []
-  constructor(private translate:TranslateService,private router:Router,private http:HttpClient,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
+  constructor(private state:Store,private translate:TranslateService,private router:Router,private http:HttpClient,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
 
 
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
@@ -74,8 +81,8 @@ if (Capacitor.getPlatform() != 'web') {
   insert(){
     this.hapticsImpactLight();
   this.presentLoading();
+  let token = this.state.selectSnapshot(AuthState.token);
 
-  this.storage.get('USER_INFO').then(res=>{
     const doPost = async () => {
       const ret = await Http.request({
         method: 'POST',
@@ -83,7 +90,7 @@ if (Capacitor.getPlatform() != 'web') {
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
         data:{
           name:this.name,
@@ -117,7 +124,6 @@ if (Capacitor.getPlatform() != 'web') {
   // this.pilots = res['data'];
   //   this.loading = false;
 })
-  })
 
 
   }

@@ -18,6 +18,8 @@ import {
   Capacitor
 } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthState } from 'src/app/state/auth.state';
+import { Store } from '@ngxs/store';
 
 const { Haptics,Http } = Plugins;
 @HostBinding('@enterAnimation')
@@ -94,6 +96,7 @@ title:string='Edit A New Order'
          private router:Router,
          private sanitizer : DomSanitizer,
          private route : ActivatedRoute,
+         private state:Store,
          private photo:PhotoService) {
 
           this.storage.get('USER_INFO').then((response) => {
@@ -122,7 +125,7 @@ this.fetchOrder();
     this.router.navigate(['/settings']);
   }
   fetchOrder(){
-      this.storage.get('USER_INFO').then(res=>{
+    let token = this.state.selectSnapshot(AuthState.token);
         const doGet = async () => {
           const ret = await Http.request({
             method: 'GET',
@@ -130,7 +133,7 @@ this.fetchOrder();
             headers:{
               'Accept':'application/json',
               'Content-Type':'application/json',
-              'Authorization': 'Bearer ' + res.token
+              'Authorization': 'Bearer ' + token
             },
           });
     
@@ -157,7 +160,6 @@ this.fetchOrder();
           }
     
         })
-      });
     }
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
     // Native StatusBar available
@@ -178,7 +180,7 @@ if (Capacitor.getPlatform() != 'web') {
 
 filterPilots(){
 
-  this.pilots = this.dataService.filterPilots(this.searchPilots);
+  this.pilots = this.dataService.filterDrivers(this.searchPilots);
 
 }
 async presentLoading() {
@@ -343,7 +345,7 @@ fetchPilots(){
   doGet().then(res=>{
     // console.log(res);
 this.pilots = res['data'];
-this.dataService.pilots = this.pilots;
+this.dataService.drivers = this.pilots;
 this.filterPilots()
 this.fetchVehicles();
 this.changePilot();

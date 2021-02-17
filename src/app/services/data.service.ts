@@ -3,6 +3,8 @@ import { Storage } from '@ionic/storage';
 import {  SERVER_URL } from '../../environments/environment';
 import '@capacitor-community/http';
 import { Plugins } from '@capacitor/core';
+import { Store } from "@ngxs/store";
+import { AuthState } from "../state/auth.state";
 
 const { Http } = Plugins;
 
@@ -11,13 +13,14 @@ const { Http } = Plugins;
 })
 export class DataService {
 vehicles: any = [];
- pilots: any = [];
+ drivers: any = [];
  orders: any = [];
 
-  constructor(private storage:Storage) { }
+  constructor(private state:Store,private storage:Storage) { }
 
-  filterPilots(searchTerm) {
-    return this.pilots.filter(item => {
+  
+  filterDrivers(searchTerm) {
+    return this.drivers.filter(item => {
       return item.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1;
     });
   }
@@ -32,30 +35,28 @@ vehicles: any = [];
       return item.client.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1;
     });
   }
-  fetchPilots(){
-    this.storage.get('USER_INFO').then(res=>{
+  fetchDrivers(){
+    let token = this.state.selectSnapshot(AuthState.token);
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/pilots`,
+        url: `${SERVER_URL}/api/drivers`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         }
       });
       return ret;
     }
     doGet().then(res=>{
       console.log(res);
-  this.pilots = res['data'];
+  this.drivers = res['data'];
 })
-  })
    
   }
   fetchVehicles(){
-    this.storage.get('USER_INFO').then(res=>{
-    console.log(res.token);
+    let token = this.state.selectSnapshot(AuthState.token);
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -63,7 +64,7 @@ vehicles: any = [];
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         }
       });
       return ret;
@@ -71,7 +72,6 @@ vehicles: any = [];
     doGet().then(res=>{
   this.vehicles = res['data'];
 })
-  })
    
   }
 }
