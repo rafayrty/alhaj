@@ -36,6 +36,8 @@
         "manage":"Manage orders",
         "manager":"Manager",
         "driver":"Driver",
+        "collector":"Collector",
+        "office":"Office",
         "portal":"Choose A Portal",
         "created":"Created By",
         "last":"Last Modified"
@@ -66,7 +68,7 @@
          
 
         "OPTIONS":{
-            "payment":"Payment/Record",
+            "payment":"Record",
             "urgency":"Urgency",
             
              "normal":"Normal",
@@ -77,8 +79,11 @@
             "heno":"Heno",
             "scania":"Scania",
             "other":"Other",
-            "date":"Scheduled Date",
-            "time":"Scheduled Time"
+            "date":"Date",
+            "start_time":"Start Time",
+            "end_time":"End Time",
+            "shipping":"Add A Shipping Certificate"
+
         },
 
 
@@ -100,6 +105,11 @@
 
         }
     },
+    "OFFICE":{
+       "all":"All",
+       "recorded":"Recorded",
+       "unrecored":"Unrecorded"
+    },
     "MANAGE":{
         "title":"Manage orders",
         "status":"Status",
@@ -109,7 +119,7 @@
         "assigned":"Assigned to:",
 
                   "receipt":"Receipt Id",
-                  "payment":"Record/Payment",
+                  "payment":"Record",
                   "history":"History",
                   "today":"Today",
                   "tomorrow":"Tomorrow",
@@ -174,19 +184,24 @@
         "vehicles":"Are You Sure You Want To Delete This <strong>Vehicle</strong>!",
         "cancel":"Cancel",
         "confirm":"Confirm",
-        "shipped":"Are you sure you want to mark this order as shipped?",
-        "delivered":"Are you sure you want to mark this order as delivered?",
-        "preparing":"Are you sure you want to mark this order as prepared?",
+        "waiting":"Are you sure you want to mark this order as <strong>waiting?</strong>",
+        "shipped":"Are you sure you want to mark this order as <strong>shipped?</strong>",
+        "delivered":"Are you sure you want to mark this order as <strong>delivered?</strong>",
+        "preparing":"Are you sure you want to mark this order as <strong>prepared?</strong>",
         "receipt":"Please Add A Receipt"
     },
     "ORDER":{
         "settings":"Order Settings",
         "call":"Call Client",
+        "location":"Location",
         "collectible":"Total collectible",
         "details":"Order Details",
         "shipped":"Mark as shipped",
         "delivered":"Mark as Delivered",
         "preparing":"Mark As Preparing",
+        "finish":"Finish Preparing ",
+        "scheduled":"Scheduled",
+        "unprepared":"UnPrepared",
         "DONE":{
             "all":"All is done",
             "notification":"You’ll get a notification when you receive a new order to deliver"
@@ -200,6 +215,7 @@
         "preparing":"Preparing",
         "Shipped":"Shipped",
         "delivered":"Delivered"
+        
         
     }
 }

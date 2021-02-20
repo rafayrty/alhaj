@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: CollectorPage
+  },
+  {
+    path: 'order-view/:id',
+    loadChildren: () => import('./order-view/order-view.module').then( m => m.OrderViewPageModule)
   }
 ];
 

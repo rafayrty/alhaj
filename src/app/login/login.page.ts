@@ -52,7 +52,7 @@ tempLogin(){
 
 }
   login(e){
-
+alert(this.fcm.token);
     e.target.innerHTML = '<ion-spinner></ion-spinner>';
     e.target.setAttribute('disabled','disabled');
     // Example of a POST request. Note: data

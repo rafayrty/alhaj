@@ -37,7 +37,6 @@ loader:any;
 ordersEmpty:any=false;
 
 orders:any = [];
-tab:any="ongoing";
 push:any;
 self:any;
   currentLang: string;
@@ -58,21 +57,9 @@ self:any;
       this.loader = null;
   }
 }
-tabchange(event){
-  if(this.tab=='ongoing'){
 
-    this.fetchOrder();
-      }else{
-        this.fetchUpcoming();
-      }  
-}
 doRefresh(event) {
-  if(this.tab=='ongoing'){
-
 this.fetchOrder();
-  }else{
-    this.fetchUpcoming();
-  }  
 setTimeout(() => {
       event.target.complete();
     }, 2000);
@@ -127,9 +114,7 @@ if (Capacitor.getPlatform() != 'web') {
   ngOnInit(){
   }
   ionViewWillEnter() {
-    this.tab = "ongoing";
    this.fetchOrder();
-    this.fetchUpcoming();
       this.currentLang = this.translate.currentLang;
     
 //  PushNotifications.addListener(
@@ -226,7 +211,7 @@ confirmStatus(e,status,id){
         }
       }
       if(res.data){
-        this.pushOrder();
+        this.fetchOrder();
       }else{
         this.currentOrders = [];
       }
@@ -296,38 +281,7 @@ this.currentOrders = ret.data;
       return ret;
 
 }
-fetchUpcoming(){
-  this.presentLoading();
-let token = this.state.selectSnapshot(AuthState.token)
-    const doGet = async () => {
-      const ret = await Http.request({
-        method: 'GET',
-        url: `${SERVER_URL}/api/upcomingOrders`,
-        headers:{
-          'Accept':'application/json',
-          'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-      });
- 
-      return ret;
-    }
-    doGet().then(res=>{
-      if(res.data){
-      this.orders = res.data;
-      if(this.orders.length==0 || this.orders == undefined){
-        this.ordersEmpty = true;
-      }else{
-        this.ordersEmpty = false;
-      }
-      this.hideLoader();
-        // this.order = false;
-      }
 
-    })
-  
-
-  }
   open(id){
     let url ='/order-view/'+id;
     this.router.navigate([url]);
@@ -415,12 +369,14 @@ return dateOutput;
   }
 
  fetchOrder(){
+  this.presentLoading();
+
   let token = this.state.selectSnapshot(AuthState.token);
   let user = this.state.selectSnapshot(AuthState.user);
       const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/orders/user/${user.id}`,
+        url: `${SERVER_URL}/api/ongoing/driver`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
@@ -431,14 +387,13 @@ return dateOutput;
       return ret;
     }
     doGet().then(res=>{
+      this.hideLoader();
       if(res.data.length != 0){
-        alert(JSON.stringify(res.data));
        this.hapticsNotification(HapticsNotificationType.SUCCESS);
    
        var audio = new Audio('/assets/sound.mp3');
         audio.play();
         this.currentOrders = res.data;
-
       }else{
         this.currentOrders = [];
       }

@@ -7,23 +7,23 @@
 
       <!-- <ion-back-button defaultHref="/home"   *ngIf="!logOutBtn"></ion-back-button> -->
     </ion-buttons>
-    <ion-title>Office</ion-title>
-
+    <ion-title>{{'HOME.office' | translate}}</ion-title>
 
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content>                
+
   <div class="tabs">
     <ion-segment scrollable value="tabs" (ionChange)="changedTab()" [(ngModel)]="currentTab" >
-      <ion-segment-button value="history">
-        <ion-label>All</ion-label>
+      <ion-segment-button value="all">
+        <ion-label>{{'OFFICE.all' | translate}}</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="today">
-        <ion-label>Unrecorded</ion-label>
+      <ion-segment-button value="recorded">
+        <ion-label>{{'OFFICE.recorded' | translate}}</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="tomorrow">
-        <ion-label>Recorded</ion-label>
+      <ion-segment-button value="unrecorded">
+        <ion-label>{{'OFFICE.unrecorded' | translate}}</ion-label>
       </ion-segment-button>
     </ion-segment>
 
@@ -35,16 +35,16 @@
   
   <div class="manage-page">
     <div class="searchBar">
-      <ion-searchbar *ngIf="currentTab=='today'|| currentTab=='tomorrow'" placeholder="{{'search' | translate}}" [(ngModel)]="searchOrders"
-      (ionChange)="fetchSearch2($event)"  debounce="500" name="searchOrders"></ion-searchbar>
-      <ion-searchbar *ngIf="currentTab=='history' || currentTab=='upcoming'" placeholder="{{'search' | translate}}" [(ngModel)]="searchOrders"
+      <!-- <ion-searchbar *ngIf="currentTab=='all'|| currentTab=='recorded' || curre" placeholder="{{'search' | translate}}" [(ngModel)]="searchOrders"
+      (ionChange)="fetchSearch2($event)"  debounce="500" name="searchOrders"></ion-searchbar> -->
+      <ion-searchbar placeholder="{{'search' | translate}}" [(ngModel)]="searchOrders"
       (ionChange)="fetchSearch($event)"  debounce="500" name="searchOrders"></ion-searchbar>
-      <div class="datePicker" *ngIf="currentTab=='history'">
+      <!-- <div class="datePicker" *ngIf="currentTab=='history'">
         <ion-icon name="calendar"></ion-icon>
         <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" (ionChange)="fetchSearch($event)"  value="2019-10-01T15:43:40.394Z" [(ngModel)]="searchDate" [max]="maxDate" displayFormat="DD/MM/YYYY" display-timezone="utc"></ion-datetime>
-      </div>
+      </div> -->
 
-      <div class="datePicker" *ngIf="currentTab=='upcoming'">
+      <div class="datePicker" >
         <ion-icon name="calendar"></ion-icon>
         <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" (ionChange)="fetchSearch($event)" value="2019-10-01T15:43:40.394Z" [(ngModel)]="searchDate" [min]="minDate" [max]="maxDateUpcoming" displayFormat="DD/MM/YYYY" display-timezone="utc"></ion-datetime>
       </div>
@@ -111,7 +111,7 @@
             <div class="status" [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
               <div class="status-text">
                 <h3 *ngIf="!order.date">{{day(order.created_at)}}, {{date(order.created_at)}}</h3>
-                <h3 *ngIf="order.date" class="created">{{day(order.date)}}, {{created(order.date)}}, {{time(order.time)}} </h3>
+                <h3 *ngIf="order.date" class="created">{{day(order.date)}}, {{created(order.date)}}, {{time(order.start_time)}} </h3>
 
               </div>
               <div class="status-total">
@@ -186,7 +186,7 @@
               
               
               </div>
-                <div class="receipt" *ngIf="order.payment == 'scania' || order.payment=='heno' || order.payment == 'inshop'">
+                <div class="receipt" >
                   <p style=" color:var(--ion-color-medium-shade) !important;
                   font-size:.8rem;">
                 {{'MANAGE.receipt' | translate}}
@@ -210,10 +210,12 @@
               </ion-text>
               <div class="pilot">
                 <div class="left">
-                  <ion-thumbnail slot="start">
-                    <img src="{{order.user.image}}">
-                  </ion-thumbnail>
-                  <p>{{order.user.name}}</p>
+                  <div class="row">
+                    <ion-thumbnail *ngFor="let driver of order.drivers" slot="start">
+                      <img src="{{driver.image}}">
+                    </ion-thumbnail>
+                  </div>
+      
                 </div>
 
                <div class="right">
@@ -223,10 +225,12 @@
 
               </div>
               <div class="vehicle">
-                <ion-thumbnail slot="start">
-                  <img src="{{order.vehicle.image}}">
-                </ion-thumbnail>
-                <p>{{order.vehicle.name}}</p>
+                <div class="row" *ngFor="let vehicle of order.vehicles">
+                  <ion-thumbnail slot="start">
+                    <img src="{{vehicle.image}}">
+                  </ion-thumbnail>
+                </div>
+       
               </div>
 
             </div>
@@ -279,12 +283,7 @@
     </div>
 
   </div>
-  <!-- fab placed to the top and end and on the top edge of the content overlapping header -->
-  <!-- <ion-fab vertical="bottom" (click)="navigate('/orders/create')" horizontal="end" slot="fixed">
-    <ion-fab-button>
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
+
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"

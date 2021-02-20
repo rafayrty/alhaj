@@ -113,10 +113,10 @@
 
         <ion-item *ngFor="let order of orders; let i = index">
           <div class="order">
-            <div class="status" [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
+            <div class="status" [ngClass]="{'tertiary': order.status === 'Scheduled','dark': order.status === 'UnPrepared','danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
               <div class="status-text">
                 <h3 *ngIf="!order.date">{{day(order.created_at)}}, {{date(order.created_at)}}</h3>
-                <h3 *ngIf="order.date" class="created">{{day(order.date)}}, {{created(order.date)}}, {{time(order.time)}} </h3>
+                <h3 *ngIf="order.date" class="created">{{day(order.date)}}, {{created(order.date)}}, {{time(order.start_time)}} </h3>
 
               </div>
               <div class="status-total">
@@ -148,8 +148,10 @@
                 <p>{{'MANAGE.address' | translate}} : <span>{{order.shipping}}</span></p>
               </div>
               <div class="delivery-status">
-                <h6 [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
+                <h6 [ngClass]="{'tertiary': order.status === 'Scheduled','dark': order.status === 'UnPrepared','danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
                   
+                  <span *ngIf="order.status==='UnPrepared'">{{'ORDER.unprepared' | translate}}</span>
+                  <span *ngIf="order.status==='Scheduled'">{{'ORDER.scheduled' | translate}}</span>
                   <span *ngIf="order.status==='Waiting'">{{'STATUS.waiting' | translate}}</span>
                   <span *ngIf="order.status==='Delivered'">{{'STATUS.delivered' | translate}}</span>
                   <span *ngIf="order.status==='Preparing'">{{'STATUS.preparing' | translate}}</span>
@@ -191,7 +193,7 @@
               
               
               </div>
-                <div class="receipt" *ngIf="order.payment == 'scania' || order.payment=='heno' || order.payment == 'inshop'">
+                <div class="receipt" >
                   <p style=" color:var(--ion-color-medium-shade) !important;
                   font-size:.8rem;">
                 {{'MANAGE.receipt' | translate}}
@@ -215,10 +217,12 @@
               </ion-text>
               <div class="pilot">
                 <div class="left">
-                  <ion-thumbnail slot="start">
-                    <img src="{{order.user.image}}">
-                  </ion-thumbnail>
-                  <p>{{order.user.name}}</p>
+                  <div class="row">
+                    <ion-thumbnail *ngFor="let driver of order.drivers" slot="start">
+                      <img src="{{driver.image}}">
+                    </ion-thumbnail>
+                  </div>
+      
                 </div>
 
                <div class="right">
@@ -228,10 +232,12 @@
 
               </div>
               <div class="vehicle">
-                <ion-thumbnail slot="start">
-                  <img src="{{order.vehicle.image}}">
-                </ion-thumbnail>
-                <p>{{order.vehicle.name}}</p>
+                <div class="row" *ngFor="let vehicle of order.vehicles">
+                  <ion-thumbnail slot="start">
+                    <img src="{{vehicle.image}}">
+                  </ion-thumbnail>
+                </div>
+       
               </div>
 
             </div>

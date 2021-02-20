@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title> Collector </ion-title>
+    <ion-title> {{'HOME.collector' | translate}} </ion-title>
     <!-- {{'HOME.driver' | translate}} -->
     <!-- <ion-buttons slot="start">
       <ion-button (click)="logOut()">{{'logout' | translate}}</ion-button>
@@ -34,14 +34,14 @@
       <ion-list lines="none">
         <ion-item *ngFor="let currentOrder of currentOrders; let i = index">
           <div class="order">
-            <div class="status" [ngClass]="{'danger': currentOrder.status === 'Waiting', 'warning':currentOrder.status === 'Delivered', 'secondary':currentOrder.status === 'Preparing' , 'primary-second':currentOrder.status==='On The Way'}">
+            <div class="status" [ngClass]="{'dark': currentOrder.status === 'UnPrepared', 'warning':currentOrder.status === 'Delivered', 'secondary':currentOrder.status === 'Preparing' , 'primary-second':currentOrder.status==='On The Way'}">
               <div class="status-text" *ngIf="currentOrder.date">
-                <h3>{{day(currentOrder.date)}}, {{created(currentOrder.date)}}, {{time(currentOrder.time)}}</h3>
+                <h3>{{day(currentOrder.date)}}, {{created(currentOrder.date)}}, {{time(currentOrder.start_time)}}</h3>
               </div>
               <div class="status-text" *ngIf="!currentOrder.date">
                 <h3>{{day(currentOrder.created_at)}}, {{date(currentOrder.created_at)}}</h3>
               </div>
-              <div class="status-total">
+              <div class="status-total" style="display:flex;">
                
                 <svg *ngIf="currentOrder.payment=='paid'" width="16" style="display:block;" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM4.72987 11.2625C5.09278 11.2625 5.38701 10.9685 5.38701 10.6059V6.00939H7.02987C7.75458 6.00939 8.34416 6.59852 8.34416 7.32267C8.34416 7.6853 8.63839 7.97931 9.0013 7.97931C9.36421 7.97931 9.65844 7.6853 9.65844 7.32267C9.65844 5.87436 8.47928 4.6961 7.02987 4.6961H4.72987C4.36696 4.6961 4.07273 4.99011 4.07273 5.35274V10.6059C4.07273 10.9685 4.36696 11.2625 4.72987 11.2625ZM11.3013 11.2625C11.6642 11.2625 11.9584 10.9685 11.9584 10.6059V5.35274C11.9584 4.99011 11.6642 4.6961 11.3013 4.6961C10.9384 4.6961 10.6442 4.99011 10.6442 5.35274V9.94923H9.0013C8.2766 9.94923 7.68701 9.3601 7.68701 8.63595C7.68701 8.27332 7.39278 7.97931 7.02987 7.97931C6.66696 7.97931 6.37273 8.27332 6.37273 8.63595C6.37273 10.0843 7.55189 11.2625 9.0013 11.2625H11.3013Z" fill="var(--ion-color-light)"/>
@@ -51,7 +51,7 @@
                     <path d="M6.38701 6.50939H5.88701V7.00939V11.6059C5.88701 11.692 5.817 11.7625 5.72987 11.7625C5.64275 11.7625 5.57273 11.692 5.57273 11.6059V6.35274C5.57273 6.26662 5.64275 6.1961 5.72987 6.1961H8.02987C9.2035 6.1961 10.1584 7.15087 10.1584 8.32267C10.1584 8.40879 10.0884 8.47931 10.0013 8.47931C9.91418 8.47931 9.84416 8.40879 9.84416 8.32267C9.84416 7.32201 9.03036 6.50939 8.02987 6.50939H6.38701ZM11.6442 11.4492H12.1442V10.9492V6.35274C12.1442 6.26662 12.2142 6.1961 12.3013 6.1961C12.3884 6.1961 12.4584 6.26662 12.4584 6.35274V11.6059C12.4584 11.692 12.3884 11.7625 12.3013 11.7625H10.0013C8.82767 11.7625 7.87273 10.8077 7.87273 9.63595C7.87273 9.54982 7.94275 9.47931 8.02987 9.47931C8.117 9.47931 8.18701 9.54982 8.18701 9.63595C8.18701 10.6366 9.00081 11.4492 10.0013 11.4492H11.6442ZM9 17.5C13.6944 17.5 17.5 13.6944 17.5 9C17.5 4.30558 13.6944 0.5 9 0.5C4.30558 0.5 0.5 4.30558 0.5 9C0.5 13.6944 4.30558 17.5 9 17.5Z" stroke="var(--ion-color-light)"/>
                     </svg>
   
-                    <svg *ngIf="currentOrder.type!='normal'" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg *ngIf="currentOrder.urgent" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M14.0999 14.522C16.8065 11.7021 16.711 7.22563 13.8867 4.5234C11.0624 1.82116 6.57876 1.9165 3.87223 4.7363C1.24685 7.47161 1.24685 11.7867 3.87223 14.522L2.03194 16.9713C1.81859 17.2554 1.87624 17.6583 2.16071 17.8714C2.44518 18.0844 2.8488 18.0268 3.06216 17.7428L4.84577 15.368C7.31322 17.163 10.6589 17.163 13.1263 15.368L14.9099 17.7428C15.1233 18.0269 15.5269 18.0844 15.8114 17.8714C16.0959 17.6583 16.1535 17.2554 15.9401 16.9713L14.0999 14.522ZM9.63002 9.64253C9.63002 9.78164 9.58482 9.91698 9.50125 10.0283L7.56955 12.5998C7.35619 12.8838 6.95257 12.9414 6.6681 12.7283C6.38363 12.5153 6.32594 12.1124 6.53933 11.8283L8.34227 9.42846V5.78526C8.34227 5.43019 8.63055 5.14237 8.98618 5.14237C9.34181 5.14237 9.63009 5.43019 9.63009 5.78526V9.64253H9.63002Z" fill="var(--ion-color-light)"/>
                       <path d="M5.46716 0.941143C4.19413 -0.298232 2.15585 -0.27258 0.914464 0.998437C-0.304695 2.24674 -0.304846 4.23783 0.914162 5.48632C1.16562 5.73731 1.5732 5.73731 1.82463 5.48632L5.46716 1.8502C5.71855 1.59914 5.71855 1.1922 5.46716 0.941143Z" fill="var(--ion-color-light)"/>
                       <path d="M17.0574 0.941142C15.8001 -0.313714 13.7622 -0.313714 12.505 0.941142C12.2536 1.1922 12.2536 1.59914 12.505 1.85016L16.1469 5.48628C16.3984 5.73727 16.8059 5.73727 17.0574 5.48628C18.3142 4.23109 18.3142 2.19638 17.0574 0.941142Z" fill="var(--ion-color-light)"/>
@@ -67,9 +67,9 @@
                 <p>{{'MANAGE.address' | translate}} : <span>{{currentOrder.shipping}}</span></p>
               </div>
               <div class="delivery-status">
-                  <h6 [ngClass]="{'danger': currentOrder.status === 'Waiting', 'warning':currentOrder.status === 'Delivered', 'secondary':currentOrder.status === 'Preparing' , 'primary-second':currentOrder.status==='On The Way'}">
+                  <h6 [ngClass]="{'dark': currentOrder.status === 'UnPrepared', 'warning':currentOrder.status === 'Delivered', 'secondary':currentOrder.status === 'Preparing' , 'primary-second':currentOrder.status==='On The Way'}">
                     
-                    <span *ngIf="currentOrder.status==='Waiting'">{{'STATUS.waiting' | translate}}</span>
+                    <span *ngIf="currentOrder.status==='UnPrepared'">UnPrepared</span>
                     <span *ngIf="currentOrder.status==='Delivered'">{{'STATUS.delivered' | translate}}</span>
                     <span *ngIf="currentOrder.status==='Preparing'">{{'STATUS.preparing' | translate}}</span>
                     <span *ngIf="currentOrder.status==='On The Way'">{{'STATUS.on' | translate}}</span>
@@ -132,23 +132,27 @@
               </ion-text>
               <div class="pilot">
                 <div class="left">
-                  <ion-thumbnail slot="start">
-                    <img src="{{currentOrder.user.image}}">
-                  </ion-thumbnail>
-                  <p>{{currentOrder.user.name}}</p>
+                  <div class="row" >
+                    <ion-thumbnail *ngFor="let driver of currentOrder.drivers" slot="start">
+                      <img src="{{driver.image}}">
+                    </ion-thumbnail>
+                  </div>
+      
                 </div>
   
-                <div class="right">
-                  <ion-button color="primary" (click)="open(currentOrder.id)" >{{'MANAGE.view' | translate}}</ion-button>
+               <div class="right">
+                  <ion-button color="primary" class="view-order" (click)="open(currentOrder.id)" >{{'MANAGE.view' | translate}}</ion-button>
   
                 </div> 
   
               </div>
               <div class="vehicle">
-                <ion-thumbnail slot="start">
-                  <img src="{{currentOrder.vehicle.image}}">
-                </ion-thumbnail>
-                <p>{{currentOrder.vehicle.name}}</p>
+                <div class="row" *ngFor="let vehicle of currentOrder.vehicles">
+                  <ion-thumbnail slot="start">
+                    <img src="{{vehicle.image}}">
+                  </ion-thumbnail>
+                </div>
+       
               </div>
   
             </div>
@@ -205,9 +209,11 @@
     <ion-list lines="none">
       <ion-item *ngFor="let order of orders; let i = index">
         <div class="order">
-          <div class="status" [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
+          <div class="status" style="align-items: center;" [ngClass]="{'tertiary': order.status === 'Scheduled', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
+            <!-- <div class="status" [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}"> -->
+
             <div class="status-text">
-              <h3 *ngIf="order.date" class="creadted">{{day(order.date)}}, {{created(order.date)}}, {{time(order.time)}}</h3>
+              <h3 *ngIf="order.date" class="creadted">{{day(order.date)}}, {{created(order.date)}}, {{time(order.start_time)}}</h3>
               <h3 *ngIf="!order.date">{{day(order.created_at)}}, {{date(order.created_at)}}</h3>
 
             </div>
@@ -239,8 +245,11 @@
               <p>{{'MANAGE.address' | translate}} : <span>{{order.shipping}}</span></p>
             </div>
             <div class="delivery-status">
-                <h6 [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
-                  
+                <!-- <h6 [ngClass]="{'danger': order.status === 'Waiting', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}"> -->
+                  <h6 [ngClass]="{'tertiary': order.status === 'Scheduled', 'warning':order.status === 'Delivered', 'secondary':order.status === 'Preparing' , 'primary-second':order.status==='On The Way'}">
+
+                  <span *ngIf="order.status==='Scheduled'">Scheduled</span>
+
                   <span *ngIf="order.status==='Waiting'">{{'STATUS.waiting' | translate}}</span>
                   <span *ngIf="order.status==='Delivered'">{{'STATUS.delivered' | translate}}</span>
                   <span *ngIf="order.status==='Preparing'">{{'STATUS.preparing' | translate}}</span>
@@ -304,23 +313,27 @@
             </ion-text>
             <div class="pilot">
               <div class="left">
-                <ion-thumbnail slot="start">
-                  <img src="{{order.user.image}}">
-                </ion-thumbnail>
-                <p>{{order.user.name}}</p>
+                <div class="row" >
+                  <ion-thumbnail *ngFor="let driver of order.drivers" slot="start">
+                    <img src="{{driver.image}}">
+                  </ion-thumbnail>
+                </div>
+    
               </div>
 
-              <div class="right">
-                <ion-button color="primary" (click)="view(order.id)" >{{'MANAGE.view' | translate}}</ion-button>
+             <div class="right">
+                <ion-button color="primary" class="view-order" (click)="open(order.id)" >{{'MANAGE.view' | translate}}</ion-button>
 
               </div> 
 
             </div>
             <div class="vehicle">
-              <ion-thumbnail slot="start">
-                <img src="{{order.vehicle.image}}">
-              </ion-thumbnail>
-              <p>{{order.vehicle.name}}</p>
+              <div class="row"  *ngFor="let vehicle of order.vehicles">
+                <ion-thumbnail slot="start">
+                  <img src="{{vehicle.image}}">
+                </ion-thumbnail>
+              </div>
+     
             </div>
 
           </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Animation, AnimationController } from '@ionic/angular';
+import { Animation, AnimationController, LoadingController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 import { Storage } from '@ionic/storage';
@@ -31,13 +31,14 @@ hideDriver:any = true;
 currentLang:any;
 selectedLang:any;
 user:any;
+loader:any;
 roles:any= {
 manager:false,
 driver:false,
 collector:false,
 office:false
 }
-  constructor(private actions: Actions,private translate:TranslateService,private state:Store, private languageService:LanguageService,private store:StorageService,private active:ActivatedRoute,private Storage:Storage,private route:Router,private animationCtrl: AnimationController) {
+  constructor(private loadingController:LoadingController,private actions: Actions,private translate:TranslateService,private state:Store, private languageService:LanguageService,private store:StorageService,private active:ActivatedRoute,private Storage:Storage,private route:Router,private animationCtrl: AnimationController) {
 // this.Storage.get('USER_INFO').then((response)=>{
 //   let  res = response;
 //   if(res.user.role=='Pilot'){
@@ -47,7 +48,10 @@ office:false
 this.active.paramMap.subscribe( paramMap => {
   let id =paramMap.get('reload');
   if(id=='1'){
-this.route.navigateByUrl('order',{replaceUrl:true})
+this.route.navigateByUrl('collector',{replaceUrl:true})
+  }else if(id=='2'){
+    this.route.navigateByUrl('driver',{replaceUrl:true})
+
   }
 
 })
@@ -82,20 +86,7 @@ if (Capacitor.getPlatform() != 'web') {
     this.hapticsImpact(HapticsImpactStyle.Light);
   }
   ngOnInit() {
-  this.user =  this.state.selectSnapshot(AuthState.user);
-if(this.user.roles.find(x => x.name =='Manager')){
-this.roles.manager = true;
-}
-if(this.user.roles.find(x => x.name =='Collector')){
-  this.roles.collector = true;
-}
- if(this.user.roles.find(x => x.name =='Driver')){
-  this.roles.driver = true;
-} 
-if(this.user.roles.find(x => x.name =='Office')){
-  this.roles.office = true;
-}
-console.log(this.roles);
+
 
 
 
@@ -103,36 +94,86 @@ console.log(this.roles);
   }
   ionViewDidEnter(){
     this.selectedLang = localStorage.getItem('SELECTED_LANGUAGE')
+    this.roles = {
+      manager:false,
+      driver:false,
+      collector:false,
+      office:false
+      }
+      this.user =  this.state.selectSnapshot(AuthState.user);
+      if(this.user.roles.find(x => x.name =='Manager')){
+      this.roles.manager = true;
+      }
+      if(this.user.roles.find(x => x.name =='Collector')){
+        this.roles.collector = true;
+      }
+       if(this.user.roles.find(x => x.name =='Driver')){
+        this.roles.driver = true;
+      } 
+      if(this.user.roles.find(x => x.name =='Office')){
+        this.roles.office = true;
+      }
   }
-  logOut(){
-    // this.Storage.get('USER_INFO').then(async res=>{
-    //   console.log(res);
-    //   const ret = await Http.request({
-    //     method: 'POST',
-    //     url: `${SERVER_URL}/api/users/status`,
-    //     headers:{
-    //       'Accept':'application/json',
-    //       'Content-Type':'application/json',
-    //       'Authorization': 'Bearer ' + res.token
-    //     },
-    //     data:{
-    //       status:"Logged Out"
-    //     }
-    //   });  
-    //   this.store.logout();
+  async presentLoading() {
+    this.loader = await this.loadingController.create({
+     cssClass: 'my-custom-class',
+     message: this.translate.instant('wait'),
+   });
+   await this.loader.present();
+   const { role, data } = await this.loader.onDidDismiss();
+   console.log('Loading dismissed!');
+ }
+ hideLoader() {
+  if (this.loader != null) {
+      this.loader.dismiss();
+      this.loader = null;
+  }
+}
+  async logOut(){
+    this.presentLoading();
+    let token = this.state.selectSnapshot(AuthState.token);
+      const ret = await Http.request({
+        method: 'POST',
+        url: `${SERVER_URL}/api/users/status`,
+        headers:{
+          'Accept':'application/json',
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        data:{
+          status:"Logged Out"
+        }
+      });  
+      // this.store.logout();
+      this.state.dispatch(new Logout()).subscribe(()=>{
+        this.hideLoader();
+        this.route.navigate(['/login']);
+      })
+      this.actions.pipe(ofActionDispatched(Logout)).subscribe(() => {
+        this.route.navigate(['/login']);
+      });
 
-    //   return ret;
 
-    // })
-    this.state.dispatch(new Logout()).subscribe(()=>{
-      this.route.navigate(['/login']);
-    })
-    this.actions.pipe(ofActionDispatched(Logout)).subscribe(() => {
-      this.route.navigate(['/login']);
-    });
+      return ret;
+
+    
     //  this.route.navigateByUrl('/login');
   }
   async orderBTN(e,route){
+    let ahead = false;
+    if(route == 'orders/manage' && this.roles.manager != false){
+      ahead = true;
+    }
+    if(route == 'collector' && this.roles.collector != false){
+      ahead = true;
+    }
+    if(route == 'office' && this.roles.office != false){
+      ahead = true;
+    }
+    if(route == 'driver' && this.roles.driver != false){
+      ahead = true;
+    }
+    if(ahead){
     const animation: Animation = this.animationCtrl.create()
     .addElement(e.target)
     .duration(300)
@@ -146,7 +187,7 @@ console.log(this.roles);
     await animation.play().then(e=>{
       this.route.navigate([route]);
     });
-
+  }
   }
 
 

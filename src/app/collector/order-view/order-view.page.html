@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title> {{'HOME.driver' | translate}}</ion-title>
+    <ion-title> {{'HOME.collector' | translate}}</ion-title>
     <!-- <ion-buttons slot="start">
       <ion-button (click)="logOut()">{{'logout' | translate}}</ion-button>
     </ion-buttons> -->
@@ -151,11 +151,10 @@
 </div>
 </ion-content>
 <ion-footer *ngIf="order">
-  <ion-button  expand="block" *ngIf="order.status == 'Waiting'" class="shipped"  (click)="updateStatus($event,'On The Way',order.id)"  >{{'ORDER.shipped' | translate}} </ion-button>
- 
+  <ion-button  expand="block" *ngIf="order.status == 'UnPrepared'"  (click)="updateStatus($event,'Preparing',order.id)" color="secondary" >{{'ORDER.finish' | translate}} </ion-button>
+  <ion-button  expand="block" *ngIf="order.status == 'Scheduled'"  style="--background:var(--ion-color-tick);">{{'ORDER.finish' | translate}} </ion-button>
+
   <!-- <ion-button  expand="block" *ngIf="order.status=='Pending'" (click)="updateStatus($event,'Preparing',order.id)" color="secondary" > <ion-icon name="paper-plane-sharp"></ion-icon> <span>{{'ORDER.shipped' | translate}}</span></ion-button> -->
-  <!-- <ion-button  expand="block"  *ngIf="order.status == 'Preparing'" class="shipped" (click)="updateStatus($event,'On The Way',order.id)"  >{{'ORDER.shipped' | translate}} </ion-button> -->
-  <ion-button  expand="block" *ngIf="order.status == 'On The Way'" class="delivered" color="warning" (click)="updateStatus($event,'Delivered',order.id)"  >{{'ORDER.delivered' | translate}} </ion-button>
 
 </ion-footer>
 

@@ -124,6 +124,14 @@ ion-item{
         width:100%;
         border-radius: 13px;
                 border:1px solid var( --ion-color-medium-shade);
+                .status.dark{
+                    background:var(--ion-color-dark);
+                
+                }
+                .status.tertiary{
+                    background:var(--ion-color-tertiary);
+                
+                }
 .status.warning{
     background:var(--ion-color-warning);
 
@@ -182,6 +190,12 @@ ion-item{
 h6{
     font-weight:700;                  
     font-size:rem(13px);
+}
+h6.tertiary{
+    color:var(--ion-color-tertiary);
+}
+h6.dark{
+    color:var(--ion-color-dark);
 }
 h6.success{
     color:var(--ion-color-success);
@@ -305,4 +319,26 @@ ion-fab-button{
     }
 
 
+}
+
+.pilot{
+    .left{
+        display:flex;
+        align-items:center;
+        .row{
+            &:not(:first-child){
+                margin:0 .5rem;
+            }
+        }
+    }
+
+}
+.vehicle{
+    display:flex;
+    align-items:center;
+    .row{
+        &:not(:first-child){
+            margin:0 .5rem;
+        }
+    }
 }

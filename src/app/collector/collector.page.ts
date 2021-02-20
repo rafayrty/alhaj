@@ -302,7 +302,7 @@ let token = this.state.selectSnapshot(AuthState.token)
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/upcomingOrders`,
+        url: `${SERVER_URL}/api/collectorOrders`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
@@ -329,7 +329,7 @@ let token = this.state.selectSnapshot(AuthState.token)
 
   }
   open(id){
-    let url ='/order-view/'+id;
+    let url ='/collector/order-view/'+id;
     this.router.navigate([url]);
   }
 view(id){
@@ -420,7 +420,7 @@ return dateOutput;
       const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/orders/user/${user.id}`,
+        url: `${SERVER_URL}/api/ongoing/collector`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
@@ -432,7 +432,6 @@ return dateOutput;
     }
     doGet().then(res=>{
       if(res.data.length != 0){
-        alert(JSON.stringify(res.data));
        this.hapticsNotification(HapticsNotificationType.SUCCESS);
    
        var audio = new Audio('/assets/sound.mp3');

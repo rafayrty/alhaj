@@ -156,3 +156,11 @@ ion-textarea:focus{
   transition:.3s ease-in-out !important;
   border:1px solid var(--ion-color-primary) !important;
 }
+.row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap:.5rem;
+  ion-thumbnail{
+    margin-top:.5rem;
+  }
+}

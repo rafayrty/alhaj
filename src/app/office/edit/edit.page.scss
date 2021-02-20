@@ -155,6 +155,10 @@ ion-text{
                 color:var(--ion-color-danger);
                 
             }
+            h6.out{
+                color:var(--ion-color-danger);
+                
+            }
          
         }
     }
@@ -199,7 +203,6 @@ ion-radio-group.schedule{
     margin:0 auto;
     margin-top:.8rem;
 
-
     .left{
         display:flex;
         flex-direction: row;
@@ -219,6 +222,10 @@ ion-radio-group.schedule{
             display:block;
 
         }
+    }
+    p:lang(ar){
+        margin-right:1.5rem;
+
     }
 }
 ion-icon{
@@ -248,28 +255,30 @@ span.warning{
   .back:lang(ar){
     transform:rotate(360deg);
   }
-
   agm-map {
 
-    width:100%;
-  height: 220px;
-  border-radius:6px;
-}
-.receipt-item{
-  margin-top:.7rem;
-}
+      width:100%;
+    height: 220px;
+    border-radius:6px;
+  }
+  .receipt-item{
+    margin-top:.7rem;
+  }
 .receipt-input{
-  --padding-end:.5rem;
-          --padding-start:.5rem !important;
+    --padding-end:.5rem;
+            --padding-start:.5rem !important;
 
-             border:1px solid var(--ion-color-medium-shade);
-             border-radius:6px;
-             --padding-top:.8rem;
-             --padding-bottom:.8rem;
-             background:var(--ion-color-medium-tint);
-             transition:.3s ease-in;
-             &:focus{
-              border:1px solid var(--ion-color-primary);
+               border:1px solid var(--ion-color-medium-shade);
+               border-radius:6px;
+               --padding-top:.8rem;
+               --padding-bottom:.8rem;
+               background:var(--ion-color-medium-tint);
+               transition:.3s ease-in;
+               &:focus{
+                border:1px solid var(--ion-color-primary);
 
-             }
+               }
+}
+.error{
+    display:block;
 }

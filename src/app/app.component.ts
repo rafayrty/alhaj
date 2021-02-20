@@ -52,11 +52,14 @@ export class AppComponent {
   }
 
   initializeApp() {
-    this.fcm.initPush();
 
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+
+      this.fcm.initPush();
+
+      
       this.languageService.setInitialAppLanguage();
 if(this.languageService.selected == 'ar'){
 

@@ -8,6 +8,8 @@ import {  Capacitor, HapticsImpactStyle, HapticsNotificationType, Plugins } from
 import { AlertController, LoadingController,ModalController, NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ViewerModalComponent } from 'ngx-ionic-image-viewer';
+import { Store } from '@ngxs/store';
+import { AuthState } from '../state/auth.state';
 
 const { Http,Haptics } = Plugins;
 
@@ -33,7 +35,8 @@ private loadingController:LoadingController,
 private translate:TranslateService,
 public modalController: ModalController,
 public alertController:AlertController,
-private router:Router
+private router:Router,
+private state:Store
   ) { }
 
   ngOnInit() {
@@ -180,8 +183,8 @@ confirmStatus(e,status,id){
 
   e.target.setAttribute('disabled','disabled');
 
+  let token = this.state.selectSnapshot(AuthState.token);
 
-  this.storage.get('USER_INFO').then(res=>{
     const doGet = async () => {
       const ret = await Http.request({
         method: 'POST',
@@ -189,7 +192,7 @@ confirmStatus(e,status,id){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
         data:{
           status:status
@@ -218,7 +221,7 @@ confirmStatus(e,status,id){
       }
 
     })
-  });
+  
 
 }
 day(date){
@@ -263,9 +266,14 @@ date(date){
     let tel_number = num;
     window.open(`tel:${tel_number}`, '_system')
   }
+  location(lat,lng){
+    let destination = lat + ',' + lng;
+    window.open("https://www.google.com/maps/search/?api=1&query="+destination)
+  }
 fetchOrder(){
 this.presentLoading();
-  this.storage.get('USER_INFO').then(res=>{
+let token = this.state.selectSnapshot(AuthState.token);
+
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -273,25 +281,25 @@ this.presentLoading();
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
       });
 
       return ret;
     }
     doGet().then(res=>{
-      this.hideLoader();
 
       if(res.data){
         this.order = res.data;
-      
+        this.hideLoader();
+
       }else{
         this.order = false;
       }
 
     })
-  });
-}
+
+  }
 
 
 

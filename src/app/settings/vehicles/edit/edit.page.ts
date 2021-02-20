@@ -15,6 +15,8 @@ import {
 } from '@capacitor/core';
 import { decimalDigest } from '@angular/compiler/src/i18n/digest';
 import { typeWithParameters } from '@angular/compiler/src/render3/util';
+import { Store } from '@ngxs/store';
+import { AuthState } from 'src/app/state/auth.state';
 
 const { Haptics,Http } = Plugins;
 
@@ -30,7 +32,7 @@ vehicle:any = {image:''};
 file:any;
 vehicleId:any;
 format:any;
-  constructor(private translate:TranslateService,private router:Router,private active: ActivatedRoute,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
+  constructor(private state:Store,private translate:TranslateService,private router:Router,private active: ActivatedRoute,private storage:Storage,private loadingController:LoadingController,private sanitizer : DomSanitizer,private photo:PhotoService) { }
 
 
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
@@ -56,15 +58,15 @@ if (Capacitor.getPlatform() != 'web') {
   }
   fetchVehicle(id){
 
-    this.storage.get('USER_INFO').then(res=>{
-      const doGet = async () => {
+    let token = this.state.selectSnapshot(AuthState.token);
+    const doGet = async () => {
         const ret = await Http.request({
           method: 'GET',
           url: `${SERVER_URL}/api/vehicles/${id}`,
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + res.token
+            'Authorization': 'Bearer ' + token
           }
         });
         return ret;
@@ -73,7 +75,6 @@ if (Capacitor.getPlatform() != 'web') {
     this.vehicle = res['data'];
       this.hideLoader();
   })
-    })
   }
   openCamera(){
     this.photo.takePicture().then(res=>{
@@ -110,7 +111,8 @@ if(this.file){
     name:this.vehicle.name,    
   }
 }
-  this.storage.get('USER_INFO').then(res=>{
+let token = this.state.selectSnapshot(AuthState.token);
+
     const doPost = async () => {
       const ret = await Http.request({
         method: 'POST',
@@ -118,7 +120,7 @@ if(this.file){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         },
         data:data
       });
@@ -136,14 +138,13 @@ if(this.file){
       this.router.navigate(["/settings/vehicles"], navigationExtras);
       }else if(res['status']==422){
         this.errors = res['data']['errors'];
-console.log(this.errors);
         }
 
         
   // this.vehicles = res['data'];
   //   this.loading = false;
 })
-  })
+  
 
 
   }

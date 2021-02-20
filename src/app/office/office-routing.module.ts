@@ -7,6 +7,14 @@ const routes: Routes = [
   {
     path: '',
     component: OfficePage
+  },
+  {
+    path: 'order-view/:id',
+    loadChildren: () => import('./order-view/order-view.module').then( m => m.OrderViewPageModule)
+  },
+  {
+    path: 'edit/:id',
+    loadChildren: () => import('./edit/edit.module').then( m => m.EditPageModule)
   }
 ];
 

@@ -65,7 +65,6 @@ const routes: Routes = [
     path: 'order-detail/:id',
     loadChildren: () => import('./order-detail/order-detail.module').then( m => m.OrderDetailPageModule),
     canActivate: [AuthGuard]
-
   },
   {
     path: 'order-view/:id',

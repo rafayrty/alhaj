@@ -75,9 +75,10 @@ vehicles:any;
 collectors:any;
 
 date:any;
-time:any;
+start_time:any;
+end_time:any;
+certificate:boolean = false;
 file:any;
-orderType:any;
 image:any;
 format:any;
 step1:boolean = true;
@@ -88,7 +89,9 @@ errors:any=[];
 receipt:any="";
 customError:any= {receipt:false };
 payment:any='cod'
-type:any='normal'
+urgent:boolean = false;
+shipping:boolean = false;
+
 form:any = {
   name:'',
   address:"",
@@ -96,7 +99,7 @@ form:any = {
   order:"",
   driver:"",
   vehicle:"",
-  collector:""
+  collector:"",
 }
 loader:any;
 selectedDriver:any = [];
@@ -534,14 +537,19 @@ let data;
         address:this.form.address,
         note:this.form.note,
         payment:this.payment,
-        orderType:this.orderType,
-        type:this.type,
+        urgent:this.urgent,
+        certificate:this.shipping,
+        
         date:this.date,
-        time:this.time,
+        start_time:this.start_time,
+        end_time:this.end_time,
         receipt:this.receipt,
         driver:this.form.driver,
         order:this.form.order,
-        vehicle:this.form.vehicle
+        vehicle:this.form.vehicle,
+        collector:this.form.collector,
+        lat:this.lat,
+        lng:this.lng
         }
       }else{
       data = {
@@ -551,16 +559,21 @@ let data;
         address:this.form.address,
         note:this.form.note,
         payment:this.payment,
-        orderType:this.orderType,
-        type:this.type,
+        urgent:this.urgent,
+        certificate:this.shipping,
+
         date:this.date,
-        time:this.time,
+        start_time:this.start_time,
+        end_time:this.end_time,
         receipt:this.receipt,
         driver:this.form.driver,
-        vehicle:this.form.vehicle
+        vehicle:this.form.vehicle,
+        collector:this.form.collector,
+        lat:this.lat,
+        lng:this.lng
                 }
       }
-    this.storage.get('USER_INFO').then(res=>{
+      let token = this.state.selectSnapshot(AuthState.token);
       const doPost = async () => {
         const ret = await Http.request({
           method: 'POST',
@@ -568,7 +581,7 @@ let data;
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + res.token
+            'Authorization': 'Bearer ' + token
           },
           data:data
         });
@@ -598,7 +611,6 @@ let data;
     // this.vehicles = res['data'];
     //   this.loading = false;
   })
-    })
 
 
   }

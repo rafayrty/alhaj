@@ -51,7 +51,7 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-label color="medium" position="stacked">Location</ion-label>
+            <ion-label color="medium" position="stacked">{{'ORDER.location' | translate}}</ion-label>
 
             <agm-map [latitude]="lat" [longitude]="lng" mapDraggable="true" [zoom]="12">
               <agm-marker [latitude]="lat" [longitude]="lng" [markerDraggable]="true" animation="DROP" (dragEnd)="updateLocation($event)"></agm-marker>
@@ -174,7 +174,9 @@
 
             <!-- Collectors Selection -->
             <ion-list-header>
-              <ion-label>Collector</ion-label>
+              <ion-label>{{'HOME.collector' | translate}}</ion-label>
+              <span class="error" *ngIf="errors.length!=0 && errors.collector" [@enterAnimation]>{{errors.collector[0]}}</span>
+
             </ion-list-header>
             <div Class="dropdown" *ngFor="let selectedCollect of selectedCollector"     (click)="openCollector()" >
               <div class="left">
@@ -202,7 +204,10 @@
 
       <ion-list-header>
         <ion-label>{{'HOME.driver' | translate}}</ion-label>
+        <span class="error" *ngIf="errors.length!=0 && errors.driver" [@enterAnimation]>{{errors.driver[0]}}</span>
+
       </ion-list-header>
+      
       <div Class="dropdown" *ngFor="let selectedDrive of selectedDriver"  (click)="openDriver()" >
         <div class="left">
 
@@ -229,6 +234,8 @@
 
       <ion-list-header> 
         <ion-label>{{'vehicle' | translate}}</ion-label>
+        <span class="error" *ngIf="errors.length!=0 && errors.vehicle" [@enterAnimation]>{{errors.vehicle[0]}}</span>
+
       </ion-list-header>
 
               <div Class="dropdown" *ngFor="let selectedVehicl of selectedVehicle"  (click)="openVehicle()"  >
@@ -256,24 +263,28 @@
 
              <ion-list>
               <ion-list-header>
-                <ion-label>Schedule</ion-label>
+                <ion-label>{{'CREATE.schedule' | translate}}</ion-label>
               </ion-list-header>
               <ion-item  >
-                <ion-label>Start Date</ion-label>
+                <ion-label>{{'CREATE.OPTIONS.date' | translate}}</ion-label>
                 <ion-datetime  cancelText="{{'ALERTS.cancel' | translate}}"  doneText="{{'done' | translate}}" displayFormat="MMM DD, YYYY" [(ngModel)]='date' name="date" [min]="minDate" [max]="maxDate"       placeholder="Nov 19, 2020"></ion-datetime>
+                <span class="error" *ngIf="errors.length!=0 && errors.date" [@enterAnimation]>{{errors.date[0]}}</span>
               </ion-item>
               <ion-item >
-                <ion-label>Start Time</ion-label>
-                <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+                <ion-label>{{'CREATE.OPTIONS.start_time' | translate}}</ion-label>
+                <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='start_time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+                <span class="error" *ngIf="errors.length!=0 && errors.start_time" [@enterAnimation]>{{errors.start_time[0]}}</span>
               </ion-item>
 
               <ion-item >
-                <ion-label>End Time</ion-label>
-                <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+                <ion-label>{{'CREATE.OPTIONS.end_time' | translate}}</ion-label>
+                <ion-datetime cancelText="{{'ALERTS.cancel' | translate}}" doneText="{{'done' | translate}}" displayFormat="HH:mm A"    [(ngModel)]='end_time'  name="time"  placeholder="11:47 AM"></ion-datetime>
+                <span class="error" *ngIf="errors.length!=0 && errors.end_time" [@enterAnimation]>{{errors.end_time[0]}}</span>
+
               </ion-item>
               <ion-item lines="none">
-                <ion-checkbox color="primary"></ion-checkbox>
-                <ion-label>Urgent</ion-label>
+                <ion-checkbox [(ngModel)]="urgent" value="1" color="primary"></ion-checkbox>
+                <ion-label>{{'CREATE.OPTIONS.urgent' | translate}}</ion-label>
 
               </ion-item>
             </ion-list>
@@ -282,7 +293,7 @@
 
             <ion-list>
               <ion-list-header>
-                <ion-label>Record</ion-label>
+                <ion-label>{{'MANAGE.payment' | translate}}</ion-label>
               </ion-list-header>
               <ion-item>
 
@@ -305,8 +316,8 @@
           
             </ion-item>
               <ion-item lines="none" style="padding-bottom:1rem;">
-                <ion-checkbox color="primary"></ion-checkbox>
-                <ion-label>Add Shipping Certificate</ion-label>
+                <ion-checkbox [(ngModel)]="shipping" value="1" color="primary"></ion-checkbox>
+                <ion-label>{{'CREATE.OPTIONS.shipping' | translate}}</ion-label>
 
               </ion-item>
             </ion-list>

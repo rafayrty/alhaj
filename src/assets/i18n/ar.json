@@ -35,6 +35,8 @@
        "manage":"ادارة الطلبات",
         "manager":"مدير",
         "driver":"سائق",
+        "collector":"جامع",
+        "office":"مكتب",
         "portal":"اختر قسم",
         "created":"اضيف بواسطة",
         "last":"آخر تعديل"
@@ -77,7 +79,10 @@
             "scania":"في السكانيا",
             "other":"اخرى",
             "date":"تاريخ الجدولة",
-            "time":"توقيت الجدولة"
+            "start_time":"وقت البدء",
+            "end_time":"نهاية الوقت",
+            "shipping":"إضافة شهادة شحن"
+
         },
 
 
@@ -99,6 +104,11 @@
 
        }
    },
+   "OFFICE":{
+    "all":"الكل",
+    "recorded":"مسجل",
+    "unrecored":"غير مسجل"
+ },
    "MANAGE":{
        "title":"ادارة الطلبات",
        "status":"الحالة",
@@ -109,7 +119,7 @@
        
     
                   "receipt":"رقم الايصال",
-                  "payment":"الدفع/التسجيل",
+                  "payment":"التسجيل",
                   "history":"قديماً",
                   "today":"اليوم",
                   "tomorrow":"الغد",
@@ -173,6 +183,7 @@
        "vehicles":"هل انت متأكد من حذف هذه <strong>المركبة</strong>!",
        "cancel":"الغاء",
        "confirm":"تأكيد",
+       "waiting":"Are you sure you want to mark this order as <strong>waiting?</strong>",
        "shipped":"هل تريد تعيين هذا الطلب على أنه تم التوصيل؟?",
        "delivered":"هل تريد تعيين هذا الطلب على أنه تم الشحن؟",
        "preparing":"هل أنت متأكد أنك تريد وضع علامة على هذا الطلب على أنه مُعد؟",
@@ -182,11 +193,15 @@
    "ORDER":{
     "settings":"إعدادات الطلب",
        "call":"اتصل بالزبون",
+       "location":"موقعك",
        "collectible":"اجمالي التكلفة",
        "details":"تفاصيل الطلب",
        "shipped":"أكد الشحن",
        "delivered":"أكد التسليم",
           "preparing":"بدأ التجهيز",
+          "finish":"الانتهاء من إعداد",
+        "scheduled":"المقرر",
+        "unprepared":"غير مستعد",
        "DONE":{
            "all":"تم كل شيئ",
            "notification":"ستتلقى إشعارًا عندما تتلقى طلبًا جديدًا للتسليم"

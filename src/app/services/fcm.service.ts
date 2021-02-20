@@ -90,23 +90,41 @@ if(Capacitor.platform == 'android'){
 
 this.notify = notification;
 const data = notification.data;
-if(data.role=='Manager'){
-  var audio = new Audio('/assets/sound.mp3');
-  audio.play();
-  this.presentAlert(this.notify.title,this.notify.body);
+// if(data.role=='Manager'){
+//   var audio = new Audio('/assets/sound.mp3');
+//   audio.play();
+//   this.presentAlert(this.notify.title,this.notify.body);
 
-}else{
+// }else{
   // if(this.router.url!='/order'){
  
   // }
-  if(data.type=='normal'){
-    if(this.router.url=='/order'){
-      this.router.navigate(['home/1'],{replaceUrl:true});
+  alert(data.role);
+  if(data.role=='Collector'){
+    if(this.router.url=='/collector'){
+      if(data.type=='Scheduled'){
+        var audio = new Audio('/assets/sound.mp3');
+        audio.play();
+        this.presentAlert(this.notify.title,this.notify.body);
+      }else{
+        this.router.navigate(['home/1'],{replaceUrl:true});
+      }
     }else{
       var audio = new Audio('/assets/sound.mp3');
       audio.play();
       this.presentAlert(this.notify.title,this.notify.body);
     }
+  }else if(data.role=='Driver'){
+
+    if(this.router.url=='/driver'){
+      this.router.navigate(['home/2'],{replaceUrl:true});
+    }else{
+      var audio = new Audio('/assets/sound.mp3');
+      audio.play();
+      this.presentAlert(this.notify.title,this.notify.body);
+    }
+
+
   }else{
     var audio = new Audio('/assets/sound.mp3');
     audio.play();
@@ -115,7 +133,7 @@ if(data.role=='Manager'){
   }
 
   // this.router.navigate(['/order'],{replaceUrl:true});
-}
+
         // console.log('Push received: ' + JSON.stringify(notification));
       }
     );

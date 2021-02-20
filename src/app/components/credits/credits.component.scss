@@ -8,20 +8,22 @@
     animation-fill-mode: forwards;
     animation-delay: .6s;
     opacity:0;
-  -webkit-filter: drop-shadow(  0px 0px 00px rgba(103, 192, 137, .4));
-  filter: drop-shadow( 0px 0px 0px rgba(103, 192, 137, .4));  
+    svg{
+        path{
+            fill:var(--ion-credits);
+        }
+    }
+
 }
 @keyframes dropShadow{
     0%{
 opacity:0;
-        -webkit-filter: drop-shadow(  0px 0px 00px rgba(103, 192, 137, .4));
-        filter: drop-shadow( 0px 0px 0px rgba(103, 192, 137, .4));  
+
     }
     100%{
         opacity:1;
 
-        -webkit-filter: drop-shadow(  0px 6px 20px rgba(103, 192, 137, .4));
-        filter: drop-shadow( 0px 6px 20px rgba(103, 192, 137, .4));
+      
     }
 }
 .hide{

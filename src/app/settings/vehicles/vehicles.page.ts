@@ -11,6 +11,8 @@ import {
   Capacitor
 } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
+import { Store } from '@ngxs/store';
+import { AuthState } from 'src/app/state/auth.state';
 const { Haptics,Http } = Plugins;
 
 @Component({
@@ -21,7 +23,7 @@ const { Haptics,Http } = Plugins;
 export class VehiclesPage implements OnInit {
 vehicles:any = []
 loading:boolean = true;
-  constructor(private translate:TranslateService,private router:Router,private activated:ActivatedRoute,public alertController: AlertController,private storage:Storage) {
+  constructor(private state:Store,private translate:TranslateService,private router:Router,private activated:ActivatedRoute,public alertController: AlertController,private storage:Storage) {
     this.activated.queryParams.subscribe(params => {
       if (params && params.reload) {
 this.fetchVehicles();
@@ -64,8 +66,7 @@ if (Capacitor.getPlatform() != 'web') {
 
 
   fetchVehicles(){
-    this.storage.get('USER_INFO').then(res=>{
-    console.log(res.token);
+    let token = this.state.selectSnapshot(AuthState.token);
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -73,7 +74,7 @@ if (Capacitor.getPlatform() != 'web') {
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         }
       });
       return ret;
@@ -82,7 +83,7 @@ if (Capacitor.getPlatform() != 'web') {
   this.vehicles = res['data'];
     this.loading = false;
 })
-  })
+
    
   }
   deleteConfirm(id,index){

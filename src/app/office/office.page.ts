@@ -40,7 +40,7 @@ maxDate:  String = new Date(new Date().setDate(new Date().getDate() - 1)).toISOS
 maxDateUpcoming:String = new Date(new Date().setDate(new Date().getDate() + 12)).toISOString();
 minDate: String = new Date(new Date().setDate(new Date().getDate() + 2)).toISOString();
 
-currentTab:any = 'history'
+currentTab:any = 'all'
   constructor(private state:Store,private store:StorageService,private router:Router, private translate:TranslateService,private loadingController:LoadingController,private dataService:DataService,private storage:Storage) {
 
 
@@ -182,7 +182,7 @@ this.fetchOrders();
 
 
 view(id){
-  let url ='/order-detail/'+id;
+  let url ='/office/order-view/'+id;
   this.router.navigate([url]);
 }
 
@@ -200,15 +200,15 @@ fetchSearch2(e){
     this.currentPage = 1;
 this.fetchOrders();
   }else{
-  this.storage.get('USER_INFO').then(res=>{
+    let token = this.state.selectSnapshot(AuthState.token);
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
-        url: `${SERVER_URL}/api/fetchOrders/${this.currentTab}?search=${this.searchOrders}`,
+        url: `${SERVER_URL}/api/office/orders/${this.currentTab}?search=${this.searchOrders}`,
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         }
       });
       return ret;
@@ -223,7 +223,6 @@ this.fetchOrders();
     }
   })
   
-  })
 }
 }
 
@@ -246,16 +245,17 @@ if(this.searchDate.substr(0,10)!=new Date().toISOString().substr(0,10)){
     let url;
 
     if(this.searchDate.substr(0,10)==new Date().toISOString().substr(0,10)){
-      url =`${SERVER_URL}/api/fetchOrders/${this.currentTab}?search=${this.searchOrders}`
+      url =`${SERVER_URL}/api/office/orders/${this.currentTab}?search=${this.searchOrders}`
     }else if(this.searchOrders!="" && this.searchDate!=new Date().toISOString()){
-      url =`${SERVER_URL}/api/fetchOrders/${this.currentTab}?search=${this.searchOrders}&date=${this.searchDate.substr(0,10)}`
+      url =`${SERVER_URL}/api/office/orders/${this.currentTab}?search=${this.searchOrders}&date=${this.searchDate.substr(0,10)}`
     }else if(this.searchOrders=="" && this.searchDate==new Date().toISOString() || this.searchDate == new Date(new Date().setDate(new Date().getDate() + 2)).toISOString()){
-      url =`${SERVER_URL}/api/fetchOrders/${this.currentTab}`
+      url =`${SERVER_URL}/api/office/orders/${this.currentTab}`
     }else{
-      url =`${SERVER_URL}/api/fetchOrders/${this.currentTab}?date=${this.searchDate.substr(0,10)}`
+      url =`${SERVER_URL}/api/office/orders/${this.currentTab}?date=${this.searchDate.substr(0,10)}`
 
     }
-  this.storage.get('USER_INFO').then(res=>{
+    let token = this.state.selectSnapshot(AuthState.token);
+
     const doGet = async () => {
       const ret = await Http.request({
         method: 'GET',
@@ -263,7 +263,7 @@ if(this.searchDate.substr(0,10)!=new Date().toISOString().substr(0,10)){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + res.token
+          'Authorization': 'Bearer ' + token
         }
       });
       return ret;
@@ -278,7 +278,6 @@ if(this.searchDate.substr(0,10)!=new Date().toISOString().substr(0,10)){
     }
   })
   
-  })
 }
 
 }
@@ -293,15 +292,15 @@ navigate(url){
 }
   fetchOrders(){
     this.presentLoading();
-    this.storage.get('USER_INFO').then(res=>{
+    let token = this.state.selectSnapshot(AuthState.token);
       const doGet = async () => {
         const ret = await Http.request({
           method: 'GET',
-          url: `${SERVER_URL}/api/fetchOrders/${this.currentTab}?page=${this.currentPage}`,
+          url: `${SERVER_URL}/api/office/orders/${this.currentTab}?page=${this.currentPage}`,
           headers:{
             'Accept':'application/json',
             'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + res.token
+            'Authorization': 'Bearer ' + token
           }
         });
         return ret;
@@ -330,7 +329,6 @@ navigate(url){
         this.ordersEmpty = false;
     }
     this.hideLoader();
-    })
     })
      
   }
