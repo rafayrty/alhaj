@@ -152,12 +152,15 @@ this.fetchOrder()
       e.target.innerHTML = '<ion-spinner></ion-spinner>';
       e.target.setAttribute('disabled','disabled');
       let token = this.state.selectSnapshot(AuthState.token);
-
+if(this.payment == 'shipping'){
+  this.shipping = true;
+}
       let data = {
         receipt:this.receipt,
         payment:this.payment,
         certificate:this.shipping
       }
+
 
       const doPost = async () => {
                 const ret = await Http.request({
@@ -174,7 +177,7 @@ this.fetchOrder()
               }
               doPost().then(res=>{
                 
-                e.target.innerHTML ="Save";
+                e.target.innerHTML =this.translate.instant('save');
                 e.target.removeAttribute('disabled');
 
                 if(res['status']==200){

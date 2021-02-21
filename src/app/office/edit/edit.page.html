@@ -120,10 +120,8 @@
                 <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="payment" name="payment">
                   <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
                   <ion-select-option value="cod">{{'CREATE.OPTIONS.cod' | translate}}</ion-select-option>
-                  <ion-select-option value="inshop">{{'CREATE.OPTIONS.inshop' | translate}}</ion-select-option>
-                  <ion-select-option value="heno">{{'CREATE.OPTIONS.heno' | translate}}</ion-select-option>
-                  <ion-select-option value="scania">{{'CREATE.OPTIONS.scania' | translate}}</ion-select-option>
-                  <ion-select-option value="other">{{'CREATE.OPTIONS.other' | translate}}</ion-select-option>
+                  <ion-select-option value="recorded">{{'OFFICE.recorded' | translate}}</ion-select-option>
+                  <ion-select-option value="shipping">{{'CREATE.OPTIONS.certificate' | translate}}</ion-select-option>
               
               
               
@@ -135,7 +133,7 @@
               </ion-item>
               <span class="error" *ngIf="errors.length!=0 && errors.receipt" [@enterAnimation]>{{errors.receipt[0]}}</span>
 
-                <ion-item lines="none" style="padding-bottom:1rem;">
+                <ion-item [@enterAnimation] *ngIf="payment != 'shipping'" lines="none" style="padding-bottom:1rem;">
                   <ion-checkbox [(ngModel)]="shipping" value="1" color="primary"></ion-checkbox>
                   <ion-label>{{'CREATE.OPTIONS.shipping' | translate}}</ion-label>
   
@@ -163,5 +161,5 @@
 </ion-content>
 <ion-footer  [@enterAnimation] style="display:flex;">
   <!-- <ion-button class="schedule"  (click)="schedule($event,'schedule')" expand="block" style="width:100%"> {{'CREATE.schedule' | translate}}</ion-button> -->
-  <ion-button color="primary" (click)="save($event)" expand="block" style="width:100%"> Save</ion-button>
+  <ion-button color="primary" (click)="save($event)" expand="block" style="width:100%"> {{'save' | translate}}</ion-button>
 </ion-footer>

@@ -156,6 +156,7 @@ this.fetchOrder();
                    this.order = res.data;
                    this.lat = parseFloat(this.order.lat);
                    this.lng = parseFloat(this.order.lng);
+                   this.image = this.order.image;
                    console.log(this.lat);
 
             if(this.order.date!=null){
@@ -517,7 +518,7 @@ this.hideLoader();
 
 
 
-if(this.image){
+if(this.file){
 data = {
   name:this.order.client,
   phone:this.order.phone,
@@ -628,6 +629,9 @@ this.presentAlert(this.translate.instant('ALERTS.select_vehicle'));
     e.target.innerHTML = '<ion-spinner></ion-spinner>';
     e.target.setAttribute('disabled','disabled');
 let data;
+if(this.order.payment == 'shipping'){
+  this.order.certificate = true;
+}
     if(this.file){
       data = {
         name:this.order.client,

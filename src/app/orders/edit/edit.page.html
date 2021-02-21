@@ -301,11 +301,8 @@
             <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="order.payment" name="payment">
               <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
               <ion-select-option value="cod">{{'CREATE.OPTIONS.cod' | translate}}</ion-select-option>
-              <ion-select-option value="inshop">{{'CREATE.OPTIONS.inshop' | translate}}</ion-select-option>
-              <ion-select-option value="heno">{{'CREATE.OPTIONS.heno' | translate}}</ion-select-option>
-              <ion-select-option value="scania">{{'CREATE.OPTIONS.scania' | translate}}</ion-select-option>
-              <ion-select-option value="other">{{'CREATE.OPTIONS.other' | translate}}</ion-select-option>
-          
+              <ion-select-option value="recorded">{{'OFFICE.recorded' | translate}}</ion-select-option>
+              <ion-select-option value="shipping">{{'CREATE.OPTIONS.certificate' | translate}}</ion-select-option>
           
           
             </ion-select>
@@ -315,8 +312,8 @@
             <span class="error"  *ngIf="customError.receipt">{{customError.receipt}}</span>
         
           </ion-item>
-            <ion-item lines="none" style="padding-bottom:1rem;">
-              <ion-checkbox [(ngModel)]="order.certificate" value="1" color="primary"></ion-checkbox>
+            <ion-item lines="none" *ngIf="order.payment != 'shipping'" [@enterAnimation] style="padding-bottom:1rem;">
+              <ion-checkbox  [(ngModel)]="order.certificate" value="1" color="primary"></ion-checkbox>
               <ion-label>{{'CREATE.OPTIONS.shipping' | translate}}</ion-label>
 
             </ion-item>

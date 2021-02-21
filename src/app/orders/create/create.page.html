@@ -298,24 +298,22 @@
               <ion-item>
 
               <ion-label style="font-weight:400;font-size:1rem;text-transform: capitalize;">{{'CREATE.OPTIONS.payment' | translate}}</ion-label>
-              <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="payment" name="payment">
+              <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="payment"  name="payment">
                 <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
                 <ion-select-option value="cod">{{'CREATE.OPTIONS.cod' | translate}}</ion-select-option>
-                <ion-select-option value="inshop">{{'CREATE.OPTIONS.inshop' | translate}}</ion-select-option>
-                <ion-select-option value="heno">{{'CREATE.OPTIONS.heno' | translate}}</ion-select-option>
-                <ion-select-option value="scania">{{'CREATE.OPTIONS.scania' | translate}}</ion-select-option>
-                <ion-select-option value="other">{{'CREATE.OPTIONS.other' | translate}}</ion-select-option>
+                <ion-select-option value="recorded">{{'OFFICE.recorded' | translate}}</ion-select-option>
+                <ion-select-option value="shipping">{{'CREATE.OPTIONS.certificate' | translate}}</ion-select-option>
             
             
             
               </ion-select>
             </ion-item>
             <ion-item class="receipt-item" lines="none">
-              <ion-input class="receipt-input" placeholder="{{'CREATE.receipt' | translate}}" [(ngModel)]="receipt" (ionInput)="removeError()"  name="name" autofocus="true"></ion-input>
+              <ion-input class="receipt-input"  placeholder="{{'CREATE.receipt' | translate}}" [(ngModel)]="receipt" (ionInput)="removeError()"  name="name" autofocus="true"></ion-input>
               <span class="error"  *ngIf="customError.receipt">{{customError.receipt}}</span>
           
             </ion-item>
-              <ion-item lines="none" style="padding-bottom:1rem;">
+              <ion-item [@enterAnimation] *ngIf="payment != 'shipping'"  lines="none" style="padding-bottom:1rem;">
                 <ion-checkbox [(ngModel)]="shipping" value="1" color="primary"></ion-checkbox>
                 <ion-label>{{'CREATE.OPTIONS.shipping' | translate}}</ion-label>
 

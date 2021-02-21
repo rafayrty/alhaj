@@ -26,6 +26,7 @@ loader:any;
 order:any;
 showDelete=true;
 role:any;
+recipient:any = "";
   currentLang: string;
   constructor(
     private navCtrl:NavController,
@@ -142,6 +143,16 @@ created(date){
   ); 
   return dateOutput;
 }
+async presentAlert(msg) {
+  const alert = await this.alertController.create({
+    cssClass: 'my-custom-class',
+    header: this.translate.instant('warning'),
+    message: msg,
+    buttons: [this.translate.instant('okay')]
+  });
+
+  await alert.present();
+}
 async updateStatus(e,status,id) {
   this.hapticsImpactLight();
 
@@ -180,7 +191,9 @@ async updateStatus(e,status,id) {
   await alert.present();
 }
 confirmStatus(e,status,id){
-
+if(status == 'Delivered' && this.recipient == ""){
+  this.presentAlert(this.translate.instant('ORDER.empty_recipient'))
+}else{
   e.target.setAttribute('disabled','disabled');
 
   let token = this.state.selectSnapshot(AuthState.token);
@@ -195,7 +208,8 @@ confirmStatus(e,status,id){
           'Authorization': 'Bearer ' + token
         },
         data:{
-          status:status
+          status:status,
+          recipient:this.recipient
         }
       });
       return ret;
@@ -221,7 +235,7 @@ confirmStatus(e,status,id){
       }
 
     })
-  
+}
 
 }
 day(date){
@@ -292,7 +306,9 @@ let token = this.state.selectSnapshot(AuthState.token);
       if(res.data){
         this.order = res.data;
         this.hideLoader();
-
+if(this.order.status == 'Delivered'){
+  this.navCtrl.back();
+}
       }else{
         this.order = false;
       }

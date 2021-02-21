@@ -528,6 +528,9 @@ this.presentAlert(this.translate.instant('ALERTS.select_vehicle'));
     e.target.innerHTML = '<ion-spinner></ion-spinner>';
     e.target.setAttribute('disabled','disabled');
 let data;
+if(this.payment == 'shipping'){
+  this.shipping = true;
+}
     if(this.image){
       data = {
         name:this.form.name,

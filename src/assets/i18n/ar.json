@@ -14,6 +14,7 @@
     "vehicle":"مركبة",
     "warning":"تنبيه",
     "okay":"حسنا",
+    "save":"يحفظ",
 
     
     "EMPTY":{
@@ -81,6 +82,8 @@
             "date":"تاريخ الجدولة",
             "start_time":"وقت البدء",
             "end_time":"نهاية الوقت",
+            "certificate":"شهادة الشحن",
+
             "shipping":"إضافة شهادة شحن"
 
         },
@@ -107,7 +110,9 @@
    "OFFICE":{
     "all":"الكل",
     "recorded":"مسجل",
-    "unrecored":"غير مسجل"
+    "unrecorded":"غير مسجل",
+    "record":"غير التسجيل",
+    "driver":"تمرير للسائق"
  },
    "MANAGE":{
        "title":"ادارة الطلبات",
@@ -183,7 +188,7 @@
        "vehicles":"هل انت متأكد من حذف هذه <strong>المركبة</strong>!",
        "cancel":"الغاء",
        "confirm":"تأكيد",
-       "waiting":"Are you sure you want to mark this order as <strong>waiting?</strong>",
+       "waiting":"هل أنت متأكد أنك تريد وضع علامة على هذا الطلب على أنه انتظار؟",
        "shipped":"هل تريد تعيين هذا الطلب على أنه تم التوصيل؟?",
        "delivered":"هل تريد تعيين هذا الطلب على أنه تم الشحن؟",
        "preparing":"هل أنت متأكد أنك تريد وضع علامة على هذا الطلب على أنه مُعد؟",
@@ -191,6 +196,8 @@
 
    },
    "ORDER":{
+    "empty_recipient":"المستلم فارغ",
+    "recipient":"اسم المستلم",
     "settings":"إعدادات الطلب",
        "call":"اتصل بالزبون",
        "location":"موقعك",
