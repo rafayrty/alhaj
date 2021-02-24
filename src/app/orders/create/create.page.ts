@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, OnInit, ViewChild,NgZone, ElementRef  } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import  { PhotoService } from '../../services/photo.service';
 import { IonSelect, LoadingController, ModalController, NavController } from '@ionic/angular';
@@ -11,6 +11,8 @@ import { Storage } from '@ionic/storage';
 import {  SERVER_URL } from '../../../environments/environment';
 import { AlertController } from '@ionic/angular';
 import { DataService } from "../../services/data.service";
+import { MapsAPILoader } from '@agm/core';
+
 import {
   Plugins,
   HapticsImpactStyle,
@@ -109,7 +111,13 @@ selectedCollector:any = [];
 showSetting:boolean=false;
 
 title:string='Create A New Order'
-  constructor(private state:Store,private loadingController:LoadingController,   private translate:TranslateService, private dataService:DataService,  public alertController: AlertController,private storage:Storage,private platform:Platform,private nav:NavController,private router:Router,private sanitizer : DomSanitizer,private photo:PhotoService) {
+private geoCoder;
+
+
+@ViewChild('search')
+public searchElementRef: ElementRef;
+
+  constructor(private mapsAPILoader: MapsAPILoader,private ngZone:NgZone,private state:Store,private loadingController:LoadingController,   private translate:TranslateService, private dataService:DataService,  public alertController: AlertController,private storage:Storage,private platform:Platform,private nav:NavController,private router:Router,private sanitizer : DomSanitizer,private photo:PhotoService) {
     // this.storage.get('USER_INFO').then((response) => {
     //   let  res = response;
     //  if(res.user.role=='Manager'){
@@ -144,6 +152,7 @@ if (Capacitor.getPlatform() != 'web') {
   updateLocation(e){
    this.lng = e.latLng.lng();
    this.lat = e.latLng.lat();
+   this.getAddress(this.lat,this.lng);
   }
 
 
@@ -215,7 +224,50 @@ this.hideLoader();
   ngOnInit() {
  
     this.fetchData();  
+    this.mapsAPILoader.load().then(() => {
+      this.geoCoder = new google.maps.Geocoder;
 
+    let autocomplete = new google.maps.places.Autocomplete(this.searchElementRef.nativeElement);
+    autocomplete.addListener("place_changed", () => {
+      this.ngZone.run(() => {
+        //get the place result
+        let place: google.maps.places.PlaceResult = autocomplete.getPlace();
+
+        //verify result
+        if (place.geometry === undefined || place.geometry === null) {
+          return;
+        }
+        //set latitude, longitude and zoom
+        this.lat = place.geometry.location.lat();
+        this.lng = place.geometry.location.lng();
+        this.getAddress(this.lat,this.lng);
+      });
+    });
+  });
+
+  }
+
+  getAddress(latitude, longitude) {
+    let address;
+    this.presentLoading();
+        this.geoCoder.geocode({ 'location': { lat: latitude, lng: longitude } }, (results, status) => {
+      console.log(results);
+      console.log(status);
+      if (status === 'OK') {
+        if (results[0]) {
+          this.searchElementRef.nativeElement.focus();
+         this.form.address = results[0].formatted_address;
+         this.hideLoader();
+
+         console.log(this.form.address)
+        } else {
+          window.alert('No results found');
+        }
+      } else {
+        window.alert('Geocoder failed due to: ' + status);
+      }
+
+    });
   }
 
 
@@ -466,6 +518,7 @@ if(type=='proceed'){
             headers:{
               'Accept':'application/json',
               'Content-Type':'application/json',
+              'charset':'utf-8',
               'Authorization': 'Bearer ' + token
             },
             data:data
@@ -577,43 +630,69 @@ if(this.payment == 'shipping'){
                 }
       }
       let token = this.state.selectSnapshot(AuthState.token);
-      const doPost = async () => {
-        const ret = await Http.request({
-          method: 'POST',
-          url: `${SERVER_URL}/api/orders`,
-          headers:{
-            'Accept':'application/json',
-            'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-          data:data
-        });
-        return ret;
-      }
-      doPost().then(res=>{
-
-        if(res['status']==200){
-          e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
-          e.target.removeAttribute('disabled');
-          this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 
-
-        // this.router.navigate(["/settings/vehicles"], navigationExtras);
-        }else if(res['status']==422){
+      fetch(`${SERVER_URL}/api/orders`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {"Content-type": "application/json; charset=UTF-8","Accept":"application/json","Authorization":'Bearer ' + token}
+      })
+      .then(response => response.json()) 
+      .then((json) =>{
+        if(json.errors){
           e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
           e.target.removeAttribute('disabled');
           alert("Form Validation Error Occurred");
-          this.errors = res['data'].errors;
+          this.errors =json.errors;
+        }else{
+          e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+          e.target.removeAttribute('disabled');
+          this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 
+        }
+      
+      }).catch((err)=>{
+        console.log(err);
+        
+      });
+    
+
+
+  //     const doPost = async () => {
+  //       const ret = await Http.request({
+  //         method: 'POST',
+  //         url: `${SERVER_URL}/api/orders`,
+  //         headers:{
+  //           'Accept':'application/json',
+  //           'Content-Type':'application/json',
+  //           'charset':'utf-8',
+  //           'Authorization': 'Bearer ' + token
+  //         },
+  //         data:data
+  //       });
+  //       return ret;
+  //     }
+  //     doPost().then(res=>{
+
+  //       if(res['status']==200){
+  //         e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+  //         e.target.removeAttribute('disabled');
+  //         this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 
+
+  //       // this.router.navigate(["/settings/vehicles"], navigationExtras);
+  //       }else if(res['status']==422){
+  //         e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+  //         e.target.removeAttribute('disabled');
+  //         alert("Form Validation Error Occurred");
+  //         this.errors = res['data'].errors;
   
-          }else{
-            e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
-            e.target.removeAttribute('disabled');
-            alert("Unable To Communicate To Server")
-          }
+  //         }else{
+  //           e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+  //           e.target.removeAttribute('disabled');
+  //           alert("Unable To Communicate To Server")
+  //         }
   
           
-    // this.vehicles = res['data'];
-    //   this.loading = false;
-  })
+  //   // this.vehicles = res['data'];
+  //   //   this.loading = false;
+  // })
 
 
   }

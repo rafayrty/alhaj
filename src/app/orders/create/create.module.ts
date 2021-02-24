@@ -19,7 +19,7 @@ import { AgmCoreModule } from '@agm/core';
     CreatePageRoutingModule,
     ComponentsModule,
     AgmCoreModule,
-    TranslateModule
+    TranslateModule,
 
   ],
   declarations: [CreatePage  ]

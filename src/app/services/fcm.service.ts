@@ -99,7 +99,7 @@ const data = notification.data;
   // if(this.router.url!='/order'){
  
   // }
-  alert(data.role);
+  // alert(data.role);
   if(data.role=='Collector'){
     if(this.router.url=='/collector'){
       if(data.type=='Scheduled'){

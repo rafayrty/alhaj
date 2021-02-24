@@ -54,7 +54,7 @@ export class EditPage implements OnInit {
   end_time:any;
   receipt:string;
   shipping:any;
-
+  certificate:boolean = false;
   selectedCollector:any;
   selectedVehicle:any;
   selectedDriver:any;
@@ -97,6 +97,7 @@ this.fetchOrder()
             headers:{
               'Accept':'application/json',
               'Content-Type':'application/json',
+              'charset':'utf-8',
               'Authorization': 'Bearer ' + token
             },
           });
@@ -115,7 +116,9 @@ this.fetchOrder()
               this.selectedVehicle = this.order.vehicles;
               this.selectedDriver = this.order.drivers;
               this.receipt = this.order.receipt;
-              this.shipping = this.order.certificate;
+              if(this.order.certificate != 0){
+                this.shipping = true;
+              }
               this.payment = this.order.payment;
      
           }else{
@@ -169,6 +172,7 @@ if(this.payment == 'shipping'){
                   headers:{
                     'Accept':'application/json',
                     'Content-Type':'application/json',
+                    'charset':'utf-8',
                     'Authorization': 'Bearer ' + token
                   },
                   data:data

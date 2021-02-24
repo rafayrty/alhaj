@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, OnInit, ViewChild,NgZone, ElementRef  } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import  { PhotoService } from '../../services/photo.service';
 import { IonSelect, LoadingController, ModalController, NavController } from '@ionic/angular';
@@ -11,6 +11,7 @@ import { Storage } from '@ionic/storage';
 import {  SERVER_URL } from '../../../environments/environment';
 import { AlertController } from '@ionic/angular';
 import { DataService } from "../../services/data.service";
+import { MapsAPILoader } from '@agm/core';
 
 import {
   Plugins,
@@ -59,6 +60,8 @@ export class EditPage implements OnInit {
   @ViewChild('Collectorselect', { static: false }) Collectorselect: IonSelect;
 
   @ViewChild(IonBackButtonDelegate, { static: false }) backButton: IonBackButtonDelegate;
+  @ViewChild('search')
+  public searchElementRef: ElementRef;
 
   minDate: String = new Date().toISOString();
   maxDate: any = new Date(new Date().setDate(new Date().getDate() + 10)).toISOString();
@@ -78,6 +81,8 @@ step3:boolean = false;
 step4:boolean = false;
 errors:any=[];
 receipt:any;
+urgent:boolean = false;
+certificate:boolean = false;
 customError:any= {receipt:false }
 id:any;
 order:any;
@@ -94,7 +99,11 @@ form:any = {
   driver:[]
 }
 title:string='Edit A New Order'
+private geoCoder;
+
   constructor(
+    private mapsAPILoader: MapsAPILoader,
+    private ngZone:NgZone,
     private loadingController:LoadingController,
        private translate:TranslateService,
         private dataService:DataService, 
@@ -153,11 +162,55 @@ this.fetchOrder();
           this.fetchData();
 
           if(res.data){     
+            
                    this.order = res.data;
                    this.lat = parseFloat(this.order.lat);
                    this.lng = parseFloat(this.order.lng);
                    this.image = this.order.image;
+                   if(this.order.urgent!=0){
+                     this.urgent = true;
+                   }
+                   if(this.order.certificate!=0){
+                     this.certificate = true;
+                   }
                    console.log(this.lat);
+
+
+
+
+
+
+
+                   this.mapsAPILoader.load().then(() => {
+                    this.geoCoder = new google.maps.Geocoder;
+                  
+                    let autocomplete = new google.maps.places.Autocomplete(this.searchElementRef.nativeElement);
+                    autocomplete.addListener("place_changed", () => {
+                      this.ngZone.run(() => {
+                        //get the place result
+                        let place: google.maps.places.PlaceResult = autocomplete.getPlace();
+                  
+                        //verify result
+                        if (place.geometry === undefined || place.geometry === null) {
+                          return;
+                        }
+                        //set latitude, longitude and zoom
+                        this.lat = place.geometry.location.lat();
+                        this.lng = place.geometry.location.lng();
+                        this.getAddress(this.lat,this.lng);
+                      });
+                    });
+                  });
+
+
+
+
+
+
+
+
+
+
 
             if(this.order.date!=null){
               this.date  = this.order.date+'T13:03:33.719+05:00';
@@ -186,7 +239,28 @@ if (Capacitor.getPlatform() != 'web') {
     this.hapticsImpact(HapticsImpactStyle.Light);
   }
 
+  getAddress(latitude, longitude) {
+    let address;
+    this.presentLoading();
+        this.geoCoder.geocode({ 'location': { lat: latitude, lng: longitude } }, (results, status) => {
+      console.log(results);
+      console.log(status);
+      if (status === 'OK') {
+        if (results[0]) {
+         this.order.shipping = results[0].formatted_address;
+         this.searchElementRef.nativeElement.focus();
+         this.hideLoader();
 
+         console.log(this.form.address)
+        } else {
+          window.alert('No results found');
+        }
+      } else {
+        window.alert('Geocoder failed due to: ' + status);
+      }
+
+    });
+  }
 
 async presentLoading() {
   this.loader = await this.loadingController.create({
@@ -208,6 +282,7 @@ hideLoader() {
 updateLocation(e){
   this.lng = e.latLng.lng();
   this.lat = e.latLng.lat();
+  this.getAddress(this.lat,this.lng);
  }
 
 doRefresh(event) {
@@ -508,6 +583,14 @@ this.hideLoader();
 
 
   // }
+  serializeObj(obj) {
+    var result = [];
+
+    for (var property in obj)
+        result.push(encodeURIComponent(property) + "=" + encodeURIComponent(obj[property]));
+
+    return result.join("&");
+}
   async next(e,type){
     this.changeVehicle();
     this.changeDriver();
@@ -555,6 +638,7 @@ if(type=='proceed'){
         headers:{
           'Accept':'application/json',
           'Content-Type':'application/json',
+          
           'Authorization': 'Bearer ' + token
         },
         data:data
@@ -651,8 +735,8 @@ if(this.order.payment == 'shipping'){
         collector:this.form.collector,
         lat:this.order.lat,
         lng:this.order.lng,
-        urgent:this.order.urgent,
-        certificate:this.order.certificate
+        urgent:this.urgent,
+        certificate:this.certificate
         }
       }else{
       data = {
@@ -671,45 +755,67 @@ if(this.order.payment == 'shipping'){
         collector:this.form.collector,
         lat:this.lat,
         lng:this.lng,
-        urgent:this.order.urgent,
-        certificate:this.order.certificate
+        urgent:this.urgent,
+        certificate:this.certificate
                 }
       }
       let token = this.state.selectSnapshot(AuthState.token);
-
-      const doPost = async () => {
-        const ret = await Http.request({
-          method: 'POST',
-          url: `${SERVER_URL}/api/orders/dummy/${this.id}`,
-          headers:{
-            'Accept':'application/json',
-            'Content-Type':'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-          data:data
-        });
-        return ret;
-      }
-      doPost().then(res=>{
-
-        if(res['status']==200){
-          e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
-          e.target.removeAttribute('disabled');
-          this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 
-
-        // this.router.navigate(["/settings/vehicles"], navigationExtras);
-        }else if(res['status']==422){
+      try {
+      fetch(`${SERVER_URL}/api/orders/dummy/${this.id}`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {"Content-type": "application/json; charset=UTF-8","Accept":"application/json","Authorization":'Bearer ' + token}
+      })
+      .then(response => response.json()) 
+      .then((json) =>{
+        if(json.errors){
           e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
           e.target.removeAttribute('disabled');
           alert("Form Validation Error Occurred");
-          this.errors = res['data'].errors;
+          this.errors = json.errors;
+        }else{
+          e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+          e.target.removeAttribute('disabled');
+          this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 
+        }
+       
+      });
+    } catch(e){
+      console.log(e);
+    }
+
+
+
+
+  //     const doPost = async () => {
+  //       const ret = await Http.request({
+  //         method: 'POST',
+  //         url: `${SERVER_URL}/api/orders/dummy/${this.id}`,
+  //         headers:{
+  //           'Accept':'application/json',
+  //           'Content-Type':'application/json',
+  //           'Authorization': 'Bearer ' + token
+  //         },
+  //         data:data
+  //       });
+  //       return ret;
+  //     }
+  //     doPost().then(res=>{
+
+  //       if(res['status']==200){
+  //         e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+  //         e.target.removeAttribute('disabled');
+  //         this.router.navigateByUrl('/orders/confirm', { replaceUrl: true }) 
+
+  //       // this.router.navigate(["/settings/vehicles"], navigationExtras);
+  //       }else if(res['status']==422){
+  //         e.target.innerHTML =  this.translate.instant('CREATE.VEHICLE.send');
+  //         e.target.removeAttribute('disabled');
+  //         alert("Form Validation Error Occurred");
+  //         this.errors = res['data'].errors;
   
-          }
-  
-          
-    // this.vehicles = res['data'];
-    //   this.loading = false;
-  })
+  //         }
+  // })
   
 
 

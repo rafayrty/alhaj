@@ -33,7 +33,6 @@ this.fetchVehicles();
    share(slidingItem: IonItemSliding) {
     
     slidingItem.getOpenAmount().then(res=>{
-alert("heyyy");
 console.log(res);
       if(res==0){
     slidingItem.open("start");

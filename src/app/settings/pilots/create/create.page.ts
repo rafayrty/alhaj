@@ -83,47 +83,79 @@ if (Capacitor.getPlatform() != 'web') {
   this.presentLoading();
   let token = this.state.selectSnapshot(AuthState.token);
 
-    const doPost = async () => {
-      const ret = await Http.request({
-        method: 'POST',
-        url: `${SERVER_URL}/api/users`,
-        headers:{
-          'Accept':'application/json',
-          'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        data:{
+ let  data = {
           name:this.name,
           phone:this.phone,
           login_id:this.loginId,
           file:this.file,
           format:this.format,
           role:this.role
-        }
-      });
-      return ret;
-    }
-    doPost().then(res=>{
-      this.hideLoader();
-
-      if(res['status']==200){
-
-        let navigationExtras: NavigationExtras = {
-          queryParams: {
-            reload:true,
-          }
         };
-      this.router.navigate(["/settings/pilots"], navigationExtras);
+  fetch(`${SERVER_URL}/api/users`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {"Content-type": "application/json; charset=UTF-8","Accept":"application/json","Authorization":'Bearer ' + token}
+  })
+  .then(response => response.json()) 
+  .then((json) =>{
+    this.hideLoader();
+    if(json.errors){
+      this.errors =json.errors;
+    }else{
+      let navigationExtras: NavigationExtras = {
+      queryParams: {
+      reload:true,
+      }
+    };
+    this.router.navigate(["/settings/pilots"], navigationExtras);
+        
+    }
+  
+  }).catch((err)=>{
+    console.log(err);
+    
+  });
+    // const doPost = async () => {
+    //   const ret = await Http.request({
+    //     method: 'POST',
+    //     url: `${SERVER_URL}/api/users`,
+    //     headers:{
+    //       'Accept':'application/json',
+    //       'Content-Type':'application/json',
+    //       'Authorization': 'Bearer ' + token
+    //     },
+    //     data:{
+    //       name:this.name,
+    //       phone:this.phone,
+    //       login_id:this.loginId,
+    //       file:this.file,
+    //       format:this.format,
+    //       role:this.role
+    //     }
+    //   });
+    //   return ret;
+    // }
+//     doPost().then(res=>{
+//       this.hideLoader();
 
-      }else if(res['status']==422){
-        this.errors = res['data'].errors;
+//       if(res['status']==200){
 
-        }
+//         let navigationExtras: NavigationExtras = {
+//           queryParams: {
+//             reload:true,
+//           }
+//         };
+//       this.router.navigate(["/settings/pilots"], navigationExtras);
+
+//       }else if(res['status']==422){
+//         this.errors = res['data'].errors;
+
+//         }
 
         
-  // this.pilots = res['data'];
-  //   this.loading = false;
-})
+//   // this.pilots = res['data'];
+//   //   this.loading = false;
+// })
 
 
   }

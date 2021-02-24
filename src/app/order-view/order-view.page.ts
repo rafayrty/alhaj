@@ -100,6 +100,7 @@ ionViewWillEnter(){
   async presentLoading() {
     this.loader = await this.loadingController.create({
      cssClass: 'my-custom-class',
+     duration:5000,
      message: this.translate.instant('wait'),
    });
    await this.loader.present();
@@ -197,44 +198,67 @@ if(status == 'Delivered' && this.recipient == ""){
   e.target.setAttribute('disabled','disabled');
 
   let token = this.state.selectSnapshot(AuthState.token);
-
-    const doGet = async () => {
-      const ret = await Http.request({
-        method: 'POST',
-        url: `${SERVER_URL}/api/orders/status/${id}`,
-        headers:{
-          'Accept':'application/json',
-          'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        data:{
-          status:status,
-          recipient:this.recipient
-        }
-      });
-      return ret;
-    }
-    doGet().then(res=>{
-      if(res){
-        if(status=="On The Way"){
-          e.target.innerHTML = `${this.translate.instant('ORDER.shipped')}`;
-          e.target.removeAttribute('disabled');
-        }else if(status=='Preparing'){
-          e.target.innerHTML = `${this.translate.instant('ORDER.preparing')}`;
-          e.target.removeAttribute('disabled');
-        }else if(status=='Delivered'){
-          e.target.innerHTML = `${this.translate.instant('ORDER.delivered')}`;
-          e.target.removeAttribute('disabled');
-        }
-      }
-      if(res.data){
-        this.fetchOrder();
-      }else{
+  fetch(`${SERVER_URL}/api/orders/status/${id}`, {
+    method: "POST",
+    body: JSON.stringify({status:status,recipient:this.recipient}),
+    headers: {"Content-type": "application/json; charset=UTF-8","Accept":"application/json","Authorization":'Bearer ' + token}
+  })
+  .then(response => response.json()) 
+  .then((res) =>{
+    if(res){
+      if(status=="On The Way"){
+        e.target.innerHTML = `${this.translate.instant('ORDER.shipped')}`;
+        e.target.removeAttribute('disabled');
+      }else if(status=='Preparing'){
+        e.target.innerHTML = `${this.translate.instant('ORDER.preparing')}`;
+        e.target.removeAttribute('disabled');
+      }else if(status=='Delivered'){
+        e.target.innerHTML = `${this.translate.instant('ORDER.delivered')}`;
+        e.target.removeAttribute('disabled');
         this.navCtrl.back();
-        // this.order = false;
       }
+      this.fetchOrder();
+    }
+  })
 
-    })
+    // const doGet = async () => {
+    //   const ret = await Http.request({
+    //     method: 'POST',
+    //     url: `${SERVER_URL}/api/orders/status/${id}`,
+    //     headers:{
+    //       'Accept':'application/json',
+    //       'Content-Type':'application/json',
+    //       'Authorization': 'Bearer ' + token
+    //     },
+    //     data:{
+    //       status:status,
+    //       recipient:this.recipient
+    //     }
+    //   });
+    //   return ret;
+    // }
+    // doGet().then(res=>{
+    //   if(res){
+    //     if(status=="On The Way"){
+    //       e.target.innerHTML = `${this.translate.instant('ORDER.shipped')}`;
+    //       e.target.removeAttribute('disabled');
+    //     }else if(status=='Preparing'){
+    //       e.target.innerHTML = `${this.translate.instant('ORDER.preparing')}`;
+    //       e.target.removeAttribute('disabled');
+    //     }else if(status=='Delivered'){
+    //       e.target.innerHTML = `${this.translate.instant('ORDER.delivered')}`;
+    //       e.target.removeAttribute('disabled');
+    //       this.navCtrl.back();
+    //     }
+    //   }
+    //   if(res.data){
+    //     this.fetchOrder();
+    //   }else{
+    //     this.navCtrl.back();
+    //     // this.order = false;
+    //   }
+
+    // })
 }
 
 }

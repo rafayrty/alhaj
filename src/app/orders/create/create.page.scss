@@ -279,3 +279,18 @@ span.warning{
 
                }
 }
+.form-group{
+    width:100%;
+    input{
+        padding:.8rem .5rem;
+        border:1px solid var(--ion-color-medium-shade);
+        border-radius:6px;
+        background:var(--ion-color-medium-tint);
+        transition:.3s ease-in;
+        width:100%;
+        margin-bottom:.5rem;
+        &:focus{
+          border:1px solid var(--ion-color-primary);
+         }
+        }
+}

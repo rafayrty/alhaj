@@ -5,7 +5,7 @@
       <ion-button class="back" ><ion-icon name="chevron-back-outline"></ion-icon> </ion-button>
       <!-- <ion-back-button defaultHref="/home"></ion-back-button> -->
     </ion-buttons>
-    <ion-title>{{title}}</ion-title>
+    <ion-title>{{'edit_order' | translate}}</ion-title>
     <ion-buttons *ngIf="showSetting" slot="end">
       <ion-button (click)="settings()">{{'settings' | translate}}</ion-button>
     </ion-buttons>
@@ -21,29 +21,28 @@
   </ion-refresher>
 
 
-<div class="create" *ngIf="order">
+<div class="create" [class.show]="order">
 
-  <div class="step1" *ngIf="step1"   [@enterAnimation]>
+  <div class="step1" [ngClass]="{'show': step1,'hide':step2 }"  [@enterAnimation]>
 
 
     <form action="">
 
       <div class="form">
-        <ion-item lines="none">
+        <ion-item *ngIf="order"  lines="none">
           <ion-label color="medium" position="stacked">{{'CREATE.name' | translate}}</ion-label>
           <ion-input placeholder="{{'CREATE.name_placeholder' | translate}}" [(ngModel)]="order.client"  name="name" autofocus="true"></ion-input>
           <span class="error" *ngIf="errors.length!=0 && errors.name" [@enterAnimation]>{{errors.name[0]}}</span>
-
         </ion-item>
 
-        <ion-item lines="none">
+        <ion-item *ngIf="order"  lines="none">
           <ion-label color="medium" position="stacked">{{'CREATE.phone' | translate}}</ion-label>
           <ion-input placeholder="{{'CREATE.phone_placeholder' | translate}}" inputmode="tel" type="tel" [(ngModel)]="order.phone" name="phone" autofocus="true"></ion-input>
           <span class="error" *ngIf="errors.length!=0 && errors.phone" [@enterAnimation]>{{errors.phone[0]}}</span>
 
         </ion-item>
 
-        <ion-item lines="none">
+        <ion-item  *ngIf="order" lines="none">
           <ion-label color="medium" position="stacked">{{'CREATE.address' | translate}}</ion-label>
           <ion-input placeholder="{{'CREATE.address_placeholder' | translate}}"  [(ngModel)]="order.shipping"  name="address" autofocus="true"></ion-input>
           <span class="error" *ngIf="errors.length!=0 && errors.address" [@enterAnimation]>{{errors.address[0]}}</span>
@@ -52,8 +51,10 @@
 
         <ion-item lines="none">
           <ion-label color="medium" position="stacked">{{'ORDER.location' | translate}}</ion-label>
-
-          <agm-map [latitude]="lat" [longitude]="lng" mapDraggable="true" [zoom]="12">
+          <div class="form-group">
+            <input type="text" class="form-control" (keydown.enter)="$event.preventDefault()" placeholder="{{'nearest' | translate}}" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" #search>
+          </div>
+          <agm-map *ngIf="order"  [latitude]="lat" [longitude]="lng" mapDraggable="true" [zoom]="12">
             <agm-marker [latitude]="lat" [longitude]="lng" [markerDraggable]="true" animation="DROP" (dragEnd)="updateLocation($event)"></agm-marker>
           </agm-map>
 
@@ -115,13 +116,13 @@
 
 
 
-        <ion-item lines="none">
+        <ion-item *ngIf="order"  lines="none">
           <ion-label color="medium" position="stacked">{{'CREATE.order' | translate}}</ion-label>
           <ion-textarea autoGrow="true" rows="4" [(ngModel)]="order.details"  name="order" placeholder="{{'CREATE.order_placeholder' | translate}}"> </ion-textarea>
           <span class="error" *ngIf="errors.length!=0 && errors.order">{{errors.order[0]}}</span>
           <span class="error" *ngIf="errors.length!=0 && errors.image" [@enterAnimation]> {{errors.image[0]}}</span>
         </ion-item>
-        <ion-item lines="none">
+        <ion-item *ngIf="order"  lines="none">
           <ion-label color="medium" position="stacked">{{'CREATE.note' | translate}}</ion-label>
           <ion-textarea autoGrow="true" rows="1" [(ngModel)]="order.note" name="note" placeholder="{{'CREATE.note_placeholder' | translate}}"> </ion-textarea>
 
@@ -129,7 +130,7 @@
           <span class="error" *ngIf="errors.length!=0 && errors.note" [@enterAnimation]>{{errors.note[0]}}</span>
 
         </ion-item>
-        <div class="images">
+        <div *ngIf="order"  class="images">
           <div class="image" *ngIf="image" >
             <ion-thumbnail height="65" width="65">
               <img [src]="image">
@@ -260,6 +261,7 @@
               </ion-select>
             </ion-item>
 
+            <hr style="height:12px;background:#E0E0E0;">
 
            <ion-list>
             <ion-list-header>
@@ -283,8 +285,8 @@
 
             </ion-item>
             <ion-item lines="none">
-              <ion-checkbox [(ngModel)]="order.urgent" value="1" color="primary"></ion-checkbox>
-              <ion-label>{{'CREATE.OPTIONS.urgent' | translate}}</ion-label>
+              <ion-checkbox [(ngModel)]="urgent" value="1" color="primary"></ion-checkbox>
+              <ion-label>{{'CREATE.OPTIONS.urgent' | translate}} </ion-label>
 
             </ion-item>
           </ion-list>
@@ -301,8 +303,8 @@
             <ion-select placeholder="Select One" interface="popover" value="payment" [(ngModel)]="order.payment" name="payment">
               <ion-select-option value="paid">{{'CREATE.OPTIONS.paid' | translate}}</ion-select-option>
               <ion-select-option value="cod">{{'CREATE.OPTIONS.cod' | translate}}</ion-select-option>
-              <ion-select-option value="recorded">{{'OFFICE.recorded' | translate}}</ion-select-option>
-              <ion-select-option value="shipping">{{'CREATE.OPTIONS.certificate' | translate}}</ion-select-option>
+              <ion-select-option value="record">{{'CREATE.OPTIONS.payment' | translate}}</ion-select-option>
+/              <ion-select-option value="shipping">{{'CREATE.OPTIONS.certificate' | translate}}</ion-select-option>
           
           
             </ion-select>
@@ -313,7 +315,7 @@
         
           </ion-item>
             <ion-item lines="none" *ngIf="order.payment != 'shipping'" [@enterAnimation] style="padding-bottom:1rem;">
-              <ion-checkbox  [(ngModel)]="order.certificate" value="1" color="primary"></ion-checkbox>
+              <ion-checkbox  [(ngModel)]="certificate" value="1" color="primary"></ion-checkbox>
               <ion-label>{{'CREATE.OPTIONS.shipping' | translate}}</ion-label>
 
             </ion-item>

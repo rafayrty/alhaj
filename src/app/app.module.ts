@@ -42,8 +42,9 @@ export function HttpLoaderFactory(http: HttpClient) {
       key: ['auth.user','auth.token'],
     }),
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyA3xZMib4wH3ZYtLCXd3OdLBqMkXg_xi-0'
-    }),
+      apiKey: 'AIzaSyD9WHBubxYyNeWnidFXdwbumqBfuHBbBvw',
+      libraries:['places']
+    }), 
     BrowserAnimationsModule, IonicStorageModule.forRoot(), IonicModule.forRoot({
       backButtonText: '',
       mode: 'ios'
@@ -54,7 +55,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     SplashScreen,
     StorageService,
     HttpClientModule,
-
     NgxIonicImageViewerModule,
     {
       provide: RouteReuseStrategy,

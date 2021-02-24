@@ -52,7 +52,9 @@
 
           <ion-item lines="none">
             <ion-label color="medium" position="stacked">{{'ORDER.location' | translate}}</ion-label>
-
+            <div class="form-group">
+              <input type="text" class="form-control" (keydown.enter)="$event.preventDefault()" placeholder="{{'nearest' | translate}}" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" #search>
+            </div>
             <agm-map [latitude]="lat" [longitude]="lng" mapDraggable="true" [zoom]="12">
               <agm-marker [latitude]="lat" [longitude]="lng" [markerDraggable]="true" animation="DROP" (dragEnd)="updateLocation($event)"></agm-marker>
             </agm-map>
@@ -260,6 +262,7 @@
                 </ion-select>
               </ion-item>
 
+              <hr style="height:12px;background:#E0E0E0;">
 
              <ion-list>
               <ion-list-header>
